@@ -89,7 +89,7 @@ class StatsScreen extends StatelessWidget {
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  childAspectRatio: 1.3,
+                  childAspectRatio: 1.15, // 👈 Kart oranını biraz daha kareye yaklaştırdık
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
@@ -263,6 +263,16 @@ class StatsScreen extends StatelessWidget {
 
   // 🏆 ROZETLERİN METODU
   Widget _buildBadgesSection(List<Habit> habits) {
+    // 🎯 Kazanılan rozetleri öne, kilitlileri sona alan sıralama mantığı:
+    final sortedBadges = List<HabitBadge>.from(allBadges)
+      ..sort((a, b) {
+        final aUnlocked = a.isUnlocked(habits);
+        final bUnlocked = b.isUnlocked(habits);
+        if (aUnlocked && !bUnlocked) return -1; // a önce gelsin
+        if (!aUnlocked && bUnlocked) return 1;  // b önce gelsin
+        return 0; // durumları aynıysa mevcut sırayı koru
+      });
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -282,11 +292,11 @@ class StatsScreen extends StatelessWidget {
             crossAxisCount: 3,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 0.85,
+            childAspectRatio: 0.9,
           ),
-          itemCount: allBadges.length,
+          itemCount: sortedBadges.length, // 👈 sortedBadges.length kullanıyoruz
           itemBuilder: (context, index) {
-            final badge = allBadges[index];
+            final badge = sortedBadges[index]; // 👈 sortedBadges'ten çekiyoruz
             final unlocked = badge.isUnlocked(habits);
 
             return GestureDetector(
@@ -298,7 +308,7 @@ class StatsScreen extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     title: Row(
                       children: [
-                        Image.asset(badge.imagePath, width: 36, height: 36),
+                        Image.asset(badge.imagePath, width: 44, height: 44),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -338,7 +348,7 @@ class StatsScreen extends StatelessWidget {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E293B),
                   borderRadius: BorderRadius.circular(16),
@@ -350,20 +360,21 @@ class StatsScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Opacity(
-                      opacity: unlocked ? 1.0 : 0.35,
-                      child: ColorFiltered(
-                        colorFilter: unlocked
-                            ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
-                            : const ColorFilter.mode(Colors.grey, BlendMode.saturation),
-                        child: Image.asset(
-                          badge.imagePath,
-                          width: 48,
-                          height: 48,
+                    Expanded(
+                      child: Opacity(
+                        opacity: unlocked ? 1.0 : 0.35,
+                        child: ColorFiltered(
+                          colorFilter: unlocked
+                              ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
+                              : const ColorFilter.mode(Colors.grey, BlendMode.saturation),
+                          child: Image.asset(
+                            badge.imagePath,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Text(
                       badge.title,
                       textAlign: TextAlign.center,
@@ -393,32 +404,54 @@ class StatsScreen extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16), // Padding biraz artırıldı
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
+        border: Border.all(color: color.withValues(alpha: 0.35), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // 1. ÜST BAŞLIK VE İKON
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w500)),
-              Icon(icon, color: color, size: 20),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white70, 
+                    fontSize: 14, // 👈 12 -> 14 yapıldı
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Icon(icon, color: color, size: 24), // 👈 İkon 20 -> 24 yapıldı
             ],
           ),
+
+          // 2. ANA RAKAM / DEĞER
           Text(
             value,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color),
+            style: TextStyle(
+              fontSize: 24, // 👈 20 -> 24 yapıldı
+              fontWeight: FontWeight.bold, 
+              color: color,
+            ),
           ),
+
+          // 3. ALT BİLGİ
           Text(
             subtitle,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Colors.grey, fontSize: 11),
+            style: const TextStyle(
+              color: Colors.white54, 
+              fontSize: 12.5, // 👈 11 -> 12.5 yapıldı
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ],
       ),

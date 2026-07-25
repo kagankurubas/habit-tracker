@@ -3,8 +3,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../models/habit.dart';
 import 'habit_detail_screen.dart';
 
-// ... Buraya HomeScreen ve _HomeScreenState sınıfların gelecek ...
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -51,19 +49,17 @@ class _HomeScreenState extends State<HomeScreen> {
     List<int> selectedWeekdays = [1, 3, 5];
     bool isTitleValid = false;
 
-    // 🎨 Renk Paleti Seçenekleri
     final List<Color> availableColors = [
-      const Color(0xFF10B981), // Zümrüt Yeşili
-      const Color(0xFF3B82F6), // Okyanus Mavisi
-      const Color(0xFF8B5CF6), // Gece Moru
-      const Color(0xFFF59E0B), // Amber Turuncu
-      const Color(0xFFEC4899), // Neon Pembe
-      const Color(0xFF06B6D4), // Turkuaz
-      const Color(0xFFEF4444), // Mercan Kırmızı
+      const Color(0xFF10B981),
+      const Color(0xFF3B82F6),
+      const Color(0xFF8B5CF6),
+      const Color(0xFFF59E0B),
+      const Color(0xFFEC4899),
+      const Color(0xFF06B6D4),
+      const Color(0xFFEF4444),
     ];
     int selectedColorValue = availableColors[0].toARGB32();
 
-    // 🎭 İkon Seçenekleri
     final List<IconData> availableIcons = [
       Icons.book_rounded,
       Icons.fitness_center_rounded,
@@ -107,7 +103,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // 🎯 İKON SEÇİCİ
                   const Text('İkon Seç:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 8),
                   Wrap(
@@ -143,7 +138,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // 🎨 RENK SEÇİCİ
                   const Text('Tema Rengi:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 8),
                   Row(
@@ -180,7 +174,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // 🔄 SIKLIK SEÇİMİ
                   const Text('Tekrar Sıklığı:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<int>(
@@ -290,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
-  } // _showAddHabitDialog()
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -324,24 +317,21 @@ class _HomeScreenState extends State<HomeScreen> {
               final isDoneToday = habit.isCompletedOn(DateTime.now());
 
               return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  // 🎯 1. DEĞİŞİKLİK: Sabit renk yerine görevin kendi renginden şeffaf ton veriyoruz
-                  color: habit.color.withValues(alpha: 0.12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    // 🎯 2. DEĞİŞİKLİK: Kenarlığı görevin ana rengiyle belirginleştiriyoruz
-                    side: BorderSide(
-                      color: isDoneToday ? Colors.greenAccent : habit.color.withValues(alpha: 0.4),
-                      width: isDoneToday ? 2.0 : 1.0,
-                    ),
+                margin: const EdgeInsets.only(bottom: 12),
+                color: habit.color.withValues(alpha: 0.12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(
+                    color: isDoneToday ? Colors.greenAccent : habit.color.withValues(alpha: 0.4),
+                    width: isDoneToday ? 2.0 : 1.0,
                   ),
-                  child: ListTile(
+                ),
+                child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  // 🎯 BUGÜNÜ TAMAMLA / İPTAL ET BUTONU
                   leading: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // 🎭 GÖREV İKONU
+                      // GÖREV İKONU
                       Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
@@ -356,17 +346,43 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 8),
 
-                      // ✅ TAMAMLAMA BUTONU (Mevcut GestureDetector Kısmetin)
+                      // ✅ TAMAMLAMA BUTONU (Kutuyu Kesin Olarak Günceller)
                       GestureDetector(
                         onTap: () async {
-                          setState(() {
-                            habit.toggleDate(DateTime.now());
-                          });
-                          await habit.save();
-                        },
-                        child: AnimatedContainer(
+                            final today = DateTime.now();
+                            final todayNormalized = DateTime(today.year, today.month, today.day);
+
+                            // 1. Ekranı güncelle
+                            setState(() {
+                              habit.toggleDate(todayNormalized);
+                            });
+
+                            // 2. Güncellenmiş nesneyi Hive kutusuna kaydet
+                            if (habit.key != null) {
+                              await _habitsBox.put(habit.key, habit);
+                            } else {
+                              await _habitsBox.putAt(index, habit);
+                            }
+
+                            // 3. Veriyi anında diske/IndexedDB'ye yazmaya zorla
+                            await _habitsBox.flush();
+                          },
+                          child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          // ... Mevcut AnimatedContainer içeriğin aynı kalacak
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: isDoneToday ? Colors.greenAccent : Colors.transparent,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isDoneToday ? Colors.greenAccent : Colors.grey,
+                              width: 2,
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.check,
+                            size: 18,
+                            color: isDoneToday ? Colors.black : Colors.transparent,
+                          ),
                         ),
                       ),
                     ],
@@ -431,13 +447,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Icon(Icons.chevron_right, color: Colors.grey),
                     ],
                   ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HabitDetailScreen(habit: habit),
-                      ),
-                    );
+                  onTap: () async {
+                    final today = DateTime.now();
+                    final todayNormalized = DateTime(today.year, today.month, today.day);
+
+                    // 1. Ekranı güncelle
+                    setState(() {
+                      habit.toggleDate(todayNormalized);
+                    });
+
+                    // 2. Güncellenmiş nesneyi Hive kutusuna kaydet
+                    if (habit.key != null) {
+                      await _habitsBox.put(habit.key, habit);
+                    } else {
+                      await _habitsBox.putAt(index, habit);
+                    }
+
+                    // 3. Veriyi anında diske/IndexedDB'ye yazmaya zorla
+                    await _habitsBox.flush();
                   },
                 ),
               );

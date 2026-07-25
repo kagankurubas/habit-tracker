@@ -8,12 +8,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
 
+  // 🧹 GEÇİCİ SATIR: Tüm bozuk/eski Hive verilerini tamamen siler
+  // await Hive.deleteBoxFromDisk('habits'); 
+
   Hive.registerAdapter(HabitAdapter());
   await Hive.openBox<Habit>('habits');
 
-  runApp(const HabitTrackerApp());
+  runApp(const HabitTrackerApp()); // veya senin App widget'ın
 }
-
 class HabitTrackerApp extends StatelessWidget {
   const HabitTrackerApp({super.key});
 

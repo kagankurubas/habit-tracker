@@ -24,7 +24,7 @@ class HabitAdapter extends TypeAdapter<Habit> {
       intervalDays: fields[5] as int,
       iconCodePoint: fields[7] as int,
       selectedWeekdays: (fields[6] as List?)?.cast<int>(),
-    );
+    )..completedDatesList = (fields[3] as List).cast<DateTime>();
   }
 
   @override

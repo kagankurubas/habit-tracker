@@ -15,8 +15,7 @@ class Habit extends HiveObject {
   final int colorValue;
 
   @HiveField(3)
-  final List<DateTime> completedDatesList;
-
+  List<DateTime> completedDatesList;
   @HiveField(4)
   final int frequencyType;
 
@@ -86,30 +85,32 @@ class Habit extends HiveObject {
   }
 
   bool isTargetDate(DateTime date) {
-    final target = DateTime(date.year, date.month, date.day);
-    final start = DateTime(startDate.year, startDate.month, startDate.day);
+      final target = DateTime(date.year, date.month, date.day);
+      final start = DateTime(startDate.year, startDate.month, startDate.day);
 
-    if (target.isBefore(start)) return false;
+      if (target.isBefore(start)) return false;
 
-    switch (frequencyType) {
-      case 1:
-        return target.weekday >= 1 && target.weekday <= 5;
-      case 2:
-        return target.weekday == 6 || target.weekday == 7;
-      case 3:
-        final differenceInDays = target.difference(start).inDays;
-        return differenceInDays % intervalDays == 0;
-      case 4:
-        return selectedWeekdays.contains(target.weekday);
-      case 0:
-      default:
-        return true;
+      switch (frequencyType) {
+        case 1:
+          return target.weekday >= 1 && target.weekday <= 5;
+        case 2:
+          return target.weekday == 6 || target.weekday == 7;
+        case 3:
+          final differenceInDays = target.difference(start).inDays;
+          return differenceInDays % intervalDays == 0;
+        case 4:
+          return selectedWeekdays.contains(target.weekday);
+        case 0:
+        default:
+          return true;
+      }
     }
-  }
 
-  bool isCompletedOn(DateTime date) {
-    return completedDatesList.any((d) =>
-        d.year == date.year && d.month == date.month && d.day == date.day);
+    bool isCompletedOn(DateTime date) {
+    final target = DateTime(date.year, date.month, date.day);
+    return completedDatesList.any(
+      (d) => d.year == target.year && d.month == target.month && d.day == target.day,
+    );
   }
   // 📊 Mevcut üst üste tamamlanma serisini (streak) hesaplar
   int get currentStreak {
@@ -139,15 +140,23 @@ class Habit extends HiveObject {
   }
 
   void toggleDate(DateTime date) {
-    final DateTime normalizedDate = DateTime(date.year, date.month, date.day);
-    if (isCompletedOn(normalizedDate)) {
-      completedDatesList.removeWhere((d) =>
-          d.year == normalizedDate.year &&
-          d.month == normalizedDate.month &&
-          d.day == normalizedDate.day);
+    final target = DateTime(date.year, date.month, date.day);
+
+    // Yeni bir liste kopyası oluşturuyoruz
+    final newList = List<DateTime>.from(completedDatesList);
+
+    final index = newList.indexWhere(
+      (d) => d.year == target.year && d.month == target.month && d.day == target.day,
+    );
+
+    if (index != -1) {
+      newList.removeAt(index);
     } else {
-      completedDatesList.add(normalizedDate);
+      newList.add(target);
     }
+
+    // Değişken final olmadığı için artık yeni listeyi direkt eşitleyebiliyoruz!
+    completedDatesList = newList; 
   }
 
   int calculateStreak() {
