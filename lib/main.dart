@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _habitsBox = Hive.box<Habit>('habits');
   }
 
-  void _addNewHabit(String title) async {
+  void _addNewHabit(String title, int frequencyType) async {
     if (title.trim().isEmpty) return;
 
     final colorList = [
@@ -68,39 +68,72 @@ class _HomeScreenState extends State<HomeScreen> {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
       colorValue: colorList[_habitsBox.length % colorList.length],
+      frequencyType: frequencyType,
     );
 
-    // Kutuya ekle (Hive nesneye otomatik key/index bağlar)
     await _habitsBox.add(newHabit);
   }
 
   void _showAddHabitDialog() {
     final controller = TextEditingController();
+    int selectedFrequency = 0;
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Yeni Görev / Rutin Ekle'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Örn: Su İç, Gitar Pratiği Yap...',
-            border: OutlineInputBorder(),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Yeni Görev / Rutin Ekle'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: controller,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Örn: Kitap Oku, Gitar Çalış...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('Tekrar Sıklığı:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<int>(
+                value: selectedFrequency,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 0, child: Text('Her Gün')),
+                  DropdownMenuItem(value: 1, child: Text('Hafta İçi (Pzt-Cum)')),
+                  DropdownMenuItem(value: 2, child: Text('Hafta Sonu (Cmt-Paz)')),
+                  DropdownMenuItem(value: 3, child: Text('Haftada 3 Gün')),
+                ],
+                onChanged: (val) {
+                  if (val != null) {
+                    setDialogState(() {
+                      selectedFrequency = val;
+                    });
+                  }
+                },
+              ),
+            ],
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('İptal'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _addNewHabit(controller.text, selectedFrequency);
+                Navigator.pop(ctx);
+              },
+              child: const Text('Ekle'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              _addNewHabit(controller.text);
-              Navigator.pop(ctx);
-            },
-            child: const Text('Ekle'),
-          ),
-        ],
       ),
     );
   }
@@ -215,10 +248,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
-                      isDoneToday ? 'Bugün Tamamlandı! 🎉' : 'Bugün henüz yapılmadı',
+                      '🔄 ${habit.frequencyText}  •  ${isDoneToday ? 'Bugün Tamamlandı 🎉' : 'Bugün henüz yapılmadı'}',
                       style: TextStyle(
                         color: isDoneToday ? Colors.greenAccent : Colors.grey[400],
-                        fontSize: 13,
+                        fontSize: 12,
                       ),
                     ),
                   ),

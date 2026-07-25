@@ -17,22 +17,39 @@ class Habit extends HiveObject {
   @HiveField(3)
   final List<DateTime> completedDatesList;
 
+  // 0: Her Gün, 1: Hafta İçi, 2: Hafta Sonu, 3: Haftada 3 Gün
+  @HiveField(4)
+  final int frequencyType; 
+
   Habit({
     required this.id,
     required this.title,
     required this.colorValue,
+    this.frequencyType = 0,
     List<DateTime>? completedDates,
   }) : completedDatesList = completedDates ?? [];
 
   Color get color => Color(colorValue);
 
-  // Belirli bir günün tamamlanıp tamamlanmadığını kontrol eder
+  String get frequencyText {
+    switch (frequencyType) {
+      case 1:
+        return 'Hafta İçi';
+      case 2:
+        return 'Hafta Sonu';
+      case 3:
+        return 'Haftada 3 Gün';
+      case 0:
+      default:
+        return 'Her Gün';
+    }
+  }
+
   bool isCompletedOn(DateTime date) {
     return completedDatesList.any((d) =>
         d.year == date.year && d.month == date.month && d.day == date.day);
   }
 
-  // Günü tamamlandı/tamamlanmadı olarak değiştirir
   void toggleDate(DateTime date) {
     final DateTime normalizedDate = DateTime(date.year, date.month, date.day);
     if (isCompletedOn(normalizedDate)) {
@@ -45,27 +62,23 @@ class Habit extends HiveObject {
     }
   }
 
-  // Kesintisiz zincir (Streak) hesaplama algoritması
   int calculateStreak() {
     if (completedDatesList.isEmpty) return 0;
 
-    // Tarihleri sıralı listeye dönüştür
     final sortedDates = completedDatesList
         .map((d) => DateTime(d.year, d.month, d.day))
         .toSet()
         .toList()
-      ..sort((a, b) => b.compareTo(a)); // En yeni tarihten eskiye doğru sırala
+      ..sort((a, b) => b.compareTo(a));
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
 
-    // Son tamamlanan tarih bugün mü yoksa dün mü kontrol et
     final latestDate = sortedDates.first;
     final isDoneToday = latestDate.isAtSameMomentAs(today);
     final isDoneYesterday = latestDate.isAtSameMomentAs(yesterday);
 
-    // Eğer ne bugün ne dün yapılmadıysa zincir kırılmıştır
     if (!isDoneToday && !isDoneYesterday) {
       return 0;
     }
@@ -78,7 +91,6 @@ class Habit extends HiveObject {
         streak++;
         checkDate = checkDate.subtract(const Duration(days: 1));
       } else if (date.isBefore(checkDate)) {
-        // Arada atlanan bir gün var, zincir bitti
         break;
       }
     }

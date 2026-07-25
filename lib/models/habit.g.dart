@@ -20,13 +20,14 @@ class HabitAdapter extends TypeAdapter<Habit> {
       id: fields[0] as String,
       title: fields[1] as String,
       colorValue: fields[2] as int,
+      frequencyType: fields[4] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, Habit obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -34,7 +35,9 @@ class HabitAdapter extends TypeAdapter<Habit> {
       ..writeByte(2)
       ..write(obj.colorValue)
       ..writeByte(3)
-      ..write(obj.completedDatesList);
+      ..write(obj.completedDatesList)
+      ..writeByte(4)
+      ..write(obj.frequencyType);
   }
 
   @override
