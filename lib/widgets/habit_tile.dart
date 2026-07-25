@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/habit.dart';
-import '../screens/habit_detail_screen.dart';
 
 class HabitTile extends StatelessWidget {
   final Habit habit;
@@ -35,7 +34,7 @@ class HabitTile extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         
         // 1. SOL ELEMANLAR: İKON VE ONAY TİKİ
         leading: Row(
@@ -50,10 +49,10 @@ class HabitTile extends StatelessWidget {
               child: Icon(
                 habit.icon,
                 color: habit.color,
-                size: 20,
+                size: 18,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             GestureDetector(
               onTap: () async {
                 final today = DateTime.now();
@@ -70,7 +69,7 @@ class HabitTile extends StatelessWidget {
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
                   color: isDoneToday ? Colors.greenAccent : Colors.transparent,
                   shape: BoxShape.circle,
@@ -81,7 +80,7 @@ class HabitTile extends StatelessWidget {
                 ),
                 child: Icon(
                   Icons.check,
-                  size: 18,
+                  size: 16,
                   color: isDoneToday ? Colors.black : Colors.transparent,
                 ),
               ),
@@ -96,17 +95,18 @@ class HabitTile extends StatelessWidget {
               child: Text(
                 habit.title,
                 overflow: TextOverflow.ellipsis,
+                maxLines: 1,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  fontSize: 15,
+                  fontSize: 14,
                   decoration: isDoneToday ? TextDecoration.lineThrough : null,
                   color: isDoneToday ? Colors.grey : Colors.white,
                 ),
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 4),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
@@ -119,7 +119,7 @@ class HabitTile extends StatelessWidget {
             if (streak > 0) ...[
               const SizedBox(width: 4),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
@@ -130,7 +130,7 @@ class HabitTile extends StatelessWidget {
                   style: const TextStyle(
                     color: Colors.orangeAccent,
                     fontWeight: FontWeight.bold,
-                    fontSize: 10,
+                    fontSize: 9,
                   ),
                 ),
               ),
@@ -140,28 +140,34 @@ class HabitTile extends StatelessWidget {
 
         // İLERLEME VE BİLDİRİM BİLGİSİ
         subtitle: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
+          padding: const EdgeInsets.only(top: 6.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const Text(
-                        'Son 30 Günlük İlerleme',
-                        style: TextStyle(fontSize: 10, color: Colors.grey),
-                      ),
-                      if (habit.isNotificationEnabled && habit.notificationHour != null) ...[
-                        const SizedBox(width: 6),
-                        Icon(Icons.alarm, size: 12, color: Colors.amberAccent.withValues(alpha: 0.8)),
-                        Text(
-                          ' ${habit.notificationHour.toString().padLeft(2, '0')}:${habit.notificationMinute.toString().padLeft(2, '0')}',
-                          style: const TextStyle(fontSize: 9, color: Colors.amberAccent),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Flexible(
+                          child: Text(
+                            'Son 30 Gün',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 10, color: Colors.grey),
+                          ),
                         ),
+                        if (habit.isNotificationEnabled && habit.notificationHour != null) ...[
+                          const SizedBox(width: 4),
+                          Icon(Icons.alarm, size: 11, color: Colors.amberAccent.withValues(alpha: 0.8)),
+                          const SizedBox(width: 2),
+                          Text(
+                            '${habit.notificationHour.toString().padLeft(2, '0')}:${habit.notificationMinute.toString().padLeft(2, '0')}',
+                            style: const TextStyle(fontSize: 9, color: Colors.amberAccent),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                   Text(
                     '%${habit.calculateCompletionRate(lastDays: 30).toStringAsFixed(0)}',
@@ -194,20 +200,21 @@ class HabitTile extends StatelessWidget {
             IconButton(
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              icon: const Icon(Icons.edit_outlined, color: Colors.blueAccent, size: 20),
+              icon: const Icon(Icons.edit_outlined, color: Colors.blueAccent, size: 18),
               onPressed: onEdit,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             IconButton(
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+              icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
               onPressed: () async {
                 await habit.delete();
                 await habitsBox.flush();
               },
             ),
-            const Icon(Icons.chevron_right, color: Colors.grey, size: 18),
+            const SizedBox(width: 2),
+            const Icon(Icons.chevron_right, color: Colors.grey, size: 16),
           ],
         ),
         onTap: onTap,
