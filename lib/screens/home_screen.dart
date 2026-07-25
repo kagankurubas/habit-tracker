@@ -284,7 +284,252 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+  
+void _showEditHabitDialog(Habit habit) {
+  final controller = TextEditingController(text: habit.title);
+  int selectedFrequency = habit.frequencyType;
+  int intervalDays = habit.intervalDays;
+  List<int> selectedWeekdays = List<int>.from(habit.selectedWeekdays);
+  bool isTitleValid = habit.title.trim().isNotEmpty;
+  int selectedColorValue = habit.colorValue;
+  int selectedIconCodePoint = habit.iconCodePoint;
 
+  final List<Color> availableColors = [
+    const Color(0xFF10B981),
+    const Color(0xFF3B82F6),
+    const Color(0xFF8B5CF6),
+    const Color(0xFFF59E0B),
+    const Color(0xFFEC4899),
+    const Color(0xFF06B6D4),
+    const Color(0xFFEF4444),
+  ];
+
+  final List<IconData> availableIcons = [
+    Icons.book_rounded,
+    Icons.fitness_center_rounded,
+    Icons.music_note_rounded,
+    Icons.code_rounded,
+    Icons.water_drop_rounded,
+    Icons.directions_run_rounded,
+    Icons.bed_rounded,
+    Icons.self_improvement_rounded,
+  ];
+
+  final daysMap = {
+    1: 'Pzt', 2: 'Sal', 3: 'Çar', 4: 'Per', 5: 'Cum', 6: 'Cmt', 7: 'Paz'
+  };
+
+  showDialog(
+    context: context,
+    builder: (ctx) => StatefulBuilder(
+      builder: (context, setDialogState) => AlertDialog(
+        title: const Text('Görevi Düzenle'),
+        content: SizedBox(
+          width: 340,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: controller,
+                  onChanged: (text) {
+                    setDialogState(() {
+                      isTitleValid = text.trim().isNotEmpty;
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Görüş / Rutin Adı',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                const Text('İkon Seç:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: availableIcons.map((iconData) {
+                    final isSelected = selectedIconCodePoint == iconData.codePoint;
+                    return InkWell(
+                      onTap: () {
+                        setDialogState(() {
+                          selectedIconCodePoint = iconData.codePoint;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Color(selectedColorValue).withValues(alpha: 0.2) : Colors.white10,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected ? Color(selectedColorValue) : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
+                        child: Icon(
+                          iconData,
+                          color: isSelected ? Color(selectedColorValue) : Colors.grey,
+                          size: 22,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+
+                const Text('Tema Rengi:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: availableColors.map((color) {
+                    final isSelected = selectedColorValue == color.toARGB32();
+                    return GestureDetector(
+                      onTap: () {
+                        setDialogState(() {
+                          selectedColorValue = color.toARGB32();
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected ? Colors.white : Colors.transparent,
+                            width: 3,
+                          ),
+                          boxShadow: isSelected
+                              ? [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 8, spreadRadius: 2)]
+                              : [],
+                        ),
+                        child: isSelected
+                            ? const Icon(Icons.check, color: Colors.white, size: 20)
+                            : null,
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+
+                const Text('Tekrar Sıklığı:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<int>(
+                  initialValue: selectedFrequency,
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 0, child: Text('Her Gün')),
+                    DropdownMenuItem(value: 1, child: Text('Hafta İçi (Pzt-Cum)')),
+                    DropdownMenuItem(value: 2, child: Text('Hafta Sonu (Cmt-Paz)')),
+                    DropdownMenuItem(value: 3, child: Text('X Günde Bir')),
+                    DropdownMenuItem(value: 4, child: Text('Haftanın Belirli Günleri')),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) {
+                      setDialogState(() {
+                        selectedFrequency = val;
+                      });
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+
+                if (selectedFrequency == 3) ...[
+                  const Text('Kaç günde bir yapılmalı?', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  const SizedBox(height: 6),
+                  DropdownButtonFormField<int>(
+                    initialValue: intervalDays,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 2, child: Text('2 Günde Bir')),
+                      DropdownMenuItem(value: 3, child: Text('3 Günde Bir')),
+                      DropdownMenuItem(value: 4, child: Text('4 Günde Bir')),
+                      DropdownMenuItem(value: 5, child: Text('5 Günde Bir')),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) {
+                        setDialogState(() {
+                          intervalDays = val;
+                        });
+                      }
+                    },
+                  ),
+                ],
+
+                if (selectedFrequency == 4) ...[
+                  const Text('Hangi günlerde yapılacak?', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: daysMap.entries.map((entry) {
+                      final isSelected = selectedWeekdays.contains(entry.key);
+                      return FilterChip(
+                        label: Text(entry.value),
+                        selected: isSelected,
+                        selectedColor: Color(selectedColorValue).withValues(alpha: 0.3),
+                        onSelected: (bool selected) {
+                          setDialogState(() {
+                            if (selected) {
+                              selectedWeekdays.add(entry.key);
+                            } else {
+                              selectedWeekdays.remove(entry.key);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('İptal'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(selectedColorValue),
+            ),
+            onPressed: isTitleValid
+                ? () async {
+                    // 🔄 Değerleri Güncelle
+                    habit.title = controller.text;
+                    habit.colorValue = selectedColorValue;
+                    habit.iconCodePoint = selectedIconCodePoint;
+                    habit.frequencyType = selectedFrequency;
+                    habit.intervalDays = intervalDays;
+                    habit.selectedWeekdays = selectedWeekdays;
+
+                    // 💾 Hive'a Yaz ve Flaşla
+                    await habit.save();
+                    await _habitsBox.flush();
+
+                    if (context.mounted) Navigator.pop(ctx);
+                  }
+                : null,
+            child: const Text('Kaydet', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -438,10 +683,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // ✏️ DÜZENLEME BUTONU
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined, color: Colors.blueAccent),
+                        onPressed: () {
+                          _showEditHabitDialog(habit);
+                        },
+                      ),
+                      // 🗑️ SİLME BUTONU
                       IconButton(
                         icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
                         onPressed: () async {
                           await habit.delete();
+                          await _habitsBox.flush();
                         },
                       ),
                       const Icon(Icons.chevron_right, color: Colors.grey),

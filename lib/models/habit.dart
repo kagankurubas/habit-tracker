@@ -6,28 +6,28 @@ part 'habit.g.dart';
 @HiveType(typeId: 0)
 class Habit extends HiveObject {
   @HiveField(0)
-  final String id;
+  final String id; // Sadece id final kalabilir
 
   @HiveField(1)
-  final String title;
+  String title; // 👈 'final' kelimesini kaldırdık
 
   @HiveField(2)
-  final int colorValue;
+  int colorValue; // 👈 'final' kelimesini kaldırdık
 
   @HiveField(3)
   List<DateTime> completedDatesList;
+
   @HiveField(4)
-  final int frequencyType;
+  int frequencyType; // 👈 'final' kelimesini kaldırdık
 
   @HiveField(5)
-  final int intervalDays;
+  int intervalDays; // 👈 'final' kelimesini kaldırdık
 
   @HiveField(6)
-  final List<int> selectedWeekdays;
+  List<int> selectedWeekdays; // 👈 'final' kelimesini kaldırdık
 
-  // 🎯 İKON DESTEĞİ (IconData codePoint olarak saklanır)
   @HiveField(7)
-  final int iconCodePoint;
+  int iconCodePoint; // 👈 'final' kelimesini kaldırdık
 
   Habit({
     required this.id,
