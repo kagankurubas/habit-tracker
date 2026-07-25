@@ -78,9 +78,12 @@ final List<HabitBadge> allBadges = [
     description: 'Bugünkü tüm rutinlerini tamamla',
     imagePath: 'assets/badges/perfect_day.png',
     isUnlocked: (habits) {
-      if (habits.isEmpty) return false;
       final today = DateTime.now();
-      return habits.every((h) => h.isCompletedOn(today));
+      // 🎯 Sadece BUGÜN YAPILMASI GEREKEN görevleri süzüyoruz:
+      final todayTargets = habits.where((h) => h.isTargetDate(today)).toList();
+      
+      if (todayTargets.isEmpty) return false;
+      return todayTargets.every((h) => h.isCompletedOn(today));
     },
   ),
 ];

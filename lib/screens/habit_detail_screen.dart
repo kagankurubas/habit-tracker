@@ -3,9 +3,6 @@ import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/habit.dart';
 
-// ... Buraya HabitDetailScreen ve _HabitDetailScreenState sınıfların gelecek ...
-
-
 class HabitDetailScreen extends StatefulWidget {
   final Habit habit;
 
@@ -48,19 +45,24 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final streak = widget.habit.calculateStreak();
+    // 🎯 YENİLENEN HABIT MODELİ İLE UYUMLU STREAK (GETTER)
+    final streak = widget.habit.currentStreak;
     final isDoneToday = widget.habit.isCompletedOn(DateTime.now());
-    final themeColor = widget.habit.color; // 🎨 Görevin Dinamik Teması
+    final themeColor = widget.habit.color;
 
     return Scaffold(
-      // 🌈 Görevin rengiyle hafif parlak arka plan efekti
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
         title: Row(
           children: [
             Icon(widget.habit.icon, color: themeColor),
             const SizedBox(width: 8),
-            Text(widget.habit.title),
+            Expanded(
+              child: Text(
+                widget.habit.title,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -113,7 +115,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             Text(
                               '🔄 ${widget.habit.frequencyText}',
                               style: const TextStyle(
-                                fontSize: 15,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -126,7 +128,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             const Text('Toplam', style: TextStyle(color: Colors.grey, fontSize: 13)),
                             const SizedBox(height: 4),
                             Text(
-                              '✅ ${widget.habit.completedDatesList.length} Gün',
+                              '✅ ${widget.habit.totalCompletedDays} Gün',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -163,7 +165,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                         label: Text(
                           isDoneToday ? 'Bugün Tamamlandı 🎉' : 'Bugün Tamamlandı Olarak İşaretle',
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -227,7 +229,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                           scrollable: true,
                           size: 28,
                           colorsets: {
-                            1: themeColor, // 🟩 HeatMap kutucukları da görevin temasına bürünür
+                            1: themeColor,
                           },
                         ),
                       )
@@ -253,7 +255,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                   bgColor = Colors.green;
                                   textColor = Colors.white;
                                 } else if (isTarget) {
-                                  bgColor = themeColor.withValues(alpha: 0.85); // 🨨 Target gün görevin renginde parlar
+                                  bgColor = themeColor.withValues(alpha: 0.85);
                                   textColor = Colors.white;
                                 }
 
@@ -289,7 +291,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                           const SizedBox(height: 12),
                           const Divider(color: Colors.white10),
                           const SizedBox(height: 8),
-
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -303,10 +304,11 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                       ),
               ),
             ),
+            const SizedBox(height: 16),
+
             // 📊 İSTATİSTİK ÖZET KARTLARI
             Row(
               children: [
-                // 1. Kutu: Aylık Başarı Oranı
                 Expanded(
                   child: Card(
                     color: Colors.white.withValues(alpha: 0.05),
@@ -334,8 +336,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-
-                // 2. Kutu: Haftalık Başarı Oranı
                 Expanded(
                   child: Card(
                     color: Colors.white.withValues(alpha: 0.05),
@@ -363,8 +363,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-
-                // 3. Kutu: Toplam Yapılan Gün Sayısı
                 Expanded(
                   child: Card(
                     color: Colors.white.withValues(alpha: 0.05),

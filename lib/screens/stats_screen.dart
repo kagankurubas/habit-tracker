@@ -40,7 +40,8 @@ class StatsScreen extends StatelessWidget {
         Habit? bestStreakHabit;
         int maxStreak = 0;
         for (var h in habits) {
-          final s = h.calculateStreak();
+          // 🎯 calculateStreak() -> currentStreak olarak güncellendi
+          final s = h.currentStreak;
           if (s > maxStreak) {
             maxStreak = s;
             bestStreakHabit = h;
@@ -89,7 +90,7 @@ class StatsScreen extends StatelessWidget {
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  childAspectRatio: 1.15, // 👈 Kart oranını biraz daha kareye yaklaştırdık
+                  childAspectRatio: 1.15,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
@@ -192,10 +193,11 @@ class StatsScreen extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: habits.length > 3 ? 3 : habits.length,
                   itemBuilder: (context, index) {
+                    // 🎯 calculateStreak() -> currentStreak olarak güncellendi
                     final sortedHabits = List<Habit>.from(habits)
-                      ..sort((a, b) => b.calculateStreak().compareTo(a.calculateStreak()));
+                      ..sort((a, b) => b.currentStreak.compareTo(a.currentStreak));
                     final h = sortedHabits[index];
-                    final streak = h.calculateStreak();
+                    final streak = h.currentStreak;
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 10),
@@ -249,7 +251,6 @@ class StatsScreen extends StatelessWidget {
                   },
                 ),
 
-                // 🏆 ROZETLER BÖLÜMÜ BURAYA EKLENDİ:
                 const SizedBox(height: 24),
                 _buildBadgesSection(habits),
                 const SizedBox(height: 24),
@@ -261,16 +262,14 @@ class StatsScreen extends StatelessWidget {
     );
   }
 
-  // 🏆 ROZETLERİN METODU
   Widget _buildBadgesSection(List<Habit> habits) {
-    // 🎯 Kazanılan rozetleri öne, kilitlileri sona alan sıralama mantığı:
     final sortedBadges = List<HabitBadge>.from(allBadges)
       ..sort((a, b) {
         final aUnlocked = a.isUnlocked(habits);
         final bUnlocked = b.isUnlocked(habits);
-        if (aUnlocked && !bUnlocked) return -1; // a önce gelsin
-        if (!aUnlocked && bUnlocked) return 1;  // b önce gelsin
-        return 0; // durumları aynıysa mevcut sırayı koru
+        if (aUnlocked && !bUnlocked) return -1;
+        if (!aUnlocked && bUnlocked) return 1;
+        return 0;
       });
 
     return Column(
@@ -294,9 +293,9 @@ class StatsScreen extends StatelessWidget {
             mainAxisSpacing: 12,
             childAspectRatio: 0.9,
           ),
-          itemCount: sortedBadges.length, // 👈 sortedBadges.length kullanıyoruz
+          itemCount: sortedBadges.length,
           itemBuilder: (context, index) {
-            final badge = sortedBadges[index]; // 👈 sortedBadges'ten çekiyoruz
+            final badge = sortedBadges[index];
             final unlocked = badge.isUnlocked(habits);
 
             return GestureDetector(
@@ -404,7 +403,7 @@ class StatsScreen extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16), // Padding biraz artırıldı
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(18),
@@ -414,7 +413,6 @@ class StatsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // 1. ÜST BAŞLIK VE İKON
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -422,34 +420,30 @@ class StatsScreen extends StatelessWidget {
                 child: Text(
                   title,
                   style: const TextStyle(
-                    color: Colors.white70, 
-                    fontSize: 14, // 👈 12 -> 14 yapıldı
+                    color: Colors.white70,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              Icon(icon, color: color, size: 24), // 👈 İkon 20 -> 24 yapıldı
+              Icon(icon, color: color, size: 24),
             ],
           ),
-
-          // 2. ANA RAKAM / DEĞER
           Text(
             value,
             style: TextStyle(
-              fontSize: 24, // 👈 20 -> 24 yapıldı
-              fontWeight: FontWeight.bold, 
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
               color: color,
             ),
           ),
-
-          // 3. ALT BİLGİ
           Text(
             subtitle,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: Colors.white54, 
-              fontSize: 12.5, // 👈 11 -> 12.5 yapıldı
+              color: Colors.white54,
+              fontSize: 12.5,
               fontWeight: FontWeight.w400,
             ),
           ),

@@ -3,52 +3,60 @@ import 'package:hive/hive.dart';
 
 part 'habit.g.dart';
 
-  class HabitCategory {
-    final String name;
-    final String icon;
+class HabitCategory {
+  final String name;
+  final String icon;
 
-    const HabitCategory(this.name, this.icon);
-  }
+  const HabitCategory(this.name, this.icon);
+}
 
-  const List<HabitCategory> availableCategories = [
-    HabitCategory('Genel', '📌'),
-    HabitCategory('Kodlama', '💻'),
-    HabitCategory('Müzik', '🎸'),
-    HabitCategory('Oyun Dev', '🎮'),
-    HabitCategory('Spor', '🏃'),
-    HabitCategory('Okuma', '📚'),
-    HabitCategory('Sağlık', '🧘'),
-  ];
+const List<HabitCategory> availableCategories = [
+  HabitCategory('Genel', '📌'),
+  HabitCategory('Kodlama', '💻'),
+  HabitCategory('Müzik', '🎸'),
+  HabitCategory('Oyun Dev', '🎮'),
+  HabitCategory('Spor', '🏃'),
+  HabitCategory('Okuma', '📚'),
+  HabitCategory('Sağlık', '🧘'),
+];
+
 @HiveType(typeId: 0)
 class Habit extends HiveObject {
-  
   @HiveField(0)
-  final String id; // Sadece id final kalabilir
+  final String id;
 
   @HiveField(1)
-  String title; // 👈 'final' kelimesini kaldırdık
+  String title;
 
   @HiveField(2)
-  int colorValue; // 👈 'final' kelimesini kaldırdık
+  int colorValue;
 
   @HiveField(3)
   List<DateTime> completedDatesList;
 
   @HiveField(4)
-  int frequencyType; // 👈 'final' kelimesini kaldırdık
+  int frequencyType;
 
   @HiveField(5)
-  int intervalDays; // 👈 'final' kelimesini kaldırdık
+  int intervalDays;
 
   @HiveField(6)
-  List<int> selectedWeekdays; // 👈 'final' kelimesini kaldırdık
+  List<int> selectedWeekdays;
 
   @HiveField(7)
-  int iconCodePoint; // 👈 'final' kelimesini kaldırdık
-  
+  int iconCodePoint;
+
   @HiveField(8)
   String category;
-  
+
+  @HiveField(9)
+  bool isNotificationEnabled;
+
+  @HiveField(10)
+  int? notificationHour;
+
+  @HiveField(11)
+  int? notificationMinute;
 
   Habit({
     required this.id,
@@ -59,15 +67,17 @@ class Habit extends HiveObject {
     this.iconCodePoint = 0xe3af,
     List<int>? selectedWeekdays,
     List<DateTime>? completedDates,
-    this.category = 'Genel', // 👈 BURAYA EKLE
+    this.category = 'Genel',
+    this.isNotificationEnabled = false,
+    this.notificationHour,
+    this.notificationMinute,
   })  : selectedWeekdays = selectedWeekdays ?? [1, 3, 5],
         completedDatesList = completedDates ?? [];
 
   Color get color => Color(colorValue);
 
-
-  // Başına const Koyma!
- IconData get icon {
+  // İkon Dönüştürücü
+  IconData get icon {
     final iconMap = <int, IconData>{
       Icons.book_rounded.codePoint: Icons.book_rounded,
       Icons.fitness_center_rounded.codePoint: Icons.fitness_center_rounded,
@@ -81,6 +91,7 @@ class Habit extends HiveObject {
 
     return iconMap[iconCodePoint] ?? Icons.star_rounded;
   }
+
   String get frequencyText {
     switch (frequencyType) {
       case 1:
@@ -99,78 +110,49 @@ class Habit extends HiveObject {
     }
   }
 
+  // Tarih saatini 00:00:00 yapacak yardımcı metot
+  DateTime _stripTime(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
+
   DateTime get startDate {
     if (completedDatesList.isNotEmpty) {
       final sorted = List<DateTime>.from(completedDatesList)..sort();
-      return DateTime(sorted.first.year, sorted.first.month, sorted.first.day);
+      return _stripTime(sorted.first);
     }
-    return DateTime.now();
+    return _stripTime(DateTime.now());
   }
 
   bool isTargetDate(DateTime date) {
-      final target = DateTime(date.year, date.month, date.day);
-      final start = DateTime(startDate.year, startDate.month, startDate.day);
+    final target = _stripTime(date);
+    final start = startDate;
 
-      if (target.isBefore(start)) return false;
+    if (target.isBefore(start)) return false;
 
-      switch (frequencyType) {
-        case 1:
-          return target.weekday >= 1 && target.weekday <= 5;
-        case 2:
-          return target.weekday == 6 || target.weekday == 7;
-        case 3:
-          final differenceInDays = target.difference(start).inDays;
-          return differenceInDays % intervalDays == 0;
-        case 4:
-          return selectedWeekdays.contains(target.weekday);
-        case 0:
-        default:
-          return true;
-      }
+    switch (frequencyType) {
+      case 1:
+        return target.weekday >= 1 && target.weekday <= 5;
+      case 2:
+        return target.weekday == 6 || target.weekday == 7;
+      case 3:
+        final differenceInDays = target.difference(start).inDays;
+        return differenceInDays % intervalDays == 0;
+      case 4:
+        return selectedWeekdays.contains(target.weekday);
+      case 0:
+      default:
+        return true;
     }
-
-    bool isCompletedOn(DateTime date) {
-    final target = DateTime(date.year, date.month, date.day);
-    return completedDatesList.any(
-      (d) => d.year == target.year && d.month == target.month && d.day == target.day,
-    );
   }
-  // 📊 Mevcut üst üste tamamlanma serisini (streak) hesaplar
-  int get currentStreak {
-    if (completedDatesList.isEmpty) return 0;
 
-    // Tarihleri sıralayalım (en yeniden en eskiye)
-    final sortedDates = completedDatesList.map((d) => DateTime(d.year, d.month, d.day)).toList()
-      ..sort((a, b) => b.compareTo(a));
-
-    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    final yesterday = today.subtract(const Duration(days: 1));
-
-    // Eğer bugün veya dün tamamlanmadıysa seri bozulmuştur (0)
-    if (!sortedDates.contains(today) && !sortedDates.contains(yesterday)) {
-      return 0;
-    }
-
-    int streak = 0;
-    DateTime checkDate = sortedDates.contains(today) ? today : yesterday;
-
-    while (sortedDates.contains(checkDate)) {
-      streak++;
-      checkDate = checkDate.subtract(const Duration(days: 1));
-    }
-
-    return streak;
+  bool isCompletedOn(DateTime date) {
+    final target = _stripTime(date);
+    return completedDatesList.any((d) => _stripTime(d).isAtSameMomentAs(target));
   }
 
   void toggleDate(DateTime date) {
-    final target = DateTime(date.year, date.month, date.day);
-
-    // Yeni bir liste kopyası oluşturuyoruz
+    final target = _stripTime(date);
     final newList = List<DateTime>.from(completedDatesList);
 
-    final index = newList.indexWhere(
-      (d) => d.year == target.year && d.month == target.month && d.day == target.day,
-    );
+    final index = newList.indexWhere((d) => _stripTime(d).isAtSameMomentAs(target));
 
     if (index != -1) {
       newList.removeAt(index);
@@ -178,21 +160,20 @@ class Habit extends HiveObject {
       newList.add(target);
     }
 
-    // Değişken final olmadığı için artık yeni listeyi direkt eşitleyebiliyoruz!
-    completedDatesList = newList; 
+    completedDatesList = newList;
   }
 
-  int calculateStreak() {
+  // 📊 Mükerrer kayıtları engelleyen ve güvenli seri (streak) hesaplayıcı
+  int get currentStreak {
     if (completedDatesList.isEmpty) return 0;
 
     final sortedDates = completedDatesList
-        .map((d) => DateTime(d.year, d.month, d.day))
+        .map((d) => _stripTime(d))
         .toSet()
         .toList()
       ..sort((a, b) => b.compareTo(a));
 
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
+    final today = _stripTime(DateTime.now());
     final yesterday = today.subtract(const Duration(days: 1));
 
     final latestDate = sortedDates.first;
@@ -217,16 +198,16 @@ class Habit extends HiveObject {
 
     return streak;
   }
-  // 📈 Son X gün içindeki başarı yüzdesini hesaplar (Örn: lastDays = 30)
+
+  // 📈 Son X gün içindeki başarı yüzdesi
   double calculateCompletionRate({int lastDays = 30}) {
     if (completedDatesList.isEmpty) return 0.0;
 
-    final today = DateTime.now();
-    final normalizedToday = DateTime(today.year, today.month, today.day);
+    final today = _stripTime(DateTime.now());
     int completedCount = 0;
 
     for (int i = 0; i < lastDays; i++) {
-      final checkDate = normalizedToday.subtract(Duration(days: i));
+      final checkDate = today.subtract(Duration(days: i));
       if (isCompletedOn(checkDate)) {
         completedCount++;
       }
@@ -235,6 +216,6 @@ class Habit extends HiveObject {
     return (completedCount / lastDays) * 100;
   }
 
-  // 🔢 Toplam kaç gün tamamlandığını döndürür
+  // 🔢 Toplam tamamlanan gün sayısı
   int get totalCompletedDays => completedDatesList.length;
 }

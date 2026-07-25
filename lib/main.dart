@@ -3,18 +3,18 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'models/habit.dart';
 import 'screens/home_screen.dart';
 import 'screens/stats_screen.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-
-  // 🧹 GEÇİCİ SATIR: Tüm bozuk/eski Hive verilerini tamamen siler
-  // await Hive.deleteBoxFromDisk('habits'); 
-
   Hive.registerAdapter(HabitAdapter());
   await Hive.openBox<Habit>('habits');
 
-  runApp(const HabitTrackerApp()); // veya senin App widget'ın
+  // 🔔 BİLDİRİM SERVİSİNİ BAŞLAT
+  await NotificationService().init();
+
+  runApp(const HabitTrackerApp());
 }
 class HabitTrackerApp extends StatelessWidget {
   const HabitTrackerApp({super.key});
