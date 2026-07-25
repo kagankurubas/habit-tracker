@@ -205,16 +205,16 @@ class StatsScreen extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: h.color.withOpacity(0.12),
+                        color: h.color.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: h.color.withOpacity(0.3)),
+                        border: Border.all(color: h.color.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: h.color.withOpacity(0.2),
+                              color: h.color.withValues(alpha: 0.2),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(h.icon, color: h.color, size: 20),
@@ -238,7 +238,7 @@ class StatsScreen extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.orange.withOpacity(0.2),
+                              color: Colors.orange.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(color: Colors.orange, width: 1),
                             ),
@@ -272,7 +272,7 @@ class StatsScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
