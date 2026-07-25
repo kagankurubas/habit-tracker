@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:timezone/data/latest_all.dart' as tz; // 1. TIMEZONE DATA IMPORT
+import 'package:timezone/timezone.dart' as tz;          // 2. TIMEZONE CORE IMPORT
 import 'models/habit.dart';
 import 'screens/home_screen.dart';
 import 'screens/stats_screen.dart';
@@ -7,15 +9,22 @@ import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 1. Zaman dilimlerini yükle ve varsayılan lokasyonu ayarla
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
+
+  // 2. Hive veritabanını başlat
   await Hive.initFlutter();
   Hive.registerAdapter(HabitAdapter());
   await Hive.openBox<Habit>('habits');
 
-  // 🔔 BİLDİRİM SERVİSİNİ BAŞLAT
+  // 3. Bildirim servisini başlat
   await NotificationService().init();
 
   runApp(const HabitTrackerApp());
 }
+
 class HabitTrackerApp extends StatelessWidget {
   const HabitTrackerApp({super.key});
 

@@ -27,11 +27,40 @@ class NotificationService {
     );
 
     await _notificationsPlugin.initialize(settings: settings);
+
+    final androidImplementation =
+        _notificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+    if (androidImplementation != null) {
+      // 1. Standart Bildirim İznini İste
+      await androidImplementation.requestNotificationsPermission();
+
+      // 2. Tam Saatli Alarm İznini Doğrudan İste (Android 12+)
+      await androidImplementation.requestExactAlarmsPermission();
+    }
   }
 
-  // 🔕 Bildirimi İptal Et (Yukarı taşındı)
+  // 🧪 ANLIK TEST BİLDİRİMİ (Sistemin çalışıp çalışmadığını anlamak için)
+  Future<void> showInstantTestNotification() async {
+    const androidDetails = AndroidNotificationDetails(
+      'habit_reminders',
+      'Rutin Hatırlatıcıları',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+    await _notificationsPlugin.show(
+      id: 999,
+      title: '🧪 Test Bildirimi',
+      body: 'Bildirim motoru sorunsuz çalışıyor!',
+      notificationDetails: const NotificationDetails(android: androidDetails),
+    );
+  }
+
+  // 🔕 Bildirimi İptal Et
   Future<void> cancelHabitNotification(Habit habit) async {
     await _notificationsPlugin.cancel(id: habit.id.hashCode);
+    print('🔕 Bildirim İptal Edildi: ${habit.title}');
   }
 
   // 🔔 Rutin İçin Günlük Hatırlatma Bildirimi Zamanla
@@ -45,9 +74,12 @@ class NotificationService {
 
     final int notificationId = habit.id.hashCode;
 
-    final now = tz.TZDateTime.now(tz.local);
+    // Türkiye / Yerel Lokasyonu Garanti Al
+    final location = tz.getLocation('Europe/Istanbul');
+    final now = tz.TZDateTime.now(location);
+
     var scheduledDate = tz.TZDateTime(
-      tz.local,
+      location,
       now.year,
       now.month,
       now.day,
@@ -55,7 +87,8 @@ class NotificationService {
       habit.notificationMinute!,
     );
 
-    if (scheduledDate.isBefore(now)) {
+    // Eğer seçilen saat geçmişte kalmışsa erteleme mantığı (Saniye kaymasını önlemek için 1 dakika tolerans)
+    if (scheduledDate.isBefore(now.subtract(const Duration(seconds: 30)))) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
@@ -63,8 +96,9 @@ class NotificationService {
       'habit_reminders',
       'Rutin Hatırlatıcıları',
       channelDescription: 'Alışkanlıklarınızı hatırlatan günlük bildirimler',
-      importance: Importance.high,
+      importance: Importance.max,
       priority: Priority.high,
+      fullScreenIntent: true, // Kilitli ekranda bildirimi uyandırmak için
     );
 
     const notificationDetails = NotificationDetails(
@@ -78,8 +112,11 @@ class NotificationService {
       body: 'Bugünün görevi: "${habit.title}" seni bekliyor!',
       scheduledDate: scheduledDate,
       notificationDetails: notificationDetails,
+      // Exact alarm modunu zorunlu kılıyoruz:
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time,
     );
+
+    print('🔔 BİLDİRİM ZAMANLANDI: ${habit.title} -> Kurulan Saat: ${scheduledDate.hour}:${scheduledDate.minute} (Hedef Zaman: $scheduledDate)');
   }
 }

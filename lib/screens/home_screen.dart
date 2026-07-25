@@ -4,6 +4,8 @@ import '../models/habit.dart';
 import '../widgets/add_edit_habit_dialog.dart';
 import 'habit_detail_screen.dart';
 import '../widgets/habit_tile.dart';
+import '../services/notification_service.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -52,6 +54,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     await _habitsBox.add(newHabit);
     await _habitsBox.flush();
+
+    // 🔔 BİLDİRİM ZAMANLAMASINI ÇAĞIR
+    await NotificationService().scheduleHabitNotification(newHabit);
   }
 
   void _showAddHabitDialog() {
@@ -117,6 +122,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
           await habit.save();
           await _habitsBox.flush();
+
+          // 🔔 DÜZENLENEN BİLDİRİMİ YENİDEN ZAMANLA
+          await NotificationService().scheduleHabitNotification(habit);
         },
       ),
     );
