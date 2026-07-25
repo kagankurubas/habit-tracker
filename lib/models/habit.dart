@@ -17,20 +17,30 @@ class Habit extends HiveObject {
   @HiveField(3)
   final List<DateTime> completedDatesList;
 
-  // 0: Her Gün, 1: Hafta İçi, 2: Hafta Sonu, 3: Haftada 3 Gün
+  // 0: Her Gün, 1: Hafta İçi, 2: Hafta Sonu, 3: X Günde Bir, 4: Belirli Günler
   @HiveField(4)
-  final int frequencyType; 
+  final int frequencyType;
+
+  @HiveField(5)
+  final int intervalDays; // X günde bir için (Örn: 2, 3, 4)
+
+  @HiveField(6)
+  final List<int> selectedWeekdays; // Belirli günler için (1: Pzt, 2: Sal, ..., 7: Paz)
 
   Habit({
     required this.id,
     required this.title,
     required this.colorValue,
     this.frequencyType = 0,
+    this.intervalDays = 2,
+    List<int>? selectedWeekdays,
     List<DateTime>? completedDates,
-  }) : completedDatesList = completedDates ?? [];
+  })  : selectedWeekdays = selectedWeekdays ?? [1, 3, 5],
+        completedDatesList = completedDates ?? [];
 
   Color get color => Color(colorValue);
 
+  // Sıklık Metni (Kartlarda ve detayda gösterilecek metin)
   String get frequencyText {
     switch (frequencyType) {
       case 1:
@@ -38,10 +48,51 @@ class Habit extends HiveObject {
       case 2:
         return 'Hafta Sonu';
       case 3:
-        return 'Haftada 3 Gün';
+        return '$intervalDays Günde Bir';
+      case 4:
+        final dayNames = {1: 'Pzt', 2: 'Sal', 3: 'Çar', 4: 'Per', 5: 'Cum', 6: 'Cmt', 7: 'Paz'};
+        final names = selectedWeekdays.map((d) => dayNames[d]).join(', ');
+        return names.isEmpty ? 'Haftalık' : names;
       case 0:
       default:
         return 'Her Gün';
+    }
+  }
+
+  DateTime get startDate {
+    if (completedDatesList.isNotEmpty) {
+      final sorted = List<DateTime>.from(completedDatesList)..sort();
+      return DateTime(sorted.first.year, sorted.first.month, sorted.first.day);
+    }
+    return DateTime.now();
+  }
+
+  // 🎯 Dynamic Hedef Gün Hesaplama Algoritması
+  bool isTargetDate(DateTime date) {
+    final target = DateTime(date.year, date.month, date.day);
+    final start = DateTime(startDate.year, startDate.month, startDate.day);
+
+    if (target.isBefore(start)) return false;
+
+    switch (frequencyType) {
+      case 0: // Her Gün
+        return true;
+
+      case 1: // Hafta İçi (Pzt-Cum)
+        return target.weekday >= 1 && target.weekday <= 5;
+
+      case 2: // Hafta Sonu (Cmt-Paz)
+        return target.weekday == 6 || target.weekday == 7;
+
+      case 3: // 🔄 X GÜNDE BİR (Haftanın gününden bağımsız döngüsel)
+        final differenceInDays = target.difference(start).inDays;
+        return differenceInDays % intervalDays == 0;
+
+      case 4: // 📅 HAFTANIN BELİRLİ GÜNLERİ (Pazartesi, Çarşamba vb. sabiti)
+        return selectedWeekdays.contains(target.weekday);
+
+      default:
+        return true;
     }
   }
 
