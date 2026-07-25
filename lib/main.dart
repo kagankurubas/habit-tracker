@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'models/habit.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
+import 'screens/stats_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -32,11 +33,59 @@ class HabitTrackerApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: const Color(0xFF0F172A),
       ),
-      home: const HomeScreen(),
+      home: const MainNavigationScreen(),
     );
   }
 }
+class MainNavigationScreen extends StatefulWidget {
+     const MainNavigationScreen({super.key});
 
+     @override
+     State<MainNavigationScreen> createState() => _MainNavigationScreenState();
+   }
+
+   class _MainNavigationScreenState extends State<MainNavigationScreen> {
+     int _currentIndex = 0;
+     final Box<Habit> _habitsBox = Hive.box<Habit>('habits');
+
+     @override
+     Widget build(BuildContext context) {
+       final List<Widget> screens = [
+        const HomeScreen(), // 👈 habitsBox: _habitsBox kısmını sildik, sadece const HomeScreen() yaptık
+        StatsScreen(habitsBox: _habitsBox),
+       ];
+
+       return Scaffold(
+         body: IndexedStack(
+           index: _currentIndex,
+           children: screens,
+         ),
+         bottomNavigationBar: BottomNavigationBar(
+           currentIndex: _currentIndex,
+           backgroundColor: const Color(0xFF1E293B),
+           selectedItemColor: const Color(0xFF10B981),
+           unselectedItemColor: Colors.grey,
+           onTap: (index) {
+             setState(() {
+               _currentIndex = index;
+             });
+           },
+           items: const [
+             BottomNavigationBarItem(
+               icon: Icon(Icons.check_box_outlined),
+               activeIcon: Icon(Icons.check_box_rounded),
+               label: 'Rutinlerim',
+             ),
+             BottomNavigationBarItem(
+               icon: Icon(Icons.bar_chart_outlined),
+               activeIcon: Icon(Icons.bar_chart_rounded),
+               label: 'İstatistikler',
+             ),
+           ],
+         ),
+       );
+     }
+   }
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
