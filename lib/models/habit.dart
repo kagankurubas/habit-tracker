@@ -3,8 +3,25 @@ import 'package:hive/hive.dart';
 
 part 'habit.g.dart';
 
+  class HabitCategory {
+    final String name;
+    final String icon;
+
+    const HabitCategory(this.name, this.icon);
+  }
+
+  const List<HabitCategory> availableCategories = [
+    HabitCategory('Genel', '📌'),
+    HabitCategory('Kodlama', '💻'),
+    HabitCategory('Müzik', '🎸'),
+    HabitCategory('Oyun Dev', '🎮'),
+    HabitCategory('Spor', '🏃'),
+    HabitCategory('Okuma', '📚'),
+    HabitCategory('Sağlık', '🧘'),
+  ];
 @HiveType(typeId: 0)
 class Habit extends HiveObject {
+  
   @HiveField(0)
   final String id; // Sadece id final kalabilir
 
@@ -28,6 +45,10 @@ class Habit extends HiveObject {
 
   @HiveField(7)
   int iconCodePoint; // 👈 'final' kelimesini kaldırdık
+  
+  @HiveField(8)
+  String category;
+  
 
   Habit({
     required this.id,
@@ -35,13 +56,15 @@ class Habit extends HiveObject {
     required this.colorValue,
     this.frequencyType = 0,
     this.intervalDays = 2,
-    this.iconCodePoint = 0xe3af, // Varsayılan: fitness_center veya local_activity
+    this.iconCodePoint = 0xe3af,
     List<int>? selectedWeekdays,
     List<DateTime>? completedDates,
+    this.category = 'Genel', // 👈 BURAYA EKLE
   })  : selectedWeekdays = selectedWeekdays ?? [1, 3, 5],
         completedDatesList = completedDates ?? [];
 
   Color get color => Color(colorValue);
+
 
   // Başına const Koyma!
  IconData get icon {

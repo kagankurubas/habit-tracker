@@ -12,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Box<Habit> _habitsBox;
+  String _selectedFilterCategory = 'Tüm Görevler'; 
 
   @override
   void initState() {
@@ -26,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     List<int> selectedWeekdays,
     int colorValue,
     int iconCodePoint,
+    String category,
   ) async {
     if (title.trim().isEmpty) return;
 
@@ -37,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
       frequencyType: frequencyType,
       intervalDays: intervalDays,
       selectedWeekdays: selectedWeekdays,
+      category: category,
     );
 
     await _habitsBox.add(newHabit);
@@ -44,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showAddHabitDialog() {
+    String selectedCategory = 'Genel';
     final controller = TextEditingController();
     int selectedFrequency = 0;
     int intervalDays = 2;
@@ -175,6 +179,31 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
+                  const Text('Kategori:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: selectedCategory,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    ),
+                    items: availableCategories.map((cat) {
+                      return DropdownMenuItem<String>(
+                        value: cat.name,
+                        child: Text('${cat.icon} ${cat.name}'),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        setDialogState(() {
+                          selectedCategory = val;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
                   const Text('Tekrar Sıklığı:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<int>(
@@ -274,6 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         selectedWeekdays,
                         selectedColorValue,
                         selectedIconCodePoint,
+                        selectedCategory,
                       );
                       Navigator.pop(ctx);
                     }
@@ -288,6 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showEditHabitDialog(Habit habit) {
     final controller = TextEditingController(text: habit.title);
+    String selectedCategory = habit.category;
     int selectedFrequency = habit.frequencyType;
     int intervalDays = habit.intervalDays;
     List<int> selectedWeekdays = List<int>.from(habit.selectedWeekdays);
@@ -417,6 +448,31 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
+                  const Text('Kategori:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: availableCategories.any((c) => c.name == selectedCategory) ? selectedCategory : 'Genel',
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    ),
+                    items: availableCategories.map((cat) {
+                      return DropdownMenuItem<String>(
+                        value: cat.name,
+                        child: Text('${cat.icon} ${cat.name}'),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        setDialogState(() {
+                          selectedCategory = val;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
                   const Text('Tekrar Sıklığı:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<int>(
@@ -510,6 +566,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: isTitleValid
                   ? () async {
                       habit.title = controller.text;
+                      habit.category = selectedCategory;
                       habit.colorValue = selectedColorValue;
                       habit.iconCodePoint = selectedIconCodePoint;
                       habit.frequencyType = selectedFrequency;
@@ -541,206 +598,300 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ValueListenableBuilder<Box<Habit>>(
         valueListenable: _habitsBox.listenable(),
         builder: (context, box, _) {
-          final habits = box.values.toList();
+          final habits = box.values.where((h) {
+            if (_selectedFilterCategory == 'Tüm Görevler') return true;
+            return h.category == _selectedFilterCategory;
+          }).toList();
 
-          if (habits.isEmpty) {
-            return const Center(
-              child: Text(
-                'Henüz eklenmiş bir görev yok!\nAşağıdaki butonla yeni görev ekleyebilirsin.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
-              ),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: habits.length,
-            itemBuilder: (context, index) {
-              final habit = habits[index];
-              final streak = habit.calculateStreak();
-              final isDoneToday = habit.isCompletedOn(DateTime.now());
-
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                color: habit.color.withValues(alpha: 0.12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(
-                    color: isDoneToday ? Colors.greenAccent : habit.color.withValues(alpha: 0.4),
-                    width: isDoneToday ? 2.0 : 1.0,
-                  ),
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  
-                  // 🎭 SOL İKON VE TAMAMLAMA BUTONU
-                  leading: Row(
-                    mainAxisSize: MainAxisSize.min,
+          return Column(
+            children: [
+              Center(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center, // 🎯 Tam ortalar!
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: habit.color.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          habit.icon,
-                          color: habit.color,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-
-                      GestureDetector(
-                        onTap: () async {
-                          final today = DateTime.now();
-                          final todayNormalized = DateTime(today.year, today.month, today.day);
-
-                          setState(() {
-                            habit.toggleDate(todayNormalized);
-                          });
-
-                          if (habit.key != null) {
-                            await _habitsBox.put(habit.key, habit);
-                          } else {
-                            await _habitsBox.putAt(index, habit);
-                          }
-                          await _habitsBox.flush();
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: isDoneToday ? Colors.greenAccent : Colors.transparent,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isDoneToday ? Colors.greenAccent : Colors.grey,
-                              width: 2,
+                      // 1. "Tüm Görevler" Çipi
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: ChoiceChip(
+                          label: const Text('✨ Tüm Görevler'),
+                          selected: _selectedFilterCategory == 'Tüm Görevler',
+                          showCheckmark: false,
+                          labelStyle: TextStyle(
+                            color: _selectedFilterCategory == 'Tüm Görevler' ? Colors.white : Colors.grey[400],
+                            fontWeight: _selectedFilterCategory == 'Tüm Görevler' ? FontWeight.bold : FontWeight.normal,
+                            fontSize: 13,
+                          ),
+                          selectedColor: Colors.blueAccent.withValues(alpha: 0.3),
+                          backgroundColor: Colors.white.withValues(alpha: 0.05),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            side: BorderSide(
+                              color: _selectedFilterCategory == 'Tüm Görevler' ? Colors.blueAccent : Colors.transparent,
                             ),
                           ),
-                          child: Icon(
-                            Icons.check,
-                            size: 18,
-                            color: isDoneToday ? Colors.black : Colors.transparent,
-                          ),
+                          onSelected: (selected) {
+                            if (selected) {
+                              setState(() {
+                                _selectedFilterCategory = 'Tüm Görevler';
+                              });
+                            }
+                          },
                         ),
                       ),
+
+                      // 2. Diğer Kategoriler
+                      ...availableCategories.map((cat) {
+                        final isSelected = _selectedFilterCategory == cat.name;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: ChoiceChip(
+                            label: Text('${cat.icon} ${cat.name}'),
+                            selected: isSelected,
+                            showCheckmark: false,
+                            labelStyle: TextStyle(
+                              color: isSelected ? Colors.white : Colors.grey[400],
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              fontSize: 13,
+                            ),
+                            selectedColor: Colors.blueAccent.withValues(alpha: 0.3),
+                            backgroundColor: Colors.white.withValues(alpha: 0.05),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: BorderSide(
+                                color: isSelected ? Colors.blueAccent : Colors.transparent,
+                              ),
+                            ),
+                            onSelected: (selected) {
+                              if (selected) {
+                                setState(() {
+                                  _selectedFilterCategory = cat.name;
+                                });
+                              }
+                            },
+                          ),
+                        );
+                      }),
                     ],
                   ),
-
-                  // 📝 BAŞLIK VE SERİ SAYACI
-                  title: Row(
-                    children: [
-                      Expanded(
+                ),
+              ),
+              const SizedBox(height: 8),
+              // 📋 GÖREV LİSTESİ
+              Expanded(
+                child: habits.isEmpty
+                    ? const Center(
                         child: Text(
-                          habit.title,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            decoration: isDoneToday ? TextDecoration.lineThrough : null,
-                            color: isDoneToday ? Colors.grey : Colors.white,
-                          ),
+                          'Bu kategoride henüz görev yok!\nAşağıdaki butonla yeni görev ekleyebilirsin.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey),
                         ),
-                      ),
-                      if (streak > 0)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.orange, width: 1),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text('🔥 ', style: TextStyle(fontSize: 12)),
-                              Text(
-                                '$streak Gün',
-                                style: const TextStyle(
-                                  color: Colors.orangeAccent,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: habits.length,
+                        itemBuilder: (context, index) {
+                          final habit = habits[index];
+                          final streak = habit.calculateStreak();
+                          final isDoneToday = habit.isCompletedOn(DateTime.now());
+
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            color: habit.color.withValues(alpha: 0.12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(
+                                color: isDoneToday ? Colors.greenAccent : habit.color.withValues(alpha: 0.4),
+                                width: isDoneToday ? 2.0 : 1.0,
+                              ),
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              
+                              // 🎭 SOL İKON VE TAMAMLAMA BUTONU
+                              leading: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: habit.color.withValues(alpha: 0.2),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      habit.icon,
+                                      color: habit.color,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+
+                                  GestureDetector(
+                                    onTap: () async {
+                                      final today = DateTime.now();
+                                      final todayNormalized = DateTime(today.year, today.month, today.day);
+
+                                      setState(() {
+                                        habit.toggleDate(todayNormalized);
+                                      });
+
+                                      if (habit.key != null) {
+                                        await _habitsBox.put(habit.key, habit);
+                                      } else {
+                                        await _habitsBox.putAt(index, habit);
+                                      }
+                                      await _habitsBox.flush();
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: isDoneToday ? Colors.greenAccent : Colors.transparent,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: isDoneToday ? Colors.greenAccent : Colors.grey,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: Icon(
+                                        Icons.check,
+                                        size: 18,
+                                        color: isDoneToday ? Colors.black : Colors.transparent,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              // 📝 BAŞLIK, KATEGORİ VE SERİ SAYACI
+                              title: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      habit.title,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                        decoration: isDoneToday ? TextDecoration.lineThrough : null,
+                                        color: isDoneToday ? Colors.grey : Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  // 🏷️ KATEGORİ ROZETİ
+                                  Container(
+                                    margin: const EdgeInsets.only(right: 6),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      habit.category,
+                                      style: const TextStyle(fontSize: 10, color: Colors.white70),
+                                    ),
+                                  ),
+                                  if (streak > 0)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withValues(alpha: 0.2),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(color: Colors.orange, width: 1),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text('🔥 ', style: TextStyle(fontSize: 12)),
+                                          Text(
+                                            '$streak Gün',
+                                            style: const TextStyle(
+                                              color: Colors.orangeAccent,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                              ),
+
+                              // 📊 MİNİ İLERLEME ÇUBUĞU
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          'Son 30 Günlük İlerleme',
+                                          style: TextStyle(fontSize: 10, color: Colors.grey),
+                                        ),
+                                        Text(
+                                          '%${habit.calculateCompletionRate(lastDays: 30).toStringAsFixed(0)}',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: habit.color,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: LinearProgressIndicator(
+                                        value: habit.calculateCompletionRate(lastDays: 30) / 100,
+                                        backgroundColor: Colors.white10,
+                                        valueColor: AlwaysStoppedAnimation<Color>(habit.color),
+                                        minHeight: 4,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
 
-                  // 🔄 ALT BİLGİ METNİ
-                  subtitle: // 📊 Mini İlerleme Çubuğu ve Yüzde Göstergesi
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Son 30 Günlük İlerleme',
-                              style: TextStyle(fontSize: 10, color: Colors.grey),
-                            ),
-                            Text(
-                              '%${habit.calculateCompletionRate(lastDays: 30).toStringAsFixed(0)}',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: habit.color,
+                              // ⚙️ SAĞ BUTONLAR (Düzenle, Sil, Detaya Git)
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit_outlined, color: Colors.blueAccent),
+                                    onPressed: () {
+                                      _showEditHabitDialog(habit);
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                                    onPressed: () async {
+                                      await habit.delete();
+                                      await _habitsBox.flush();
+                                    },
+                                  ),
+                                  const Icon(Icons.chevron_right, color: Colors.grey),
+                                ],
                               ),
+
+                              // 🎯 KARTA TIKLANDIĞINDA DETAY SAYFASINA GİT
+                              onTap: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HabitDetailScreen(habit: habit),
+                                  ),
+                                );
+                                setState(() {});
+                              },
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            value: habit.calculateCompletionRate(lastDays: 30) / 100,
-                            backgroundColor: Colors.white10,
-                            valueColor: AlwaysStoppedAnimation<Color>(habit.color),
-                            minHeight: 4,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // ⚙️ SAĞ BUTONLAR (Düzenle, Sil, Detaya Git)
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined, color: Colors.blueAccent),
-                        onPressed: () {
-                          _showEditHabitDialog(habit);
+                          );
                         },
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                        onPressed: () async {
-                          await habit.delete();
-                          await _habitsBox.flush();
-                        },
-                      ),
-                      const Icon(Icons.chevron_right, color: Colors.grey),
-                    ],
-                  ),
-
-                  // 🎯 KARTA TIKLANDIĞINDA DETAY SAYFASINA GİT
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HabitDetailScreen(habit: habit),
-                      ),
-                    );
-                    setState(() {});
-                  },
-                ),
-              );
-            },
+              ),
+            ],
           );
         },
       ),
