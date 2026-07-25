@@ -670,14 +670,40 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
 
                   // 🔄 ALT BİLGİ METNİ
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(
-                      '🔄 ${habit.frequencyText}  •  ${isDoneToday ? 'Bugün Tamamlandı 🎉' : 'Bugün henüz yapılmadı'}',
-                      style: TextStyle(
-                        color: isDoneToday ? Colors.greenAccent : Colors.grey[400],
-                        fontSize: 12,
-                      ),
+                  subtitle: // 📊 Mini İlerleme Çubuğu ve Yüzde Göstergesi
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Son 30 Günlük İlerleme',
+                              style: TextStyle(fontSize: 10, color: Colors.grey),
+                            ),
+                            Text(
+                              '%${habit.calculateCompletionRate(lastDays: 30).toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: habit.color,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: habit.calculateCompletionRate(lastDays: 30) / 100,
+                            backgroundColor: Colors.white10,
+                            valueColor: AlwaysStoppedAnimation<Color>(habit.color),
+                            minHeight: 4,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 

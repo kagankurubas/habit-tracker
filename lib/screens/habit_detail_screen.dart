@@ -303,6 +303,97 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                       ),
               ),
             ),
+            // 📊 İSTATİSTİK ÖZET KARTLARI
+            Row(
+              children: [
+                // 1. Kutu: Aylık Başarı Oranı
+                Expanded(
+                  child: Card(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            '%${widget.habit.calculateCompletionRate(lastDays: 30).toStringAsFixed(0)}',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: widget.habit.color,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Aylık Başarı',
+                            style: TextStyle(fontSize: 11, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                // 2. Kutu: Haftalık Başarı Oranı
+                Expanded(
+                  child: Card(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            '%${widget.habit.calculateCompletionRate(lastDays: 7).toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.greenAccent,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Son 7 Gün',
+                            style: TextStyle(fontSize: 11, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                // 3. Kutu: Toplam Yapılan Gün Sayısı
+                Expanded(
+                  child: Card(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            '${widget.habit.totalCompletedDays}',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueAccent,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Toplam Gün',
+                            style: TextStyle(fontSize: 11, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),

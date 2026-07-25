@@ -194,4 +194,24 @@ class Habit extends HiveObject {
 
     return streak;
   }
+  // 📈 Son X gün içindeki başarı yüzdesini hesaplar (Örn: lastDays = 30)
+  double calculateCompletionRate({int lastDays = 30}) {
+    if (completedDatesList.isEmpty) return 0.0;
+
+    final today = DateTime.now();
+    final normalizedToday = DateTime(today.year, today.month, today.day);
+    int completedCount = 0;
+
+    for (int i = 0; i < lastDays; i++) {
+      final checkDate = normalizedToday.subtract(Duration(days: i));
+      if (isCompletedOn(checkDate)) {
+        completedCount++;
+      }
+    }
+
+    return (completedCount / lastDays) * 100;
+  }
+
+  // 🔢 Toplam kaç gün tamamlandığını döndürür
+  int get totalCompletedDays => completedDatesList.length;
 }
