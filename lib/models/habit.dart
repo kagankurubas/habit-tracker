@@ -111,6 +111,32 @@ class Habit extends HiveObject {
     return completedDatesList.any((d) =>
         d.year == date.year && d.month == date.month && d.day == date.day);
   }
+  // 📊 Mevcut üst üste tamamlanma serisini (streak) hesaplar
+  int get currentStreak {
+    if (completedDatesList.isEmpty) return 0;
+
+    // Tarihleri sıralayalım (en yeniden en eskiye)
+    final sortedDates = completedDatesList.map((d) => DateTime(d.year, d.month, d.day)).toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    // Eğer bugün veya dün tamamlanmadıysa seri bozulmuştur (0)
+    if (!sortedDates.contains(today) && !sortedDates.contains(yesterday)) {
+      return 0;
+    }
+
+    int streak = 0;
+    DateTime checkDate = sortedDates.contains(today) ? today : yesterday;
+
+    while (sortedDates.contains(checkDate)) {
+      streak++;
+      checkDate = checkDate.subtract(const Duration(days: 1));
+    }
+
+    return streak;
+  }
 
   void toggleDate(DateTime date) {
     final DateTime normalizedDate = DateTime(date.year, date.month, date.day);

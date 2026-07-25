@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/habit.dart';
+import '../models/badge_model.dart';
 
 class StatsScreen extends StatelessWidget {
   final Box<Habit> habitsBox;
@@ -53,20 +54,14 @@ class StatsScreen extends StatelessWidget {
         for (int i = 6; i >= 0; i--) {
           final checkDate = DateTime(today.year, today.month, today.day).subtract(Duration(days: i));
 
-          // 🎯 GÜNCELLENEN MANTIK:
-          // O günün hedefi = (Normalde o gün hedef olanlar) + (O gün henüz hedef gözükmese de bugün başlanıp TAMAMLATILANLAR)
           final dayTargets = habits.where((h) {
             final isTarget = h.isTargetDate(checkDate);
             final isDoneOnDate = h.isCompletedOn(checkDate);
-            
-            // Eğer o gün hedefse VEYA o gün tamamlandıysa bunu hedeflere dahil et!
             return isTarget || isDoneOnDate;
           }).toList();
 
-          // O gün tamamlananlar
           final dayDone = dayTargets.where((h) => h.isCompletedOn(checkDate)).length;
 
-          // Yüzde Hesabı
           double ratio = 0.0;
           if (dayTargets.isNotEmpty) {
             ratio = dayDone / dayTargets.length;
@@ -77,6 +72,7 @@ class StatsScreen extends StatelessWidget {
           final weekdayName = last7DaysLabels[checkDate.weekday - 1];
           current7DaysLabels.add(i == 0 ? 'Bugün' : weekdayName);
         }
+
         return Scaffold(
           backgroundColor: const Color(0xFF0F172A),
           appBar: AppBar(
@@ -252,11 +248,140 @@ class StatsScreen extends StatelessWidget {
                     );
                   },
                 ),
+
+                // 🏆 ROZETLER BÖLÜMÜ BURAYA EKLENDİ:
+                const SizedBox(height: 24),
+                _buildBadgesSection(habits),
+                const SizedBox(height: 24),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  // 🏆 ROZETLERİN METODU
+  Widget _buildBadgesSection(List<Habit> habits) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Başarımlar & Rozetler 🏆',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 12),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 0.85,
+          ),
+          itemCount: allBadges.length,
+          itemBuilder: (context, index) {
+            final badge = allBadges[index];
+            final unlocked = badge.isUnlocked(habits);
+
+            return GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: const Color(0xFF1E293B),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    title: Row(
+                      children: [
+                        Image.asset(badge.imagePath, width: 36, height: 36),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            badge.title,
+                            style: const TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          badge.description,
+                          style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: unlocked ? Colors.green.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            unlocked ? 'Kazanıldı 🎉' : 'Kilitli 🔒',
+                            style: TextStyle(
+                              color: unlocked ? Colors.greenAccent : Colors.redAccent,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E293B),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: unlocked ? Colors.amber.withValues(alpha: 0.6) : Colors.white10,
+                    width: unlocked ? 1.5 : 1,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Opacity(
+                      opacity: unlocked ? 1.0 : 0.35,
+                      child: ColorFiltered(
+                        colorFilter: unlocked
+                            ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
+                            : const ColorFilter.mode(Colors.grey, BlendMode.saturation),
+                        child: Image.asset(
+                          badge.imagePath,
+                          width: 48,
+                          height: 48,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      badge.title,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: unlocked ? Colors.white : Colors.white38,
+                        fontSize: 12,
+                        fontWeight: unlocked ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
