@@ -17,15 +17,18 @@ class Habit extends HiveObject {
   @HiveField(3)
   final List<DateTime> completedDatesList;
 
-  // 0: Her Gün, 1: Hafta İçi, 2: Hafta Sonu, 3: X Günde Bir, 4: Belirli Günler
   @HiveField(4)
   final int frequencyType;
 
   @HiveField(5)
-  final int intervalDays; // X günde bir için (Örn: 2, 3, 4)
+  final int intervalDays;
 
   @HiveField(6)
-  final List<int> selectedWeekdays; // Belirli günler için (1: Pzt, 2: Sal, ..., 7: Paz)
+  final List<int> selectedWeekdays;
+
+  // 🎯 İKON DESTEĞİ (IconData codePoint olarak saklanır)
+  @HiveField(7)
+  final int iconCodePoint;
 
   Habit({
     required this.id,
@@ -33,6 +36,7 @@ class Habit extends HiveObject {
     required this.colorValue,
     this.frequencyType = 0,
     this.intervalDays = 2,
+    this.iconCodePoint = 0xe3af, // Varsayılan: fitness_center veya local_activity
     List<int>? selectedWeekdays,
     List<DateTime>? completedDates,
   })  : selectedWeekdays = selectedWeekdays ?? [1, 3, 5],
@@ -40,7 +44,21 @@ class Habit extends HiveObject {
 
   Color get color => Color(colorValue);
 
-  // Sıklık Metni (Kartlarda ve detayda gösterilecek metin)
+  // Başına const Koyma!
+ IconData get icon {
+    final iconMap = <int, IconData>{
+      Icons.book_rounded.codePoint: Icons.book_rounded,
+      Icons.fitness_center_rounded.codePoint: Icons.fitness_center_rounded,
+      Icons.music_note_rounded.codePoint: Icons.music_note_rounded,
+      Icons.code_rounded.codePoint: Icons.code_rounded,
+      Icons.water_drop_rounded.codePoint: Icons.water_drop_rounded,
+      Icons.directions_run_rounded.codePoint: Icons.directions_run_rounded,
+      Icons.bed_rounded.codePoint: Icons.bed_rounded,
+      Icons.self_improvement_rounded.codePoint: Icons.self_improvement_rounded,
+    };
+
+    return iconMap[iconCodePoint] ?? Icons.star_rounded;
+  }
   String get frequencyText {
     switch (frequencyType) {
       case 1:
@@ -67,7 +85,6 @@ class Habit extends HiveObject {
     return DateTime.now();
   }
 
-  // 🎯 Dynamic Hedef Gün Hesaplama Algoritması
   bool isTargetDate(DateTime date) {
     final target = DateTime(date.year, date.month, date.day);
     final start = DateTime(startDate.year, startDate.month, startDate.day);
@@ -75,22 +92,16 @@ class Habit extends HiveObject {
     if (target.isBefore(start)) return false;
 
     switch (frequencyType) {
-      case 0: // Her Gün
-        return true;
-
-      case 1: // Hafta İçi (Pzt-Cum)
+      case 1:
         return target.weekday >= 1 && target.weekday <= 5;
-
-      case 2: // Hafta Sonu (Cmt-Paz)
+      case 2:
         return target.weekday == 6 || target.weekday == 7;
-
-      case 3: // 🔄 X GÜNDE BİR (Haftanın gününden bağımsız döngüsel)
+      case 3:
         final differenceInDays = target.difference(start).inDays;
         return differenceInDays % intervalDays == 0;
-
-      case 4: // 📅 HAFTANIN BELİRLİ GÜNLERİ (Pazartesi, Çarşamba vb. sabiti)
+      case 4:
         return selectedWeekdays.contains(target.weekday);
-
+      case 0:
       default:
         return true;
     }

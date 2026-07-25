@@ -22,6 +22,7 @@ class HabitAdapter extends TypeAdapter<Habit> {
       colorValue: fields[2] as int,
       frequencyType: fields[4] as int,
       intervalDays: fields[5] as int,
+      iconCodePoint: fields[7] as int,
       selectedWeekdays: (fields[6] as List?)?.cast<int>(),
     );
   }
@@ -29,7 +30,7 @@ class HabitAdapter extends TypeAdapter<Habit> {
   @override
   void write(BinaryWriter writer, Habit obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -43,7 +44,9 @@ class HabitAdapter extends TypeAdapter<Habit> {
       ..writeByte(5)
       ..write(obj.intervalDays)
       ..writeByte(6)
-      ..write(obj.selectedWeekdays);
+      ..write(obj.selectedWeekdays)
+      ..writeByte(7)
+      ..write(obj.iconCodePoint);
   }
 
   @override

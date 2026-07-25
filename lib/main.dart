@@ -58,21 +58,16 @@ class _HomeScreenState extends State<HomeScreen> {
     int frequencyType,
     int intervalDays,
     List<int> selectedWeekdays,
+    int colorValue,
+    int iconCodePoint,
   ) async {
     if (title.trim().isEmpty) return;
-
-    final colorList = [
-      Colors.green.value,
-      Colors.indigoAccent.value,
-      Colors.orangeAccent.value,
-      Colors.purpleAccent.value,
-      Colors.pinkAccent.value,
-    ];
 
     final newHabit = Habit(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
-      colorValue: colorList[_habitsBox.length % colorList.length],
+      colorValue: colorValue,
+      iconCodePoint: iconCodePoint,
       frequencyType: frequencyType,
       intervalDays: intervalDays,
       selectedWeekdays: selectedWeekdays,
@@ -86,17 +81,35 @@ class _HomeScreenState extends State<HomeScreen> {
     int selectedFrequency = 0;
     int intervalDays = 2;
     List<int> selectedWeekdays = [1, 3, 5];
-    // 🛑 İsim dolu mu kontrolü için durum değişkeni
     bool isTitleValid = false;
 
+    // 🎨 Renk Paleti Seçenekleri
+    final List<Color> availableColors = [
+      const Color(0xFF10B981), // Zümrüt Yeşili
+      const Color(0xFF3B82F6), // Okyanus Mavisi
+      const Color(0xFF8B5CF6), // Gece Moru
+      const Color(0xFFF59E0B), // Amber Turuncu
+      const Color(0xFFEC4899), // Neon Pembe
+      const Color(0xFF06B6D4), // Turkuaz
+      const Color(0xFFEF4444), // Mercan Kırmızı
+    ];
+    int selectedColorValue = availableColors[0].value;
+
+    // 🎭 İkon Seçenekleri
+    final List<IconData> availableIcons = [
+      Icons.book_rounded,
+      Icons.fitness_center_rounded,
+      Icons.music_note_rounded,
+      Icons.code_rounded,
+      Icons.water_drop_rounded,
+      Icons.directions_run_rounded,
+      Icons.bed_rounded,
+      Icons.self_improvement_rounded,
+    ];
+    int selectedIconCodePoint = availableIcons[0].codePoint;
+
     final daysMap = {
-      1: 'Pzt',
-      2: 'Sal',
-      3: 'Çar',
-      4: 'Per',
-      5: 'Cum',
-      6: 'Cmt',
-      7: 'Paz',
+      1: 'Pzt', 2: 'Sal', 3: 'Çar', 4: 'Per', 5: 'Cum', 6: 'Cmt', 7: 'Paz'
     };
 
     showDialog(
@@ -105,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context, setDialogState) => AlertDialog(
           title: const Text('Yeni Görev / Rutin Ekle'),
           content: SizedBox(
-            width: 320,
+            width: 340,
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -114,7 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   TextField(
                     controller: controller,
                     autofocus: true,
-                    // 🎯 Metin değiştikçe butonun durumunu güncelliyoruz
                     onChanged: (text) {
                       setDialogState(() {
                         isTitleValid = text.trim().isNotEmpty;
@@ -126,6 +138,81 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
+                  // 🎯 İKON SEÇİCİ
+                  const Text('İkon Seç:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: availableIcons.map((iconData) {
+                      final isSelected = selectedIconCodePoint == iconData.codePoint;
+                      return InkWell(
+                        onTap: () {
+                          setDialogState(() {
+                            selectedIconCodePoint = iconData.codePoint;
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: isSelected ? Color(selectedColorValue).withOpacity(0.2) : Colors.white10,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected ? Color(selectedColorValue) : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                          child: Icon(
+                            iconData,
+                            color: isSelected ? Color(selectedColorValue) : Colors.grey,
+                            size: 22,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 🎨 RENK SEÇİCİ
+                  const Text('Tema Rengi:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: availableColors.map((color) {
+                      final isSelected = selectedColorValue == color.value;
+                      return GestureDetector(
+                        onTap: () {
+                          setDialogState(() {
+                            selectedColorValue = color.value;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected ? Colors.white : Colors.transparent,
+                              width: 3,
+                            ),
+                            boxShadow: isSelected
+                                ? [BoxShadow(color: color.withOpacity(0.5), blurRadius: 8, spreadRadius: 2)]
+                                : [],
+                          ),
+                          child: isSelected
+                              ? const Icon(Icons.check, color: Colors.white, size: 20)
+                              : null,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 🔄 SIKLIK SEÇİMİ
                   const Text('Tekrar Sıklığı:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<int>(
@@ -189,6 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return FilterChip(
                           label: Text(entry.value),
                           selected: isSelected,
+                          selectedColor: Color(selectedColorValue).withOpacity(0.3),
                           onSelected: (bool selected) {
                             setDialogState(() {
                               if (selected) {
@@ -211,8 +299,10 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () => Navigator.pop(ctx),
               child: const Text('İptal'),
             ),
-            // 🛑 Ekle butonu sadece isTitleValid true ise tıklanabilir!
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(selectedColorValue),
+              ),
               onPressed: isTitleValid
                   ? () {
                       _addNewHabit(
@@ -220,11 +310,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         selectedFrequency,
                         intervalDays,
                         selectedWeekdays,
+                        selectedColorValue,
+                        selectedIconCodePoint,
                       );
                       Navigator.pop(ctx);
                     }
-                  : null, // null verildiğinde buton pasif (disabled) duruma geçer
-              child: const Text('Ekle'),
+                  : null,
+              child: const Text('Ekle', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -264,42 +356,52 @@ class _HomeScreenState extends State<HomeScreen> {
               final isDoneToday = habit.isCompletedOn(DateTime.now());
 
               return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                color: const Color(0xFF1E293B),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: isDoneToday
-                      ? BorderSide(color: habit.color, width: 1.5)
-                      : BorderSide.none,
-                ),
-                child: ListTile(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  // 🎯 1. DEĞİŞİKLİK: Sabit renk yerine görevin kendi renginden şeffaf ton veriyoruz
+                  color: habit.color.withOpacity(0.12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    // 🎯 2. DEĞİŞİKLİK: Kenarlığı görevin ana rengiyle belirginleştiriyoruz
+                    side: BorderSide(
+                      color: isDoneToday ? Colors.greenAccent : habit.color.withOpacity(0.4),
+                      width: isDoneToday ? 2.0 : 1.0,
+                    ),
+                  ),
+                  child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   // 🎯 BUGÜNÜ TAMAMLA / İPTAL ET BUTONU
-                  leading: GestureDetector(
-                    onTap: () async {
-                      setState(() {
-                        habit.toggleDate(DateTime.now());
-                      });
-                      await habit.save();
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: isDoneToday ? habit.color : habit.color.withOpacity(0.15),
-                        shape: BoxShape.circle,
-                        border: Border.all(
+                  leading: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 🎭 GÖREV İKONU
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: habit.color.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          habit.icon,
                           color: habit.color,
-                          width: 2,
+                          size: 20,
                         ),
                       ),
-                      child: Icon(
-                        isDoneToday ? Icons.check : Icons.add,
-                        color: isDoneToday ? Colors.white : habit.color,
-                        size: 24,
+                      const SizedBox(width: 8),
+
+                      // ✅ TAMAMLAMA BUTONU (Mevcut GestureDetector Kısmetin)
+                      GestureDetector(
+                        onTap: () async {
+                          setState(() {
+                            habit.toggleDate(DateTime.now());
+                          });
+                          await habit.save();
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          // ... Mevcut AnimatedContainer içeriğin aynı kalacak
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                   title: Row(
                     children: [
@@ -394,7 +496,7 @@ class HabitDetailScreen extends StatefulWidget {
 
 class _HabitDetailScreenState extends State<HabitDetailScreen> {
   DateTime _focusedDay = DateTime.now();
-  int _selectedViewIndex = 0; // 0: Heatmap, 1: Takvim
+  int _selectedViewIndex = 0;
 
   Map<DateTime, int> _getHeatmapDatasets() {
     Map<DateTime, int> datasets = {};
@@ -405,7 +507,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     return datasets;
   }
 
-  // 🎨 Renk Lejantı Yardımcı Widget'ı
   Widget _buildLegendItem(Color color, String label) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -428,10 +529,19 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   Widget build(BuildContext context) {
     final streak = widget.habit.calculateStreak();
     final isDoneToday = widget.habit.isCompletedOn(DateTime.now());
+    final themeColor = widget.habit.color; // 🎨 Görevin Dinamik Teması
 
     return Scaffold(
+      // 🌈 Görevin rengiyle hafif parlak arka plan efekti
+      backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        title: Text(widget.habit.title),
+        title: Row(
+          children: [
+            Icon(widget.habit.icon, color: themeColor),
+            const SizedBox(width: 8),
+            Text(widget.habit.title),
+          ],
+        ),
         backgroundColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
@@ -439,15 +549,25 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🎯 ÖZET VE TAMAMLAMA BUTONU
-            Card(
-              color: const Color(0xFF1E293B),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            // 🎯 DİNAMİK TEMALI ÖZET VE BUTON KARTI
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  colors: [
+                    themeColor.withOpacity(0.25),
+                    const Color(0xFF1E293B),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(color: themeColor.withOpacity(0.3), width: 1.5),
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(18.0),
                 child: Column(
                   children: [
-                   Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Column(
@@ -456,10 +576,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             const SizedBox(height: 4),
                             Text(
                               '🔥 $streak Gün',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.orangeAccent,
+                                color: themeColor,
                               ),
                             ),
                           ],
@@ -472,9 +592,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             Text(
                               '🔄 ${widget.habit.frequencyText}',
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.cyanAccent,
+                                color: Colors.white,
                               ),
                             ),
                           ],
@@ -503,7 +623,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isDoneToday ? Colors.green : widget.habit.color,
+                          backgroundColor: isDoneToday ? Colors.green : themeColor,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -567,7 +687,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             ),
             const SizedBox(height: 12),
 
-            // 📊 DİNAMİK KART (HEATMAP VEYA RENKLİ TAKVİM + LEJANT)
+            // 📊 DİNAMİK KART
             Card(
               color: const Color(0xFF1E293B),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -586,7 +706,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                           scrollable: true,
                           size: 28,
                           colorsets: {
-                            1: widget.habit.color,
+                            1: themeColor, // 🟩 HeatMap kutucukları da görevin temasına bürünür
                           },
                         ),
                       )
@@ -594,14 +714,12 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                         children: [
                           TableCalendar(
                             firstDay: DateTime.utc(2024, 1, 1),
-                            // Gelecek ayları da takvimde gezinebilmek için ileri bir tarih veriyoruz
-                            lastDay: DateTime.utc(2030, 12, 31), 
+                            lastDay: DateTime.utc(2030, 12, 31),
                             focusedDay: _focusedDay,
                             headerStyle: const HeaderStyle(
                               formatButtonVisible: false,
                               titleCentered: true,
                             ),
-                            // 🎨 TÜM GÜNLER İÇİN TEK BİR ÖZEL ÇİZİM METODU
                             calendarBuilders: CalendarBuilders(
                               prioritizedBuilder: (context, day, focusedDay) {
                                 final isDone = widget.habit.isCompletedOn(day);
@@ -611,12 +729,11 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 Color textColor = Colors.grey.withOpacity(0.4);
 
                                 if (isDone) {
-                                  bgColor = Colors.green; // 🟩 Yapılan Günler
+                                  bgColor = Colors.green;
                                   textColor = Colors.white;
                                 } else if (isTarget) {
-                                  // 🨨 Yapılması Gereken HEDEF Günler (Gelecek günler dahil sarı gösteriyoruz)
-                                  bgColor = Colors.amber.withOpacity(0.85);
-                                  textColor = Colors.black;
+                                  bgColor = themeColor.withOpacity(0.85); // 🨨 Target gün görevin renginde parlar
+                                  textColor = Colors.white;
                                 }
 
                                 return Container(
@@ -626,7 +743,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                     color: bgColor,
                                     shape: BoxShape.circle,
                                     border: isSameDay(day, DateTime.now()) && !isDone
-                                        ? Border.all(color: Colors.amber, width: 2)
+                                        ? Border.all(color: themeColor, width: 2)
                                         : null,
                                   ),
                                   child: Text(
@@ -652,12 +769,11 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                           const Divider(color: Colors.white10),
                           const SizedBox(height: 8),
 
-                          // 🎨 Renk Açıklaması
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               _buildLegendItem(Colors.green, 'Yapıldı'),
-                              _buildLegendItem(Colors.amber, 'Hedef Gün'),
+                              _buildLegendItem(themeColor, 'Hedef Gün'),
                               _buildLegendItem(Colors.grey.withOpacity(0.4), 'Rutin Dışı'),
                             ],
                           ),
