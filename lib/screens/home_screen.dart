@@ -6,7 +6,6 @@ import 'habit_detail_screen.dart';
 import '../widgets/habit_tile.dart';
 import '../services/notification_service.dart';
 
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -22,6 +21,45 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _habitsBox = Hive.box<Habit>('habits');
+
+    // 🔔 Bildirim Tıklamalarını Güvenli Şekilde Dinleme
+    NotificationService.selectNotificationStream.addListener(_handleNotificationClick);
+  }
+
+  @override
+  void dispose() {
+    // Memory leak önlemek için listener'ı temizliyoruz
+    NotificationService.selectNotificationStream.removeListener(_handleNotificationClick);
+    super.dispose();
+  }
+
+  // 🚀 Bildirim Tıklandığında Çalışacak Güvenli Yönlendirme
+  void _handleNotificationClick() {
+    final habitId = NotificationService.selectNotificationStream.value;
+    if (habitId == null) return;
+
+    // Flutter'ın ilk karesini çizmesini bekleyip sayfayı öyle açıyoruz (Kırmızı ekranı önleyen kısım!)
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+
+      // Tıklanan habit.id'ye karşılık gelen Habit nesnesini kutudan buluyoruz
+      final habit = _habitsBox.values.firstWhere(
+        (h) => h.id == habitId,
+        orElse: () => _habitsBox.values.first, // Bulunamazsa varsayılan
+      );
+
+      // İlgili alışkanlığın Detay Sayfasına yönlendiriyoruz
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HabitDetailScreen(habit: habit),
+        ),
+      );
+
+      // Stream'i tekrar tetiklenmemesi için sıfırlıyoruz
+      NotificationService.selectNotificationStream.value = null;
+      setState(() {});
+    });
   }
 
   void _addNewHabit({
@@ -235,7 +273,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemBuilder: (context, index) {
                           final habit = habits[index];
 
-                          // ESKİ UZUN CARD YAPISI SİLİNDİ, YERİNE HABITTILE EKLENDİ
                           return HabitTile(
                             habit: habit,
                             index: index,
