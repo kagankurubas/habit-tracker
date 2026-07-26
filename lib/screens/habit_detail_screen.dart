@@ -68,11 +68,17 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
         backgroundColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        // 1. DOKUNUŞ: bottom değerini 40.0 yapıyoruz
+        padding: const EdgeInsets.only(
+          left: 16.0,
+          right: 16.0,
+          top: 16.0,
+          bottom: 40.0,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🎯 DİNAMİK TEMALI ÖZET VE BUTON KARTI
+            // ... (Aynen Kalıyor: DİNAMİK TEMALI ÖZET KARTI) ...
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
@@ -178,7 +184,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             ),
             const SizedBox(height: 24),
 
-            // ⚙️ GÖRÜNÜM SEÇİMİ (HEATMAP / TAKVİM)
+            // ... (Aynen Kalıyor: GÖRÜNÜM SEÇİMİ) ...
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -210,7 +216,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             ),
             const SizedBox(height: 12),
 
-            // 📊 DİNAMİK KART
+            // ... (Aynen Kalıyor: DİNAMİK KART / HEATMAP & TAKVİM) ...
             Card(
               color: const Color(0xFF1E293B),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -306,7 +312,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             ),
             const SizedBox(height: 16),
 
-            // 📊 İSTATİSTİK ÖZET KARTLARI
+            // ... (Aynen Kalıyor: İSTATİSTİK ÖZET KARTLARI) ...
             Row(
               children: [
                 Expanded(
@@ -391,7 +397,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            
+            // 2. DOKUNUŞ: En alta ekstra kaydırma payı ekliyoruz
+            const SizedBox(height: 40),
           ],
         ),
       ),
