@@ -27,23 +27,12 @@
 
 ## 🚀 Kurulum & Çalıştırma
 
-Projeyi yerel makinenizde çalıştırmak için aşağıdaki adımları takip edebilirsiniz:
+Projeyi yerel makinenizde çalıştırmak için terminalde aşağıdaki komutları sırasıyla çalıştırabilirsiniz:
 
-1. Depoyu klonlayın:
-
-git clone [https://github.com/kagankurubas/habitto.git](https://github.com/kagankurubas/habitto.git)
-
-2. Proje dizinine gidin:
-
+```bash
+git clone https://github.com/kagankurubas/habitto.git
 cd habitto
-
-3. Gerekli paketleri yükleyin:
-
 flutter pub get
-
-4. Uygulamayı çalıştırın:
-
 flutter run
-
 
 
