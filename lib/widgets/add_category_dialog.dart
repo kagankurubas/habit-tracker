@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import '../models/category_model.dart';
-import '../services/theme_service.dart';
-import '../app_themes.dart';
 
 class AddCategoryDialog extends StatefulWidget {
-  const AddCategoryDialog({super.key});
+  final Function(String name, int colorValue, int iconCodePoint) onSave;
+
+  const AddCategoryDialog({super.key, required this.onSave});
 
   @override
   State<AddCategoryDialog> createState() => _AddCategoryDialogState();
@@ -13,132 +12,154 @@ class AddCategoryDialog extends StatefulWidget {
 
 class _AddCategoryDialogState extends State<AddCategoryDialog> {
   final TextEditingController _nameController = TextEditingController();
-  String _selectedEmoji = '⭐';
-
-  final List<String> _emojiList = [
-    '⭐', '📌', '💻', '🎸', '🎮', '🏃', '📚', '🧘',
-    '🎯', '🎨', '💼', '🚀', '☕', '💧', '🍕', '🛠️'
+  
+  final List<Color> _availableColors = const [
+    Color(0xFF6366F1),
+    Color(0xFF10B981),
+    Color(0xFF3B82F6),
+    Color(0xFF8B5CF6),
+    Color(0xFFF59E0B),
+    Color(0xFFEC4899),
+    Color(0xFF06B6D4),
+    Color(0xFFEF4444),
   ];
 
+  final List<IconData> _availableIcons = const [
+    Icons.star_rounded,
+    Icons.push_pin_rounded,
+    Icons.laptop_rounded,
+    Icons.music_note_rounded,
+    Icons.sports_esports_rounded,
+    Icons.directions_run_rounded,
+    Icons.book_rounded,
+    Icons.fitness_center_rounded,
+    Icons.brush_rounded,
+    Icons.work_rounded,
+  ];
+
+  late int _selectedColorValue;
+  late int _selectedIconCodePoint;
+
   @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _selectedColorValue = _availableColors[0].toARGB32();
+    _selectedIconCodePoint = _availableIcons[0].codePoint;
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<Color>(
-      valueListenable: ThemeService.currentColor,
-      builder: (context, bgColor, child) {
-        final cardColor = AppThemes.getCardColor(bgColor);
-        final textColor = AppThemes.getTextColor(bgColor);
-        final subtextColor = AppThemes.getSubtextColor(bgColor);
-
-        return AlertDialog(
-          backgroundColor: AppThemes.isLightBackground(bgColor)
-              ? const Color(0xFFF1F5F9)
-              : const Color(0xFF1E293B),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text(
-            'Yeni Kategori Ekle',
-            style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: _nameController,
-                style: TextStyle(color: textColor),
-                decoration: InputDecoration(
-                  labelText: 'Kategori Adı',
-                  labelStyle: TextStyle(color: subtextColor),
-                  hintText: 'Örn: Diş Bakımı, Bütçe...',
-                  hintStyle: TextStyle(color: subtextColor.withValues(alpha: 0.5)),
-                  filled: true,
-                  fillColor: cardColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
+    return AlertDialog(
+      title: const Text('Yeni Kategori Ekle'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                hintText: 'Kategori Adı',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 16),
-              Text(
-                'İkon / Emoji Seç:',
-                style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 120,
-                width: double.maxFinite,
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 6,
-                    crossAxisSpacing: 6,
-                    mainAxisSpacing: 6,
-                  ),
-                  itemCount: _emojiList.length,
-                  itemBuilder: (context, index) {
-                    final emoji = _emojiList[index];
-                    final isSelected = _selectedEmoji == emoji;
-
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedEmoji = emoji;
-                        });
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 150),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.indigo.shade400.withValues(alpha: 0.3)
-                              : cardColor,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: isSelected ? Colors.indigoAccent : Colors.transparent,
-                            width: 2,
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(emoji, style: const TextStyle(fontSize: 20)),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('İptal', style: TextStyle(color: subtextColor)),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6366F1),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              onPressed: () async {
-                final name = _nameController.text.trim();
-                if (name.isNotEmpty) {
-                  final box = Hive.box<CategoryModel>('categories');
-                  final newCategory = CategoryModel(
-                    id: DateTime.now().millisecondsSinceEpoch.toString(),
-                    name: name,
-                    icon: _selectedEmoji,
+            const SizedBox(height: 16),
+
+            // 🎨 RENK SEÇİMİ
+            const Text('Kategori Rengi:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _availableColors.map((color) {
+                  final isSelected = _selectedColorValue == color.toARGB32();
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedColorValue = color.toARGB32();
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected ? Colors.white : Colors.transparent,
+                          width: 3,
+                        ),
+                      ),
+                      child: isSelected
+                          ? const Icon(Icons.check, color: Colors.white, size: 18)
+                          : null,
+                    ),
                   );
-                  await box.add(newCategory);
-                  if (context.mounted) Navigator.pop(context);
-                }
-              },
-              child: const Text('Ekle', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 🎭 İKON SEÇİMİ
+            const Text('İkon Seç:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _availableIcons.map((iconData) {
+                final isSelected = _selectedIconCodePoint == iconData.codePoint;
+                return InkWell(
+                  onTap: () {
+                    setState(() {
+                      _selectedIconCodePoint = iconData.codePoint;
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? Color(_selectedColorValue).withValues(alpha: 0.2)
+                          : Colors.white10,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected ? Color(_selectedColorValue) : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Icon(
+                      iconData,
+                      color: isSelected ? Color(_selectedColorValue) : Colors.grey,
+                      size: 22,
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ],
-        );
-      },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('İptal'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Color(_selectedColorValue)),
+          onPressed: () {
+            if (_nameController.text.trim().isNotEmpty) {
+              widget.onSave(
+                _nameController.text.trim(),
+                _selectedColorValue,
+                _selectedIconCodePoint,
+              );
+              Navigator.pop(context);
+            }
+          },
+          child: const Text('Ekle', style: TextStyle(color: Colors.white)),
+        ),
+      ],
     );
   }
 }

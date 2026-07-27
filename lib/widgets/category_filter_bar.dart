@@ -31,7 +31,7 @@ class CategoryFilterBar extends StatelessWidget {
           style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
         ),
         content: Text(
-          '"${category.icon} ${category.name}" kategorisini silmek istediğinize emin misiniz?',
+          '"${category.name}" kategorisini silmek istediğinize emin misiniz?',
           style: TextStyle(color: subtextColor),
         ),
         actions: [
@@ -74,18 +74,21 @@ class CategoryFilterBar extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: userCategories.length + 2,
                 itemBuilder: (context, index) {
+                  // 1. TÜM GÖREVLER ÇİPİ
                   if (index == 0) {
                     final isSelected = selectedCategory == 'Tüm Görevler';
                     return _buildChip(
                       context: context,
                       label: 'Tüm Görevler',
-                      icon: '✨',
+                      iconData: Icons.stars_rounded,
+                      chipColor: const Color(0xFF6366F1),
                       isSelected: isSelected,
                       isLight: isLight,
                       onTap: () => onCategorySelected('Tüm Görevler'),
                     );
                   }
 
+                  // 2. KATEGORİ EKLE BUTONU
                   if (index == 1) {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8.0),
@@ -93,7 +96,17 @@ class CategoryFilterBar extends StatelessWidget {
                         onTap: () {
                           showDialog(
                             context: context,
-                            builder: (ctx) => const AddCategoryDialog(),
+                            builder: (ctx) => AddCategoryDialog(
+                              onSave: (name, colorValue, iconCodePoint) async {
+                                final newCategory = CategoryModel(
+                                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                                  name: name,
+                                  colorValue: colorValue,
+                                  iconCodePoint: iconCodePoint,
+                                );
+                                await categoriesBox.add(newCategory);
+                              },
+                            ),
                           );
                         },
                         borderRadius: BorderRadius.circular(20),
@@ -128,13 +141,15 @@ class CategoryFilterBar extends StatelessWidget {
                     );
                   }
 
+                  // 3. DİNAMİK KATEGORİ ÇİPLERİ
                   final category = userCategories[index - 2];
                   final isSelected = selectedCategory == category.name;
 
                   return _buildChip(
                     context: context,
                     label: category.name,
-                    icon: category.icon,
+                    iconData: category.iconData,
+                    chipColor: category.color,
                     isSelected: isSelected,
                     isLight: isLight,
                     onTap: () => onCategorySelected(category.name),
@@ -152,13 +167,14 @@ class CategoryFilterBar extends StatelessWidget {
   Widget _buildChip({
     required BuildContext context,
     required String label,
-    required String icon,
+    required IconData iconData,
+    required Color chipColor,
     required bool isSelected,
     required bool isLight,
     required VoidCallback onTap,
     VoidCallback? onLongPress,
   }) {
-    final Color activeBgColor = isLight ? const Color(0xFF0F172A) : const Color(0xFF6366F1);
+    final Color activeBgColor = chipColor;
     final Color unselectedBgColor = isLight ? Colors.white.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.08);
     final Color activeTextColor = Colors.white;
     final Color unselectedTextColor = isLight ? const Color(0xFF0F172A) : Colors.white.withValues(alpha: 0.8);
@@ -184,7 +200,11 @@ class CategoryFilterBar extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(icon, style: const TextStyle(fontSize: 13)),
+              Icon(
+                iconData,
+                size: 15,
+                color: isSelected ? Colors.white : (isLight ? chipColor : chipColor.withValues(alpha: 0.9)),
+              ),
               const SizedBox(width: 6),
               Text(
                 label,
