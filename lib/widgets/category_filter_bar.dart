@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import '../models/category_model.dart';
 import '../services/theme_service.dart';
 import '../app_themes.dart';
+import 'add_category_dialog.dart';
 
 class CategoryFilterBar extends StatelessWidget {
   final String selectedCategory;
@@ -12,98 +15,189 @@ class CategoryFilterBar extends StatelessWidget {
     required this.onCategorySelected,
   });
 
-  static const List<Map<String, dynamic>> categories = [
-    {'name': 'Tüm Görevler', 'icon': '✨'},
-    {'name': 'Genel', 'icon': '📌'},
-    {'name': 'Kodlama', 'icon': '💻'},
-    {'name': 'Müzik', 'icon': '🎸'},
-    {'name': 'Oyun Dev.', 'icon': '🎮'},
-    {'name': 'Spor', 'icon': '🏃'},
-    {'name': 'Okuma', 'icon': '📚'},
-    {'name': 'Sağlık', 'icon': '🧘'},
-  ];
+  void _showDeleteDialog(BuildContext context, CategoryModel category, Color bgColor) {
+    final textColor = AppThemes.getTextColor(bgColor);
+    final subtextColor = AppThemes.getSubtextColor(bgColor);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppThemes.isLightBackground(bgColor)
+            ? const Color(0xFFF1F5F9)
+            : const Color(0xFF1E293B),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Kategoriyi Sil',
+          style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          '"${category.icon} ${category.name}" kategorisini silmek istediğinize emin misiniz?',
+          style: TextStyle(color: subtextColor),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('İptal', style: TextStyle(color: subtextColor)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () async {
+              await category.delete();
+              if (ctx.mounted) Navigator.pop(ctx);
+              onCategorySelected('Tüm Görevler');
+            },
+            child: const Text('Sil', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final categoriesBox = Hive.box<CategoryModel>('categories');
+
     return ValueListenableBuilder<Color>(
       valueListenable: ThemeService.currentColor,
       builder: (context, bgColor, child) {
         final isLight = AppThemes.isLightBackground(bgColor);
 
-        return SizedBox(
-          height: 38,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final cat = categories[index];
-              final String name = cat['name'];
-              final String icon = cat['icon'];
-              final isSelected = selectedCategory == name;
+        return ValueListenableBuilder<Box<CategoryModel>>(
+          valueListenable: categoriesBox.listenable(),
+          builder: (context, box, child) {
+            final userCategories = box.values.toList();
 
-              // 🎯 RENK VE KONTRAST AYARLARI
-              final Color activeBgColor = isLight 
-                  ? const Color(0xFF0F172A)  // Açık temada seçili: Koyu Lacivert
-                  : const Color(0xFF6366F1); // Koyu temada seçili: İndigo Mor
+            return SizedBox(
+              height: 38,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: userCategories.length + 2,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    final isSelected = selectedCategory == 'Tüm Görevler';
+                    return _buildChip(
+                      context: context,
+                      label: 'Tüm Görevler',
+                      icon: '✨',
+                      isSelected: isSelected,
+                      isLight: isLight,
+                      onTap: () => onCategorySelected('Tüm Görevler'),
+                    );
+                  }
 
-              final Color unselectedBgColor = isLight
-                  ? Colors.white.withValues(alpha: 0.5) // Açık temada seçili olmayan: Yarı saydam krem/beyaz
-                  : Colors.white.withValues(alpha: 0.08); // Koyu temada seçili olmayan: Yarı saydam gri
-
-              final Color activeTextColor = Colors.white;
-              final Color unselectedTextColor = isLight
-                  ? const Color(0xFF0F172A) // Açık temada seçili olmayan metin: Koyu Lacivert (Net Okunur!)
-                  : Colors.white.withValues(alpha: 0.8); // Koyu temada seçili olmayan metin: Açık Gri
-
-              return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => onCategorySelected(name),
-                    borderRadius: BorderRadius.circular(20),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected ? activeBgColor : unselectedBgColor,
+                  if (index == 1) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: InkWell(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => const AddCategoryDialog(),
+                          );
+                        },
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isSelected
-                              ? Colors.transparent
-                              : (isLight 
-                                  ? Colors.black.withValues(alpha: 0.1) 
-                                  : Colors.white.withValues(alpha: 0.15)),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            icon,
-                            style: const TextStyle(fontSize: 13),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            name,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                              color: isSelected ? activeTextColor : unselectedTextColor,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isLight
+                                ? Colors.indigo.shade50
+                                : const Color(0xFF6366F1).withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: const Color(0xFF6366F1).withValues(alpha: 0.5),
+                              width: 1.5,
                             ),
                           ),
-                        ],
+                          child: const Row(
+                            children: [
+                              Icon(Icons.add, size: 16, color: Color(0xFF6366F1)),
+                              SizedBox(width: 4),
+                              Text(
+                                'Ekle',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF6366F1),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+                    );
+                  }
+
+                  final category = userCategories[index - 2];
+                  final isSelected = selectedCategory == category.name;
+
+                  return _buildChip(
+                    context: context,
+                    label: category.name,
+                    icon: category.icon,
+                    isSelected: isSelected,
+                    isLight: isLight,
+                    onTap: () => onCategorySelected(category.name),
+                    onLongPress: () => _showDeleteDialog(context, category, bgColor),
+                  );
+                },
+              ),
+            );
+          },
         );
       },
+    );
+  }
+
+  Widget _buildChip({
+    required BuildContext context,
+    required String label,
+    required String icon,
+    required bool isSelected,
+    required bool isLight,
+    required VoidCallback onTap,
+    VoidCallback? onLongPress,
+  }) {
+    final Color activeBgColor = isLight ? const Color(0xFF0F172A) : const Color(0xFF6366F1);
+    final Color unselectedBgColor = isLight ? Colors.white.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.08);
+    final Color activeTextColor = Colors.white;
+    final Color unselectedTextColor = isLight ? const Color(0xFF0F172A) : Colors.white.withValues(alpha: 0.8);
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: GestureDetector(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? activeBgColor : unselectedBgColor,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isSelected
+                  ? Colors.transparent
+                  : (isLight ? Colors.black.withValues(alpha: 0.1) : Colors.white.withValues(alpha: 0.15)),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(icon, style: const TextStyle(fontSize: 13)),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                  color: isSelected ? activeTextColor : unselectedTextColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

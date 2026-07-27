@@ -8,19 +8,49 @@ import 'screens/stats_screen.dart';
 import 'services/notification_service.dart';
 import 'services/theme_service.dart'; 
 import 'app_themes.dart';
+import 'models/category_model.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   // 1. Zaman dilimlerini yükle ve varsayılan lokasyonu ayarla
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
 
   // 2. Hive veritabanını başlat
   await Hive.initFlutter();
-  Hive.registerAdapter(HabitAdapter());
-  await Hive.openBox<Habit>('habits');
 
-  // 3. Tema servisini başlat (settings box'ını bu metod içinde açıyoruz)
+  // Adapter Kayıtları (Çift kayıt engelleyici ile)
+  if (!Hive.isAdapterRegistered(0)) {
+    Hive.registerAdapter(HabitAdapter());
+  }
+
+  if (!Hive.isAdapterRegistered(2)) {
+    Hive.registerAdapter(CategoryModelAdapter());
+  }
+
+  // Kutuları Açalım
+  await Hive.openBox<Habit>('habits');
+  final categoriesBox = await Hive.openBox<CategoryModel>('categories');
+
+  // Varsayılan Kategoriler
+  if (categoriesBox.isEmpty) {
+    final defaultCategories = [
+      CategoryModel(id: '1', name: 'Genel', icon: '📌'),
+      CategoryModel(id: '2', name: 'Kodlama', icon: '💻'),
+      CategoryModel(id: '3', name: 'Müzik', icon: '🎸'),
+      CategoryModel(id: '4', name: 'Oyun Dev.', icon: '🎮'),
+      CategoryModel(id: '5', name: 'Spor', icon: '🏃'),
+      CategoryModel(id: '6', name: 'Okuma', icon: '📚'),
+      CategoryModel(id: '7', name: 'Sağlık', icon: '🧘'),
+    ];
+
+    for (var cat in defaultCategories) {
+      await categoriesBox.add(cat);
+    }
+  }
+
+  // 3. Tema servisini başlat
   await ThemeService.init();
 
   // 4. Bildirim servisini başlat
@@ -34,7 +64,6 @@ class HabitTrackerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 🚀 Dinamik renk değişimi için ThemeService.currentColor değerini dinliyoruz
     return ValueListenableBuilder<Color>(
       valueListenable: ThemeService.currentColor,
       builder: (context, bgColor, child) {
@@ -47,7 +76,7 @@ class HabitTrackerApp extends StatelessWidget {
               seedColor: const Color(0xFF6366F1),
               brightness: Brightness.dark,
             ),
-            scaffoldBackgroundColor: bgColor, // 👈 Arka plan seçilen renge göre anında değişir
+            scaffoldBackgroundColor: bgColor,
           ),
           home: const MainNavigationScreen(),
         );
@@ -74,7 +103,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       StatsScreen(habitsBox: _habitsBox),
     ];
 
-    // 🚀 Tema rengini dinleyip nav bar rengini otomatik hesaplıyoruz
     return ValueListenableBuilder<Color>(
       valueListenable: ThemeService.currentColor,
       builder: (context, bgColor, child) {
@@ -88,7 +116,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: _currentIndex,
-            backgroundColor: navBarBg, // 👈 Dinamik uyumlu ton
+            backgroundColor: navBarBg,
             selectedItemColor: AppThemes.isLightBackground(bgColor) ? Colors.indigo.shade700 : const Color(0xFF6366F1),
             unselectedItemColor: textColor.withValues(alpha: 0.6),
             onTap: (index) {
