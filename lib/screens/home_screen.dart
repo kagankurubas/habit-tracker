@@ -57,7 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
       );
 
       NotificationService.selectNotificationStream.value = null;
-      setState(() {});
     });
   }
 
@@ -94,7 +93,6 @@ class _HomeScreenState extends State<HomeScreen> {
           );
 
           await _habitsBox.add(newHabit);
-          await _habitsBox.flush();
           await NotificationService().scheduleHabitNotification(newHabit);
         },
       ),
@@ -130,7 +128,6 @@ class _HomeScreenState extends State<HomeScreen> {
           habit.notificationMinute = notificationMinute;
 
           await habit.save();
-          await _habitsBox.flush();
           await NotificationService().scheduleHabitNotification(habit);
         },
       ),
@@ -139,54 +136,52 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ⚡ TEK ÜST DİNLENİCİ: Ekranın tamamı için temayı yalnızca en tepede 1 kez dinler
     return ValueListenableBuilder<Color>(
       valueListenable: ThemeService.currentColor,
       builder: (context, bgColor, child) {
+        final textColor = AppThemes.getTextColor(bgColor);
+        final subtextColor = AppThemes.getSubtextColor(bgColor);
+        final isLight = AppThemes.isLightBackground(bgColor);
+        final btnBgColor = isLight ? const Color(0xFF1E293B) : const Color(0xFF6366F1);
+
         return Scaffold(
           backgroundColor: bgColor,
           resizeToAvoidBottomInset: false,
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
-            child: ValueListenableBuilder<Color>(
-              valueListenable: ThemeService.currentColor,
-              builder: (context, bgColor, child) {
-                final textColor = AppThemes.getTextColor(bgColor);
-
-                return AppBar(
-                  title: Text(
-                    'Rutin & Alışkanlık Takibi',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                    ),
+            child: AppBar(
+              title: Text(
+                'Rutin & Alışkanlık Takibi',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              actions: [
+                IconButton(
+                  icon: Icon(
+                    Icons.settings_outlined,
+                    color: textColor,
                   ),
-                  centerTitle: true,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  actions: [
-                    // ⚙️ AYARLAR EKRANI BUTONU
-                    IconButton(
-                      icon: Icon(
-                        Icons.settings_outlined,
-                        color: textColor,
+                  tooltip: 'Ayarlar',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SettingsScreen(
+                          habitsBox: _habitsBox,
+                          categoriesBox: _categoriesBox,
+                        ),
                       ),
-                      tooltip: 'Ayarlar',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SettingsScreen(
-                              habitsBox: _habitsBox,
-                              categoriesBox: _categoriesBox,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                );
-              },
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
+              ],
             ),
           ),
           body: ValueListenableBuilder<Box<Habit>>(
@@ -210,18 +205,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 8),
                   Expanded(
                     child: habits.isEmpty
-                        ? ValueListenableBuilder<Color>(
-                            valueListenable: ThemeService.currentColor,
-                            builder: (context, bgColor, _) {
-                              final subtextColor = AppThemes.getSubtextColor(bgColor);
-                              return Center(
-                                child: Text(
-                                  'Bu kategoride henüz görev yok!\nAşağıdaki butonla yeni görev ekleyebilirsin.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: subtextColor),
-                                ),
-                              );
-                            },
+                        ? Center(
+                            child: Text(
+                              'Bu kategoride henüz görev yok!\nAşağıdaki butonla yeni görev ekleyebilirsin.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: subtextColor),
+                            ),
                           )
                         : ListView.builder(
                             padding: const EdgeInsets.all(16),
@@ -229,6 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemBuilder: (context, index) {
                               final habit = habits[index];
                               return HabitTile(
+                                key: ValueKey(habit.id),
                                 habit: habit,
                                 index: index,
                                 habitsBox: _habitsBox,
@@ -240,7 +230,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       builder: (context) => HabitDetailScreen(habit: habit),
                                     ),
                                   );
-                                  setState(() {});
                                 },
                               );
                             },
@@ -250,24 +239,16 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          floatingActionButton: ValueListenableBuilder<Color>(
-            valueListenable: ThemeService.currentColor,
-            builder: (context, bgColor, child) {
-              final isLight = AppThemes.isLightBackground(bgColor);
-              final btnBgColor = isLight ? const Color(0xFF1E293B) : const Color(0xFF6366F1);
-
-              return FloatingActionButton.extended(
-                onPressed: _showAddHabitDialog,
-                backgroundColor: btnBgColor,
-                foregroundColor: Colors.white,
-                elevation: 4,
-                icon: const Icon(Icons.add),
-                label: const Text(
-                  'Yeni Görev',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              );
-            },
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: _showAddHabitDialog,
+            backgroundColor: btnBgColor,
+            foregroundColor: Colors.white,
+            elevation: 4,
+            icon: const Icon(Icons.add),
+            label: const Text(
+              'Yeni Görev',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         );
       },

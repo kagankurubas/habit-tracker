@@ -76,21 +76,20 @@ class Habit extends HiveObject {
 
   Color get color => Color(colorValue);
 
-  // İkon Dönüştürücü
-  IconData get icon {
-    final iconMap = <int, IconData>{
-      Icons.book_rounded.codePoint: Icons.book_rounded,
-      Icons.fitness_center_rounded.codePoint: Icons.fitness_center_rounded,
-      Icons.music_note_rounded.codePoint: Icons.music_note_rounded,
-      Icons.code_rounded.codePoint: Icons.code_rounded,
-      Icons.water_drop_rounded.codePoint: Icons.water_drop_rounded,
-      Icons.directions_run_rounded.codePoint: Icons.directions_run_rounded,
-      Icons.bed_rounded.codePoint: Icons.bed_rounded,
-      Icons.self_improvement_rounded.codePoint: Icons.self_improvement_rounded,
-    };
+  // ⚡ Static Icon Map: RAM'de sadece 1 kez oluşturulur
+  static final Map<int, IconData> _iconMap = {
+    Icons.book_rounded.codePoint: Icons.book_rounded,
+    Icons.fitness_center_rounded.codePoint: Icons.fitness_center_rounded,
+    Icons.music_note_rounded.codePoint: Icons.music_note_rounded,
+    Icons.code_rounded.codePoint: Icons.code_rounded,
+    Icons.water_drop_rounded.codePoint: Icons.water_drop_rounded,
+    Icons.directions_run_rounded.codePoint: Icons.directions_run_rounded,
+    Icons.bed_rounded.codePoint: Icons.bed_rounded,
+    Icons.self_improvement_rounded.codePoint: Icons.self_improvement_rounded,
+  };
 
-    return iconMap[iconCodePoint] ?? Icons.star_rounded;
-  }
+  // İkon Dönüştürücü
+  IconData get icon => _iconMap[iconCodePoint] ?? Icons.star_rounded;
 
   String get frequencyText {
     switch (frequencyType) {
@@ -112,6 +111,10 @@ class Habit extends HiveObject {
 
   // Tarih saatini 00:00:00 yapacak yardımcı metot
   DateTime _stripTime(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
+
+  /// ⚡ O(1) Hızlı arama için tamamlanmış tarihlerin Set versiyonu
+  Set<DateTime> get _completedDatesSet =>
+      completedDatesList.map((d) => _stripTime(d)).toSet();
 
   DateTime get startDate {
     if (completedDatesList.isNotEmpty) {
@@ -143,9 +146,10 @@ class Habit extends HiveObject {
     }
   }
 
+  /// ⚡ OPTİMİZE EDİLDİ: O(1) Hızlı kontrol
   bool isCompletedOn(DateTime date) {
     final target = _stripTime(date);
-    return completedDatesList.any((d) => _stripTime(d).isAtSameMomentAs(target));
+    return _completedDatesSet.contains(target);
   }
 
   void toggleDate(DateTime date) {
@@ -163,57 +167,48 @@ class Habit extends HiveObject {
     completedDatesList = newList;
   }
 
-  // 📊 Mükerrer kayıtları engelleyen ve güvenli seri (streak) hesaplayıcı
+  /// ⚡ OPTİMİZE EDİLDİ: O(N) Sıralama yapmadan doğrudan geriye sayım yapan Seri (Streak) hesaplayıcı
   int get currentStreak {
     if (completedDatesList.isEmpty) return 0;
 
-    final sortedDates = completedDatesList
-        .map((d) => _stripTime(d))
-        .toSet()
-        .toList()
-      ..sort((a, b) => b.compareTo(a));
-
+    final completedSet = _completedDatesSet;
     final today = _stripTime(DateTime.now());
     final yesterday = today.subtract(const Duration(days: 1));
 
-    final latestDate = sortedDates.first;
-    final isDoneToday = latestDate.isAtSameMomentAs(today);
-    final isDoneYesterday = latestDate.isAtSameMomentAs(yesterday);
-
-    if (!isDoneToday && !isDoneYesterday) {
+    // Bugün veya dün yapılmadıysa seri bozulmuştur
+    if (!completedSet.contains(today) && !completedSet.contains(yesterday)) {
       return 0;
     }
 
     int streak = 0;
-    DateTime checkDate = isDoneToday ? today : yesterday;
+    DateTime checkDate = completedSet.contains(today) ? today : yesterday;
 
-    for (final date in sortedDates) {
-      if (date.isAtSameMomentAs(checkDate)) {
-        streak++;
-        checkDate = checkDate.subtract(const Duration(days: 1));
-      } else if (date.isBefore(checkDate)) {
-        break;
-      }
+    // Kırılma gününe kadar geriye doğru adımla
+    while (completedSet.contains(checkDate)) {
+      streak++;
+      checkDate = checkDate.subtract(const Duration(days: 1));
     }
 
     return streak;
   }
 
-  // 📈 Son X gün içindeki başarı yüzdesi
+  /// ⚡ OPTİMİZE EDİLDİ: Son X gün içindeki başarı yüzdesi
   double calculateCompletionRate({int lastDays = 30}) {
-    if (completedDatesList.isEmpty) return 0.0;
+    if (completedDatesList.isEmpty || lastDays <= 0) return 0.0;
 
+    final completedSet = _completedDatesSet;
     final today = _stripTime(DateTime.now());
     int completedCount = 0;
 
     for (int i = 0; i < lastDays; i++) {
       final checkDate = today.subtract(Duration(days: i));
-      if (isCompletedOn(checkDate)) {
+      if (completedSet.contains(checkDate)) {
         completedCount++;
       }
     }
 
-    return (completedCount / lastDays) * 100;
+    final rate = (completedCount / lastDays) * 100;
+    return rate > 100 ? 100.0 : double.parse(rate.toStringAsFixed(1));
   }
 
   // 🔢 Toplam tamamlanan gün sayısı

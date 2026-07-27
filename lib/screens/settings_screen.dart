@@ -18,6 +18,9 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ⚡ Ayarlar kutumuzu açıyoruz (Varsayılan ad: 'settings')
+    final settingsBox = Hive.box('settings');
+
     return ValueListenableBuilder<Color>(
       valueListenable: ThemeService.currentColor,
       builder: (context, bgColor, child) {
@@ -55,6 +58,67 @@ class SettingsScreen extends StatelessWidget {
                   trailing: const Icon(Icons.chevron_right_rounded, color: Colors.grey),
                   onTap: () => ThemeService.showThemeSelector(context),
                 ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 🔊 SES & GERİ BİLDİRİM SEKSİYONU (YENİ EKLENDİ)
+              _buildSectionTitle('Ses & Geri Bildirim', textColor),
+              const SizedBox(height: 8),
+              ValueListenableBuilder<Box>(
+                valueListenable: settingsBox.listenable(),
+                builder: (context, box, _) {
+                  final isSoundEnabled = box.get('isSoundEnabled', defaultValue: true);
+                  final isHapticEnabled = box.get('isHapticEnabled', defaultValue: true);
+
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: subtextColor.withValues(alpha: 0.15)),
+                    ),
+                    child: Column(
+                      children: [
+                        // 🔊 Ses Efekti Switch
+                        SwitchListTile(
+                          activeColor: const Color(0xFF6366F1),
+                          secondary: const Icon(Icons.volume_up_rounded, color: Color(0xFF6366F1)),
+                          title: Text(
+                            'Ses Efektleri',
+                            style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
+                          ),
+                          subtitle: Text(
+                            'Görev tamamlandığında tamamlama sesi çalar',
+                            style: TextStyle(color: subtextColor, fontSize: 12),
+                          ),
+                          value: isSoundEnabled,
+                          onChanged: (bool value) async {
+                            await box.put('isSoundEnabled', value);
+                          },
+                        ),
+                        Divider(height: 1, color: subtextColor.withValues(alpha: 0.1)),
+
+                        // 📳 Haptik Titreşim Switch
+                        SwitchListTile(
+                          activeColor: const Color(0xFF6366F1),
+                          secondary: const Icon(Icons.vibration_rounded, color: Color(0xFF10B981)),
+                          title: Text(
+                            'Haptik Titreşim',
+                            style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
+                          ),
+                          subtitle: Text(
+                            'Dokunma anında fiziksel titreşim hissi verir',
+                            style: TextStyle(color: subtextColor, fontSize: 12),
+                          ),
+                          value: isHapticEnabled,
+                          onChanged: (bool value) async {
+                            await box.put('isHapticEnabled', value);
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
 
               const SizedBox(height: 24),

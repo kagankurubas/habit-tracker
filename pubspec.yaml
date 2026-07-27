@@ -46,6 +46,7 @@ dependencies:
   file_picker: ^8.0.0  # Yedek dosyasını telefondan seçmek için
   share_plus: ^10.0.0
   universal_html: ^2.2.4
+  audioplayers: ^6.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -72,6 +73,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/badges/
+    - assets/sounds/complete.mp3
 
   # To add assets to your application, add an assets section, like this:
   # assets:
