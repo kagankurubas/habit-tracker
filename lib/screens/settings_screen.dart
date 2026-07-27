@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // 📌 Panoya kopyalama için eklendi
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/habit.dart';
 import '../models/category_model.dart';
@@ -195,7 +196,7 @@ class SettingsScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // ℹ️ UYGULAMA BİLGİSİ
+              // ℹ️ UYGULAMA BİLGİSİ & GİTHUB
               _SectionTitle(title: 'Hakkında', textColor: textColor),
               const SizedBox(height: 8),
               Container(
@@ -204,10 +205,29 @@ class SettingsScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: subtextColor.withValues(alpha: 0.15)),
                 ),
-                child: ListTile(
-                  leading: const Icon(Icons.info_outline_rounded, color: Colors.amber),
-                  title: Text('Habit Tracker', style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
-                  subtitle: Text('Sürüm 1.0.0', style: TextStyle(color: subtextColor, fontSize: 12)),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.info_outline_rounded, color: Colors.amber),
+                      title: Text('HABITTO', style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
+                      subtitle: Text('Sürüm 1.0.0', style: TextStyle(color: subtextColor, fontSize: 12)),
+                    ),
+                    Divider(height: 1, color: subtextColor.withValues(alpha: 0.1)),
+                    ListTile(
+                      leading: const Icon(Icons.code_rounded, color: Color(0xFF6366F1)),
+                      title: Text('GitHub Kaynak Kodu', style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
+                      subtitle: Text('kagankurubas/habit-tracker', style: TextStyle(color: subtextColor, fontSize: 12)),
+                      trailing: const Icon(Icons.copy_rounded, size: 18, color: Colors.grey),
+                      onTap: () async {
+                        await Clipboard.setData(const ClipboardData(text: 'https://github.com/kagankurubas/habit-tracker'));
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('GitHub bağlantısı kopyalandı! 📋')),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -218,7 +238,7 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-// 🛠️ BAŞLIK WIDGET'I (Re-render performans desteği ile ayrıştırıldı)
+// 🛠️ BAŞLIK WIDGET'I
 class _SectionTitle extends StatelessWidget {
   final String title;
   final Color textColor;
