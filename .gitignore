@@ -1,12 +1,15 @@
 # Miscellaneous
+
 *.class
-*.lock
 *.log
 *.pyc
 *.swp
 .buildlog/
 .history
 
+# IDE files
+.idea/
+*.iml
 
 
 # Flutter repo-specific
