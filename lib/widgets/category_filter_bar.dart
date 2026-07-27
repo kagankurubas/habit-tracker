@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart'; // ⚡ 1. SÜRÜKLEME DESTEĞİ İÇİN EKLENDİ
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/category_model.dart';
@@ -69,93 +70,102 @@ class CategoryFilterBar extends StatelessWidget {
 
             return SizedBox(
               height: 38,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: userCategories.length + 2,
-                itemBuilder: (context, index) {
-                  // 1. TÜM GÖREVLER ÇİPİ
-                  if (index == 0) {
-                    final isSelected = selectedCategory == 'Tüm Görevler';
-                    return _buildChip(
-                      context: context,
-                      label: 'Tüm Görevler',
-                      iconData: Icons.stars_rounded,
-                      chipColor: const Color(0xFF6366F1),
-                      isSelected: isSelected,
-                      isLight: isLight,
-                      onTap: () => onCategorySelected('Tüm Görevler'),
-                    );
-                  }
+              // ⚡ 2. SCROLLCONFIGURATION ILE LISTVIEW SARMALANDI (Hata Çözümü)
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  dragDevices: {
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.mouse, // 👈 Fare ile basılı tutup sürüklemeyi etkinleştirir
+                  },
+                ),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: userCategories.length + 2,
+                  itemBuilder: (context, index) {
+                    // 1. TÜM GÖREVLER ÇİPİ
+                    if (index == 0) {
+                      final isSelected = selectedCategory == 'Tüm Görevler';
+                      return _buildChip(
+                        context: context,
+                        label: 'Tüm Görevler',
+                        iconData: Icons.stars_rounded,
+                        chipColor: const Color(0xFF6366F1),
+                        isSelected: isSelected,
+                        isLight: isLight,
+                        onTap: () => onCategorySelected('Tüm Görevler'),
+                      );
+                    }
 
-                  // 2. KATEGORİ EKLE BUTONU
-                  if (index == 1) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: InkWell(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (ctx) => AddCategoryDialog(
-                              onSave: (name, colorValue, iconCodePoint) async {
-                                final newCategory = CategoryModel(
-                                  id: DateTime.now().millisecondsSinceEpoch.toString(),
-                                  name: name,
-                                  colorValue: colorValue,
-                                  iconCodePoint: iconCodePoint,
-                                );
-                                await categoriesBox.add(newCategory);
-                              },
-                            ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isLight
-                                ? Colors.indigo.shade50
-                                : const Color(0xFF6366F1).withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: const Color(0xFF6366F1).withValues(alpha: 0.5),
-                              width: 1.5,
-                            ),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.add, size: 16, color: Color(0xFF6366F1)),
-                              SizedBox(width: 4),
-                              Text(
-                                'Ekle',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF6366F1),
-                                ),
+                    // 2. KATEGORİ EKLE BUTONU
+                    if (index == 1) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: InkWell(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AddCategoryDialog(
+                                onSave: (name, colorValue, iconCodePoint) async {
+                                  final newCategory = CategoryModel(
+                                    id: DateTime.now().millisecondsSinceEpoch.toString(),
+                                    name: name,
+                                    colorValue: colorValue,
+                                    iconCodePoint: iconCodePoint,
+                                  );
+                                  await categoriesBox.add(newCategory);
+                                },
                               ),
-                            ],
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isLight
+                                  ? Colors.indigo.shade50
+                                  : const Color(0xFF6366F1).withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: const Color(0xFF6366F1).withValues(alpha: 0.5),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.add, size: 16, color: Color(0xFF6366F1)),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Ekle',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF6366F1),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+                      );
+                    }
+
+                    // 3. DİNAMİK KATEGORİ ÇİPLERİ
+                    final category = userCategories[index - 2];
+                    final isSelected = selectedCategory == category.name;
+
+                    return _buildChip(
+                      context: context,
+                      label: category.name,
+                      iconData: category.iconData,
+                      chipColor: category.color,
+                      isSelected: isSelected,
+                      isLight: isLight,
+                      onTap: () => onCategorySelected(category.name),
+                      onLongPress: () => _showDeleteDialog(context, category, bgColor),
                     );
-                  }
-
-                  // 3. DİNAMİK KATEGORİ ÇİPLERİ
-                  final category = userCategories[index - 2];
-                  final isSelected = selectedCategory == category.name;
-
-                  return _buildChip(
-                    context: context,
-                    label: category.name,
-                    iconData: category.iconData,
-                    chipColor: category.color,
-                    isSelected: isSelected,
-                    isLight: isLight,
-                    onTap: () => onCategorySelected(category.name),
-                    onLongPress: () => _showDeleteDialog(context, category, bgColor),
-                  );
-                },
+                  },
+                ),
               ),
             );
           },
