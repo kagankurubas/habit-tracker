@@ -216,10 +216,10 @@ class SettingsScreen extends StatelessWidget {
                     ListTile(
                       leading: const Icon(Icons.code_rounded, color: Color(0xFF6366F1)),
                       title: Text('GitHub Kaynak Kodu', style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
-                      subtitle: Text('kagankurubas/habit-tracker', style: TextStyle(color: subtextColor, fontSize: 12)),
+                      subtitle: Text('kagankurubas/habitto', style: TextStyle(color: subtextColor, fontSize: 12)),
                       trailing: const Icon(Icons.copy_rounded, size: 18, color: Colors.grey),
                       onTap: () async {
-                        await Clipboard.setData(const ClipboardData(text: 'https://github.com/kagankurubas/habit-tracker'));
+                        await Clipboard.setData(const ClipboardData(text: 'https://github.com/kagankurubas/habitto'));
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('GitHub bağlantısı kopyalandı! 📋')),
