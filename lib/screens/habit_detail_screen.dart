@@ -18,6 +18,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   final DateTime _focusedDay = DateTime.now();
   int _selectedViewIndex = 0;
 
+  // 🎯 HEDEF GÜN İÇİN SABİT SARI RENK (GÖREV TEMA RENGİNDEN BAĞIMSIZ)
+  static const Color targetDayColor = Color(0xFFF59E0B);
+
   Map<DateTime, int> _getHeatmapDatasets() {
     Map<DateTime, int> datasets = {};
     for (var date in widget.habit.completedDatesList) {
@@ -51,7 +54,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     final isDoneToday = widget.habit.isCompletedOn(DateTime.now());
     final themeColor = widget.habit.color;
 
-    // 🚀 TEMA DİNLEYİCİSİ EKLENDİ
     return ValueListenableBuilder<Color>(
       valueListenable: ThemeService.currentColor,
       builder: (context, bgColor, child) {
@@ -60,7 +62,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
         final cardColor = AppThemes.getCardColor(bgColor);
 
         return Scaffold(
-          backgroundColor: bgColor, // 👈 Dinamik Arka Plan
+          backgroundColor: bgColor,
           appBar: AppBar(
             title: Row(
               children: [
@@ -89,7 +91,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 🎯 DİNAMİK TEMALI ÖZET KARTI
+                // DİNAMİK TEMALI ÖZET KARTI
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
@@ -195,7 +197,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // 🎯 GÖRÜNÜM SEÇİMİ (HEATMAP & TAKVİM SEÇİCİ)
+                // GÖRÜNÜM SEÇİMİ (HEATMAP & TAKVİM SEÇİCİ)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -227,7 +229,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 ),
                 const SizedBox(height: 12),
 
-                // 🎯 DİNAMİK KART / HEATMAP & TAKVİM
+                // DİNAMİK KART / HEATMAP & TAKVİM
                 Card(
                   color: cardColor,
                   elevation: 0,
@@ -278,7 +280,8 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                       itemBgColor = Colors.green;
                                       itemTextColor = Colors.white;
                                     } else if (isTarget) {
-                                      itemBgColor = themeColor.withValues(alpha: 0.85);
+                                      // 🚀 HEDEF GÜNLER ARTIK HER ZAMAN SARI
+                                      itemBgColor = targetDayColor.withValues(alpha: 0.85);
                                       itemTextColor = Colors.white;
                                     }
 
@@ -289,7 +292,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                         color: itemBgColor,
                                         shape: BoxShape.circle,
                                         border: isSameDay(day, DateTime.now()) && !isDone
-                                            ? Border.all(color: themeColor, width: 2)
+                                            ? Border.all(color: targetDayColor, width: 2)
                                             : null,
                                       ),
                                       child: Text(
@@ -318,7 +321,8 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   _buildLegendItem(Colors.green, 'Yapıldı', subtextColor),
-                                  _buildLegendItem(themeColor, 'Hedef Gün', subtextColor),
+                                  // 🚀 SARI LEJANT/LEGEND NOKTASI
+                                  _buildLegendItem(targetDayColor, 'Hedef Gün', subtextColor),
                                   _buildLegendItem(subtextColor.withValues(alpha: 0.4), 'Rutin Dışı', subtextColor),
                                 ],
                               ),
@@ -329,7 +333,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // 🎯 İSTATİSTİK ÖZET KARTLARI
+                // İSTATİSTİK ÖZET KARTLARI
                 Row(
                   children: [
                     Expanded(
