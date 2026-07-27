@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/category_model.dart';
 
 class AddCategoryDialog extends StatefulWidget {
   final Function(String name, int colorValue, int iconCodePoint) onSave;

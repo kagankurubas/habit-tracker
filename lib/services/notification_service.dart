@@ -99,8 +99,8 @@ class NotificationService {
     if (kIsWeb) return;
 
     // Özel gün seçildiyse her günün ID'sini iptal et
-    if (habit.selectedWeekdays != null && habit.selectedWeekdays!.isNotEmpty) {
-      for (int weekday in habit.selectedWeekdays!) {
+    if (habit.selectedWeekdays.isNotEmpty) {
+      for (int weekday in habit.selectedWeekdays) {
         final notificationId = (habit.id.hashCode ^ weekday).abs();
         await _notificationsPlugin.cancel(id: notificationId);
       }
@@ -152,8 +152,8 @@ class NotificationService {
     );
 
     // 🗓️ A) ÖZEL GÜNLER SEÇİLDİYSE (Sadece O Günlerde Çal)
-    if (habit.selectedWeekdays != null && habit.selectedWeekdays!.isNotEmpty) {
-      for (int weekday in habit.selectedWeekdays!) {
+    if ( habit.selectedWeekdays.isNotEmpty) {
+      for (int weekday in habit.selectedWeekdays) {
         // weekday: 1 (Pazartesi) .. 7 (Pazar)
         var scheduledDate = tz.TZDateTime(
           location,
