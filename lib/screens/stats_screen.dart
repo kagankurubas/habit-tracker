@@ -5,10 +5,28 @@ import '../models/badge_model.dart';
 import '../services/theme_service.dart';
 import '../app_themes.dart';
 
-class StatsScreen extends StatelessWidget {
+class StatsScreen extends StatefulWidget {
   final Box<Habit> habitsBox;
 
   const StatsScreen({super.key, required this.habitsBox});
+
+  @override
+  State<StatsScreen> createState() => _StatsScreenState();
+}
+
+class _StatsScreenState extends State<StatsScreen> {
+  String _selectedBadgeCategory = 'Tüm Rozetler';
+
+  final List<String> _badgeCategories = const [
+    'Tüm Rozetler',
+    'Genel',
+    'Kodlama',
+    'Müzik',
+    'Oyun Dev.',
+    'Spor',
+    'Okuma',
+    'Gizli',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +39,7 @@ class StatsScreen extends StatelessWidget {
         final cardColor = AppThemes.getCardColor(bgColor);
 
         return Scaffold(
-          backgroundColor: bgColor, // 👈 Dinamik Zemin
+          backgroundColor: bgColor,
           appBar: AppBar(
             title: Text(
               'Genel İstatistikler & Başarı',
@@ -31,7 +49,7 @@ class StatsScreen extends StatelessWidget {
             elevation: 0,
           ),
           body: ValueListenableBuilder(
-            valueListenable: habitsBox.listenable(),
+            valueListenable: widget.habitsBox.listenable(),
             builder: (context, Box<Habit> box, _) {
               final habits = box.values.toList();
 
@@ -286,7 +304,7 @@ class StatsScreen extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 24),
-                    // 4. BAŞARIMLAR VE ROZETLER
+                    // 4. BAŞARIMLAR VE ROZETLER (Kategori Filtreli)
                     _buildBadgesSection(habits, cardColor, textColor, subtextColor),
                     const SizedBox(height: 24),
                   ],
@@ -305,7 +323,13 @@ class StatsScreen extends StatelessWidget {
     Color textColor,
     Color subtextColor,
   ) {
-    final sortedBadges = List<HabitBadge>.from(allBadges)
+    // 1. Kategorisine göre filtreleme yapıyoruz
+    final filteredBadges = _selectedBadgeCategory == 'Tüm Rozetler'
+        ? allBadges
+        : allBadges.where((b) => b.category == _selectedBadgeCategory).toList();
+
+    // 2. Kazanılanlar üstte görünecek şekilde sıralıyoruz
+    final sortedBadges = List<HabitBadge>.from(filteredBadges)
       ..sort((a, b) {
         final aUnlocked = a.isUnlocked(habits);
         final bUnlocked = b.isUnlocked(habits);
@@ -322,6 +346,43 @@ class StatsScreen extends StatelessWidget {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
         ),
         const SizedBox(height: 12),
+
+        // 🏷️ ROZET KATEGORİ FİLTRE ÇUBUĞU
+        SizedBox(
+          height: 38,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _badgeCategories.length,
+            itemBuilder: (context, index) {
+              final cat = _badgeCategories[index];
+              final isSelected = _selectedBadgeCategory == cat;
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: FilterChip(
+                  label: Text(cat),
+                  selected: isSelected,
+                  selectedColor: const Color(0xFF6366F1),
+                  backgroundColor: cardColor,
+                  showCheckmark: false,
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.white : textColor,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 12,
+                  ),
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedBadgeCategory = cat;
+                    });
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // 🏆 ROZET GRID LISTESI
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -329,7 +390,7 @@ class StatsScreen extends StatelessWidget {
             crossAxisCount: 3,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 0.9,
+            childAspectRatio: 0.85,
           ),
           itemCount: sortedBadges.length,
           itemBuilder: (context, index) {
@@ -350,7 +411,7 @@ class StatsScreen extends StatelessWidget {
                         Expanded(
                           child: Text(
                             badge.title,
-                            style: TextStyle(color: textColor, fontSize: 18),
+                            style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -387,7 +448,7 @@ class StatsScreen extends StatelessWidget {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
                 decoration: BoxDecoration(
                   color: cardColor,
                   borderRadius: BorderRadius.circular(16),
@@ -409,6 +470,9 @@ class StatsScreen extends StatelessWidget {
                           child: Image.asset(
                             badge.imagePath,
                             fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(Icons.stars_rounded, size: 40, color: Colors.grey);
+                            },
                           ),
                         ),
                       ),
