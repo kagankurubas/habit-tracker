@@ -94,18 +94,27 @@ class NotificationService {
     );
   }
 
-  // 🔕 Bildirimi İptal Et
+  // 🔕 Bildirimi İptal Et (Seçili günlerin tüm ID'lerini temizler)
   Future<void> cancelHabitNotification(Habit habit) async {
-    if (kIsWeb) return; // 🌐 Web'de çalışıyorsa iptal metodunu es geç
+    if (kIsWeb) return;
 
-    await _notificationsPlugin.cancel(id: habit.id.hashCode);
-    print('🔕 Bildirim İptal Edildi: ${habit.title}');
+    // Özel gün seçildiyse her günün ID'sini iptal et
+    if (habit.selectedWeekdays != null && habit.selectedWeekdays!.isNotEmpty) {
+      for (int weekday in habit.selectedWeekdays!) {
+        final notificationId = (habit.id.hashCode ^ weekday).abs();
+        await _notificationsPlugin.cancel(id: notificationId);
+      }
+    } else {
+      await _notificationsPlugin.cancel(id: habit.id.hashCode.abs());
+    }
+    print('🔕 Bildirim(ler) İptal Edildi: ${habit.title}');
   }
 
-  // 🔔 Rutin Zamanla
+  // 🔔 Rutin Zamanla (Sadece Hedef Günlerde Çalar)
   Future<void> scheduleHabitNotification(Habit habit) async {
-    if (kIsWeb) return; // 🌐 Web'de çalışıyorsa zamanlamayı es geç
+    if (kIsWeb) return;
 
+    // Bildirim kapalıysa veya saat tanımlanmamışsa iptal etip çık
     if (!habit.isNotificationEnabled ||
         habit.notificationHour == null ||
         habit.notificationMinute == null) {
@@ -113,35 +122,22 @@ class NotificationService {
       return;
     }
 
-    final int notificationId = habit.id.hashCode;
+    // Önce bu habit'e ait eski bildirimleri temizleyelim
+    await cancelHabitNotification(habit);
 
     final location = tz.getLocation('Europe/Istanbul');
     final now = tz.TZDateTime.now(location);
-
-    var scheduledDate = tz.TZDateTime(
-      location,
-      now.year,
-      now.month,
-      now.day,
-      habit.notificationHour!,
-      habit.notificationMinute!,
-    );
-
-    if (scheduledDate.isBefore(now.subtract(const Duration(seconds: 30)))) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
-    }
-
     final String motivationBody = MotivationService.getRandomQuote();
 
-    final androidDetails = AndroidNotificationDetails(
+    const androidDetails = AndroidNotificationDetails(
       'habit_reminders',
       'Rutin Hatırlatıcıları',
-      channelDescription: 'Alışkanlıklarınızı hatırlatan günlük bildirimler',
+      channelDescription: 'Alışkanlıklarınızı hatırlatan bildirimler',
       importance: Importance.max,
       priority: Priority.high,
       fullScreenIntent: true,
       actions: <AndroidNotificationAction>[
-        const AndroidNotificationAction(
+        AndroidNotificationAction(
           'open_habit',
           '🔍 Detayı Aç',
           showsUserInterface: true,
@@ -150,22 +146,75 @@ class NotificationService {
       ],
     );
 
-    final notificationDetails = NotificationDetails(
+    const notificationDetails = NotificationDetails(
       android: androidDetails,
-      iOS: const DarwinNotificationDetails(),
+      iOS: DarwinNotificationDetails(),
     );
 
-    await _notificationsPlugin.zonedSchedule(
-      id: notificationId,
-      title: '🔥 ${habit.title}',
-      body: motivationBody,
-      scheduledDate: scheduledDate,
-      notificationDetails: notificationDetails,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
-      payload: habit.id,
-    );
+    // 🗓️ A) ÖZEL GÜNLER SEÇİLDİYSE (Sadece O Günlerde Çal)
+    if (habit.selectedWeekdays != null && habit.selectedWeekdays!.isNotEmpty) {
+      for (int weekday in habit.selectedWeekdays!) {
+        // weekday: 1 (Pazartesi) .. 7 (Pazar)
+        var scheduledDate = tz.TZDateTime(
+          location,
+          now.year,
+          now.month,
+          now.day,
+          habit.notificationHour!,
+          habit.notificationMinute!,
+        );
 
-    print('🔔 BİLDİRİM ZAMANLANDI: ${habit.title} -> Kurulan Saat: ${scheduledDate.hour}:${scheduledDate.minute} (Hedef Zaman: $scheduledDate)');
+        // Hedef güne kadar tarihi ileri saralım
+        while (scheduledDate.weekday != weekday || scheduledDate.isBefore(now)) {
+          scheduledDate = scheduledDate.add(const Duration(days: 1));
+        }
+
+        // Her gün için çakışmayan benzersiz ID
+        final notificationId = (habit.id.hashCode ^ weekday).abs();
+
+        await _notificationsPlugin.zonedSchedule(
+          id: notificationId,
+          title: '🔥 ${habit.title}',
+          body: motivationBody,
+          scheduledDate: scheduledDate,
+          notificationDetails: notificationDetails,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime, // 👈 SADECE SEÇİLİ HAFTANIN GÜNÜNDE
+          payload: habit.id,
+        );
+
+        print('🔔 GÜNLÜK BİLDİRİM ZAMANLANDI: ${habit.title} -> Gün: $weekday, Saat: ${scheduledDate.hour}:${scheduledDate.minute}');
+      }
+    } 
+    // 📆 B) ÖZEL GÜN SEÇİLMEDİYSE (Her Gün Çal)
+    else {
+      var scheduledDate = tz.TZDateTime(
+        location,
+        now.year,
+        now.month,
+        now.day,
+        habit.notificationHour!,
+        habit.notificationMinute!,
+      );
+
+      if (scheduledDate.isBefore(now.subtract(const Duration(seconds: 30)))) {
+        scheduledDate = scheduledDate.add(const Duration(days: 1));
+      }
+
+      final notificationId = habit.id.hashCode.abs();
+
+      await _notificationsPlugin.zonedSchedule(
+        id: notificationId,
+        title: '🔥 ${habit.title}',
+        body: motivationBody,
+        scheduledDate: scheduledDate,
+        notificationDetails: notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time, // 👈 HER GÜN
+        payload: habit.id,
+      );
+
+      print('🔔 HER GÜN BİLDİRİM ZAMANLANDI: ${habit.title} -> Saat: ${scheduledDate.hour}:${scheduledDate.minute}');
+    }
   }
 }
