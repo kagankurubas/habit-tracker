@@ -27,7 +27,8 @@ class HabitTile extends StatelessWidget {
 
   // ⚡ TIKLAMA HAPTIK, SES VE VERİ GÜNCELLEME İŞLEMİ
   Future<void> _handleToggle(BuildContext context, Habit currentHabit) async {
-    final todayNormalized = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final now = DateTime.now();
+    final todayNormalized = DateTime(now.year, now.month, now.day);
     final willComplete = !currentHabit.isCompletedOn(todayNormalized);
 
     final bool isSettingsOpen = Hive.isBoxOpen('settings');
@@ -56,51 +57,52 @@ class HabitTile extends StatelessWidget {
     }
 
     if (willComplete && context.mounted) {
-      _checkBadgeUnlocked(context, currentHabit);
+      _checkBadgeUnlocked(context);
     }
   }
 
   // 🏆 ROZET KONTROLÜ VE SIRALI POP-UP GÖSTERİMİ
-    void _checkBadgeUnlocked(BuildContext context, Habit updatedHabit) async {
-      final int streak = updatedHabit.currentStreak;
-      int totalCompletions = habitsBox.values.fold(0, (sum, h) => sum + h.completedDatesList.length);
+  void _checkBadgeUnlocked(BuildContext context) async {
+    final int streak = habit.currentStreak;
+    final int totalCompletions = habitsBox.values.fold(0, (sum, h) => sum + h.completedDatesList.length);
 
-      final todayNormalized = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-      final allHabits = habitsBox.values.toList();
-      final todayTargets = allHabits.where((h) => h.isTargetDate(todayNormalized)).toList();
-      final isPerfectDay = todayTargets.length >= 3 && todayTargets.every((h) => h.isCompletedOn(todayNormalized));
+    final now = DateTime.now();
+    final todayNormalized = DateTime(now.year, now.month, now.day);
+    final allHabits = habitsBox.values.toList();
+    final todayTargets = allHabits.where((h) => h.isTargetDate(todayNormalized)).toList();
+    final isPerfectDay = todayTargets.length >= 3 && todayTargets.every((h) => h.isCompletedOn(todayNormalized));
 
-      final List<Map<String, dynamic>> badges = [];
+    final List<Map<String, dynamic>> badges = [];
 
-      if (totalCompletions == 1) {
-        badges.add({'title': 'İlk Adım', 'desc': 'İlk rutinini başarıyla tamamladın!', 'imagePath': 'assets/badges/first_step.png', 'color': const Color(0xFF10B981)});
-      }
-      if (isPerfectDay) {
-        badges.add({'title': 'Mükemmel Gün', 'desc': 'Bugünkü tüm hedefleri eksiksiz tamamladın!', 'imagePath': 'assets/badges/perfect_day.png', 'color': const Color(0xFFF59E0B)});
-      }
-      if (streak == 3) {
-        badges.add({'title': 'Alev Alev', 'desc': '3 gün üst üste harika seri!', 'imagePath': 'assets/badges/streak_3.png', 'color': const Color(0xFF3B82F6)});
-      } else if (streak == 7) {
-        badges.add({'title': 'İrade Ustası', 'desc': 'Aralıksız 1 hafta disiplin!', 'imagePath': 'assets/badges/streak_7.png', 'color': const Color(0xFF8B5CF6)});
-      } else if (streak == 30) {
-        badges.add({'title': 'Alışkanlık Canavarı', 'desc': 'Tam 30 günlük efsane seri!', 'imagePath': 'assets/badges/completion_50.png', 'color': const Color(0xFFEC4899)});
-      } else if (totalCompletions == 50) {
-        badges.add({'title': 'Efsane', 'desc': 'Toplamda 50 kez tamamladın!', 'imagePath': 'assets/badges/completion_50.png', 'color': const Color(0xFFF59E0B)});
-      }
-
-      for (var b in badges) {
-        if (!context.mounted) return;
-        await showDialog(
-          context: context,
-          builder: (_) => BadgeUnlockedDialog(
-            badgeTitle: b['title'],
-            badgeDescription: b['desc'],
-            imagePath: b['imagePath'],
-            badgeColor: b['color'],
-          ),
-        );
-      }
+    if (totalCompletions == 1) {
+      badges.add({'title': 'İlk Adım', 'desc': 'İlk rutinini başarıyla tamamladın!', 'imagePath': 'assets/badges/first_step.png', 'color': const Color(0xFF10B981)});
     }
+    if (isPerfectDay) {
+      badges.add({'title': 'Mükemmel Gün', 'desc': 'Bugünkü tüm hedefleri eksiksiz tamamladın!', 'imagePath': 'assets/badges/perfect_day.png', 'color': const Color(0xFFF59E0B)});
+    }
+    if (streak == 3) {
+      badges.add({'title': 'Alev Alev', 'desc': '3 gün üst üste harika seri!', 'imagePath': 'assets/badges/streak_3.png', 'color': const Color(0xFF3B82F6)});
+    } else if (streak == 7) {
+      badges.add({'title': 'İrade Ustası', 'desc': 'Aralıksız 1 hafta disiplin!', 'imagePath': 'assets/badges/streak_7.png', 'color': const Color(0xFF8B5CF6)});
+    } else if (streak == 30) {
+      badges.add({'title': 'Alışkanlık Canavarı', 'desc': 'Tam 30 günlük efsane seri!', 'imagePath': 'assets/badges/completion_50.png', 'color': const Color(0xFFEC4899)});
+    } else if (totalCompletions == 50) {
+      badges.add({'title': 'Efsane', 'desc': 'Toplamda 50 kez tamamladın!', 'imagePath': 'assets/badges/completion_50.png', 'color': const Color(0xFFF59E0B)});
+    }
+
+    for (final b in badges) {
+      if (!context.mounted) return;
+      await showDialog(
+        context: context,
+        builder: (_) => BadgeUnlockedDialog(
+          badgeTitle: b['title'],
+          badgeDescription: b['desc'],
+          imagePath: b['imagePath'],
+          badgeColor: b['color'],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +165,6 @@ class HabitTile extends StatelessWidget {
 }
 
 // ============================================================================
-// ============================================================================
 
 class _LeadingCheck extends StatelessWidget {
   final Habit habit;
@@ -171,7 +172,12 @@ class _LeadingCheck extends StatelessWidget {
   final Color subtextColor;
   final VoidCallback onToggle;
 
-  const _LeadingCheck({required this.habit, required this.isDoneToday, required this.subtextColor, required this.onToggle});
+  const _LeadingCheck({
+    required this.habit,
+    required this.isDoneToday,
+    required this.subtextColor,
+    required this.onToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -266,7 +272,11 @@ class _SubtitleProgress extends StatelessWidget {
   final Color subtextColor;
   final bool isLight;
 
-  const _SubtitleProgress({required this.habit, required this.subtextColor, required this.isLight});
+  const _SubtitleProgress({
+    required this.habit,
+    required this.subtextColor,
+    required this.isLight,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -319,7 +329,11 @@ class _TrailingActions extends StatelessWidget {
   final Color subtextColor;
   final VoidCallback onEdit;
 
-  const _TrailingActions({required this.habit, required this.subtextColor, required this.onEdit});
+  const _TrailingActions({
+    required this.habit,
+    required this.subtextColor,
+    required this.onEdit,
+  });
 
   @override
   Widget build(BuildContext context) {

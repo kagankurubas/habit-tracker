@@ -71,7 +71,6 @@ class NotificationService {
     if (kIsWeb) return;
 
     if (response.payload != null) {
-      print('🚀 Bildirim tıklandı, Habit ID: ${response.payload}');
       selectNotificationStream.value = response.payload;
     }
   }
@@ -107,7 +106,6 @@ class NotificationService {
     } else {
       await _notificationsPlugin.cancel(id: habit.id.hashCode.abs());
     }
-    print('🔕 Bildirim(ler) İptal Edildi: ${habit.title}');
   }
 
   // 🔔 Rutin Zamanla (Sadece Hedef Günlerde Çalar)
@@ -183,7 +181,6 @@ class NotificationService {
           payload: habit.id,
         );
 
-        print('🔔 GÜNLÜK BİLDİRİM ZAMANLANDI: ${habit.title} -> Gün: $weekday, Saat: ${scheduledDate.hour}:${scheduledDate.minute}');
       }
     } 
     // 📆 B) ÖZEL GÜN SEÇİLMEDİYSE (Her Gün Çal)
@@ -213,8 +210,6 @@ class NotificationService {
         matchDateTimeComponents: DateTimeComponents.time, // 👈 HER GÜN
         payload: habit.id,
       );
-
-      print('🔔 HER GÜN BİLDİRİM ZAMANLANDI: ${habit.title} -> Saat: ${scheduledDate.hour}:${scheduledDate.minute}');
     }
   }
 }

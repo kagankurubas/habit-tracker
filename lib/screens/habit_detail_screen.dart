@@ -18,12 +18,12 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   final DateTime _focusedDay = DateTime.now();
   int _selectedViewIndex = 0;
 
-  // 🎯 HEDEF GÜN İÇİN SABİT SARI RENK (GÖREV TEMA RENGİNDEN BAĞIMSIZ)
+  // 🎯 HEDEF GÜN İÇİN SABİT SARI RENK
   static const Color targetDayColor = Color(0xFFF59E0B);
 
   Map<DateTime, int> _getHeatmapDatasets() {
-    Map<DateTime, int> datasets = {};
-    for (var date in widget.habit.completedDatesList) {
+    final Map<DateTime, int> datasets = {};
+    for (final date in widget.habit.completedDatesList) {
       final normalizedDate = DateTime(date.year, date.month, date.day);
       datasets[normalizedDate] = 1;
     }
@@ -238,12 +238,11 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                     padding: const EdgeInsets.all(12.0),
                     child: _selectedViewIndex == 0
                         ? IgnorePointer(
-                            ignoring: true,
                             child: HeatMap(
                               datasets: _getHeatmapDatasets(),
                               colorMode: ColorMode.color,
-                              defaultColor: AppThemes.isLightBackground(bgColor) 
-                                  ? Colors.grey.shade300 
+                              defaultColor: AppThemes.isLightBackground(bgColor)
+                                  ? Colors.grey.shade300
                                   : const Color(0xFF334155),
                               textColor: textColor,
                               showColorTip: false,
@@ -280,7 +279,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                       itemBgColor = Colors.green;
                                       itemTextColor = Colors.white;
                                     } else if (isTarget) {
-                                      // 🚀 HEDEF GÜNLER ARTIK HER ZAMAN SARI
                                       itemBgColor = targetDayColor.withValues(alpha: 0.85);
                                       itemTextColor = Colors.white;
                                     }
@@ -321,7 +319,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   _buildLegendItem(Colors.green, 'Yapıldı', subtextColor),
-                                  // 🚀 SARI LEJANT/LEGEND NOKTASI
                                   _buildLegendItem(targetDayColor, 'Hedef Gün', subtextColor),
                                   _buildLegendItem(subtextColor.withValues(alpha: 0.4), 'Rutin Dışı', subtextColor),
                                 ],

@@ -65,22 +65,22 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (ctx) => AddEditHabitDialog(
         onSave: ({
-          required title,
-          required frequencyType,
-          required intervalDays,
-          required selectedWeekdays,
-          required colorValue,
-          required iconCodePoint,
-          required category,
-          required isNotificationEnabled,
-          notificationHour,
-          notificationMinute,
+          required String title,
+          required int frequencyType,
+          required int intervalDays,
+          required List<int> selectedWeekdays,
+          required int colorValue,
+          required int iconCodePoint,
+          required String category,
+          required bool isNotificationEnabled,
+          int? notificationHour,
+          int? notificationMinute,
         }) async {
           if (title.trim().isEmpty) return;
 
           final newHabit = Habit(
             id: DateTime.now().millisecondsSinceEpoch.toString(),
-            title: title,
+            title: title.trim(),
             colorValue: colorValue,
             iconCodePoint: iconCodePoint,
             frequencyType: frequencyType,
@@ -105,18 +105,18 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (ctx) => AddEditHabitDialog(
         habit: habit,
         onSave: ({
-          required title,
-          required frequencyType,
-          required intervalDays,
-          required selectedWeekdays,
-          required colorValue,
-          required iconCodePoint,
-          required category,
-          required isNotificationEnabled,
-          notificationHour,
-          notificationMinute,
+          required String title,
+          required int frequencyType,
+          required int intervalDays,
+          required List<int> selectedWeekdays,
+          required int colorValue,
+          required int iconCodePoint,
+          required String category,
+          required bool isNotificationEnabled,
+          int? notificationHour,
+          int? notificationMinute,
         }) async {
-          habit.title = title;
+          habit.title = title.trim();
           habit.category = category;
           habit.colorValue = colorValue;
           habit.iconCodePoint = iconCodePoint;
@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ⚡ NOKTA VE BOŞLUK FARKLARINI YOK SAYAN TEMİZLİK METODU
-  String _normalizeCategory(String text) {
+  static String _normalizeCategory(String text) {
     return text.replaceAll('.', '').trim().toLowerCase();
   }
 
@@ -191,7 +191,6 @@ class _HomeScreenState extends State<HomeScreen> {
           body: ValueListenableBuilder<Box<Habit>>(
             valueListenable: _habitsBox.listenable(),
             builder: (context, box, _) {
-              // ⚡ FİLTRELEME MANTIĞI ESNETİLDİ (Nokta ve Büyük/Küçük Harf Toleranslı)
               final habits = box.values.where((h) {
                 if (_selectedFilterCategory == 'Tüm Görevler') return true;
                 return _normalizeCategory(h.category) == _normalizeCategory(_selectedFilterCategory);

@@ -23,6 +23,15 @@ class CategoryDistributionChart extends StatefulWidget {
 class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
   int _touchedIndex = -1;
 
+  // ⚡ KATEGORİ TEMİZLEME YARDIMCISI
+  static String _cleanCategoryName(String rawCategory) {
+    String name = rawCategory.trim();
+    if (name.endsWith('.')) {
+      name = name.substring(0, name.length - 1).trim();
+    }
+    return name.isEmpty ? 'Genel' : name;
+  }
+
   @override
   Widget build(BuildContext context) {
     // 1. Kategori bazında toplam tamamlama sayılarını hesaplayalım
@@ -30,19 +39,8 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
     final Map<String, Color> categoryColors = {};
     int totalCount = 0;
 
-    for (var habit in widget.habits) {
-      // ⚡ KATEGORİ İSMİNİ TEMİZLEME & NORMALIZE ETME
-      String categoryName = habit.category.trim();
-      
-      // Sondaki noktaları temizleyerek "Oyun Dev." ve "Oyun Dev" çakışmasını önleyelim
-      if (categoryName.endsWith('.')) {
-        categoryName = categoryName.substring(0, categoryName.length - 1).trim();
-      }
-      
-      if (categoryName.isEmpty) {
-        categoryName = 'Genel';
-      }
-
+    for (final habit in widget.habits) {
+      final categoryName = _cleanCategoryName(habit.category);
       final count = habit.completedDatesList.length;
 
       if (count > 0) {

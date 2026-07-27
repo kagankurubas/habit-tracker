@@ -27,16 +27,18 @@ class SmartInsightCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final today = DateTime.now();
+    final now = DateTime.now();
+    final todayNormalized = DateTime(now.year, now.month, now.day);
+
     final Map<int, int> completedPerDay = {for (var i = 1; i <= 7; i++) i: 0};
     final Map<int, int> targetPerDay = {for (var i = 1; i <= 7; i++) i: 0};
 
     // Son 28 günün analizi
     for (int i = 0; i < 28; i++) {
-      final date = DateTime(today.year, today.month, today.day).subtract(Duration(days: i));
+      final date = todayNormalized.subtract(Duration(days: i));
       final weekday = date.weekday;
 
-      for (var habit in habits) {
+      for (final habit in habits) {
         if (habit.isTargetDate(date)) {
           targetPerDay[weekday] = (targetPerDay[weekday] ?? 0) + 1;
           if (habit.isCompletedOn(date)) {
@@ -73,13 +75,13 @@ class SmartInsightCard extends StatelessWidget {
     Color accentColor = const Color(0xFF6366F1);
 
     if (worstDay != null && lowestRate < 60) {
-      final dayName = _dayNames[worstDay]!;
+      final dayName = _dayNames[worstDay] ?? '';
       final dropPercent = (100 - lowestRate).toInt();
       emoji = '⚠️';
       accentColor = Colors.orangeAccent;
       message = '$dayName günleri alışkanlıklarını %$dropPercent oranında aksatıyorsun! Bugünlere biraz daha odaklanmaya ne dersin?';
     } else if (bestDay != null && highestRate >= 80) {
-      final dayName = _dayNames[bestDay]!;
+      final dayName = _dayNames[bestDay] ?? '';
       emoji = '⚡';
       accentColor = const Color(0xFF10B981);
       message = 'Süper performans! En verimli günün %${highestRate.toInt()} başarı oranıyla $dayName.';

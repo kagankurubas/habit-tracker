@@ -3,6 +3,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../app_themes.dart';
 
 class ThemeService {
+  // 🛠️ Nesne türetilmesini engeller
+  ThemeService._();
+
   static const String _boxName = 'settings';
   static const String _colorKey = 'bg_color';
 
@@ -24,7 +27,7 @@ class ThemeService {
   static Future<void> changeColor(Color newColor) async {
     currentColor.value = newColor;
     final box = Hive.box(_boxName);
-    await box.put(_colorKey, newColor.value);
+    await box.put(_colorKey, newColor.toARGB32());
   }
 
   // 🎨 3. Renk Seçim Modalını Açma
@@ -61,7 +64,7 @@ class ThemeService {
                       itemCount: AppThemes.backgroundPalette.length,
                       itemBuilder: (context, index) {
                         final color = AppThemes.backgroundPalette[index];
-                        final isSelected = activeColor.value == color.value;
+                        final isSelected = activeColor.toARGB32() == color.toARGB32();
 
                         return GestureDetector(
                           onTap: () async {

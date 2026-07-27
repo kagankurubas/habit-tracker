@@ -39,9 +39,12 @@ class WeeklyPerformanceChart extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: List.generate(7, (index) {
-                final ratio = last7DaysRatios[index];
-                final label = current7DaysLabels[index];
+                // ⚡ Liste uzunluğu güvenliği (RangeError önleme)
+                final ratio = (index < last7DaysRatios.length ? last7DaysRatios[index] : 0.0).clamp(0.0, 1.0);
+                final label = index < current7DaysLabels.length ? current7DaysLabels[index] : '';
                 final isToday = index == 6;
+
+                final barHeight = 90 * ratio < 6 ? 6.0 : 90 * ratio;
 
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -53,7 +56,7 @@ class WeeklyPerformanceChart extends StatelessWidget {
                     const SizedBox(height: 6),
                     Container(
                       width: 24,
-                      height: 90 * ratio < 6 ? 6 : 90 * ratio,
+                      height: barHeight,
                       decoration: BoxDecoration(
                         color: isToday
                             ? const Color(0xFF10B981)

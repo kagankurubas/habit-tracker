@@ -8,7 +8,7 @@ class HabitBadge {
   final String category;
   final bool Function(List<Habit> habits) isUnlocked;
 
-  HabitBadge({
+  const HabitBadge({
     required this.id,
     required this.title,
     required this.description,
@@ -16,6 +16,17 @@ class HabitBadge {
     required this.category,
     required this.isUnlocked,
   });
+}
+
+// 🛠️ YARDIMCI METOTLAR (Kod tekrarını engeller ve performansı artırır)
+int _getTotalCompletions(List<Habit> habits) {
+  return habits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
+}
+
+int _getCategoryCompletions(List<Habit> habits, String category) {
+  return habits
+      .where((h) => h.category == category)
+      .fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
 }
 
 // 🏆 TÜM ROZETLER VE AÇILMA ŞARTLARI
@@ -51,10 +62,7 @@ final List<HabitBadge> allBadges = [
     description: 'Toplamda 10 kez rutin tamamla',
     imagePath: 'assets/badges/completion_10.png',
     category: 'Genel',
-    isUnlocked: (habits) {
-      final total = habits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-      return total >= 10;
-    },
+    isUnlocked: (habits) => _getTotalCompletions(habits) >= 10,
   ),
   HabitBadge(
     id: 'completion_50',
@@ -62,10 +70,7 @@ final List<HabitBadge> allBadges = [
     description: 'Toplamda 50 kez rutin tamamla',
     imagePath: 'assets/badges/completion_50.png',
     category: 'Genel',
-    isUnlocked: (habits) {
-      final total = habits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-      return total >= 50;
-    },
+    isUnlocked: (habits) => _getTotalCompletions(habits) >= 50,
   ),
   HabitBadge(
     id: 'diversity_3',
@@ -82,8 +87,8 @@ final List<HabitBadge> allBadges = [
     imagePath: 'assets/badges/perfect_day.png',
     category: 'Genel',
     isUnlocked: (habits) {
-      final today = DateTime.now();
-      final todayNormalized = DateTime(today.year, today.month, today.day);
+      final now = DateTime.now();
+      final todayNormalized = DateTime(now.year, now.month, now.day);
       final todayTargets = habits.where((h) => h.isTargetDate(todayNormalized)).toList();
 
       if (todayTargets.length < 3) return false;
@@ -98,9 +103,7 @@ final List<HabitBadge> allBadges = [
     description: 'Kodlama kategorisinde ilk görevini tamamla',
     imagePath: 'assets/badges/code_first.png',
     category: 'Kodlama',
-    isUnlocked: (habits) {
-      return habits.any((h) => h.category == 'Kodlama' && h.completedDatesList.isNotEmpty);
-    },
+    isUnlocked: (habits) => habits.any((h) => h.category == 'Kodlama' && h.completedDatesList.isNotEmpty),
   ),
   HabitBadge(
     id: 'code_bug_hunter',
@@ -108,11 +111,7 @@ final List<HabitBadge> allBadges = [
     description: 'Kodlama kategorisinde 5 görev tamamla',
     imagePath: 'assets/badges/code_bug_hunter.png',
     category: 'Kodlama',
-    isUnlocked: (habits) {
-      final codeHabits = habits.where((h) => h.category == 'Kodlama');
-      final total = codeHabits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-      return total >= 5;
-    },
+    isUnlocked: (habits) => _getCategoryCompletions(habits, 'Kodlama') >= 5,
   ),
   HabitBadge(
     id: 'code_master',
@@ -120,11 +119,7 @@ final List<HabitBadge> allBadges = [
     description: 'Kodlama kategorisinde 15 görev tamamla',
     imagePath: 'assets/badges/code_master.png',
     category: 'Kodlama',
-    isUnlocked: (habits) {
-      final codeHabits = habits.where((h) => h.category == 'Kodlama');
-      final total = codeHabits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-      return total >= 15;
-    },
+    isUnlocked: (habits) => _getCategoryCompletions(habits, 'Kodlama') >= 15,
   ),
 
   // 🎸 3. MÜZİK ROZETLERİ
@@ -134,9 +129,7 @@ final List<HabitBadge> allBadges = [
     description: 'Müzik kategorisinde ilk pratik yapışın',
     imagePath: 'assets/badges/music_first.png',
     category: 'Müzik',
-    isUnlocked: (habits) {
-      return habits.any((h) => h.category == 'Müzik' && h.completedDatesList.isNotEmpty);
-    },
+    isUnlocked: (habits) => habits.any((h) => h.category == 'Müzik' && h.completedDatesList.isNotEmpty),
   ),
   HabitBadge(
     id: 'music_virtuoso',
@@ -144,11 +137,7 @@ final List<HabitBadge> allBadges = [
     description: 'Müzik kategorisinde 10 kez pratik yap',
     imagePath: 'assets/badges/music_virtuoso.png',
     category: 'Müzik',
-    isUnlocked: (habits) {
-      final musicHabits = habits.where((h) => h.category == 'Müzik');
-      final total = musicHabits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-      return total >= 10;
-    },
+    isUnlocked: (habits) => _getCategoryCompletions(habits, 'Müzik') >= 10,
   ),
   HabitBadge(
     id: 'music_rockstar',
@@ -156,11 +145,7 @@ final List<HabitBadge> allBadges = [
     description: 'Müzik kategorisinde 20 görev tamamla',
     imagePath: 'assets/badges/music_rockstar.png',
     category: 'Müzik',
-    isUnlocked: (habits) {
-      final musicHabits = habits.where((h) => h.category == 'Müzik');
-      final total = musicHabits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-      return total >= 20;
-    },
+    isUnlocked: (habits) => _getCategoryCompletions(habits, 'Müzik') >= 20,
   ),
 
   // 🎮 4. OYUN DEV. ROZETLERİ
@@ -170,9 +155,7 @@ final List<HabitBadge> allBadges = [
     description: 'Oyun Dev. kategorisinde ilk görevini tamamla',
     imagePath: 'assets/badges/gamedev_builder.png',
     category: 'Oyun Dev.',
-    isUnlocked: (habits) {
-      return habits.any((h) => h.category == 'Oyun Dev.' && h.completedDatesList.isNotEmpty);
-    },
+    isUnlocked: (habits) => habits.any((h) => h.category == 'Oyun Dev.' && h.completedDatesList.isNotEmpty),
   ),
   HabitBadge(
     id: 'gamedev_level_up',
@@ -180,11 +163,7 @@ final List<HabitBadge> allBadges = [
     description: 'Oyun Dev. kategorisinde 10 görev tamamla',
     imagePath: 'assets/badges/gamedev_level_up.png',
     category: 'Oyun Dev.',
-    isUnlocked: (habits) {
-      final devHabits = habits.where((h) => h.category == 'Oyun Dev.');
-      final total = devHabits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-      return total >= 10;
-    },
+    isUnlocked: (habits) => _getCategoryCompletions(habits, 'Oyun Dev.') >= 10,
   ),
 
   // 🏃 5. SPOR ROZETLERİ
@@ -194,11 +173,7 @@ final List<HabitBadge> allBadges = [
     description: 'Spor kategorisinde 5 görev tamamla',
     imagePath: 'assets/badges/sport_runner.png',
     category: 'Spor',
-    isUnlocked: (habits) {
-      final sportHabits = habits.where((h) => h.category == 'Spor');
-      final total = sportHabits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-      return total >= 5;
-    },
+    isUnlocked: (habits) => _getCategoryCompletions(habits, 'Spor') >= 5,
   ),
   HabitBadge(
     id: 'sport_ironman',
@@ -206,11 +181,7 @@ final List<HabitBadge> allBadges = [
     description: 'Spor kategorisinde 15 tamamlama yap',
     imagePath: 'assets/badges/sport_ironman.png',
     category: 'Spor',
-    isUnlocked: (habits) {
-      final sportHabits = habits.where((h) => h.category == 'Spor');
-      final total = sportHabits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-      return total >= 15;
-    },
+    isUnlocked: (habits) => _getCategoryCompletions(habits, 'Spor') >= 15,
   ),
 
   // 📚 6. OKUMA ROZETLERİ
@@ -220,11 +191,7 @@ final List<HabitBadge> allBadges = [
     description: 'Okuma kategorisinde 5 görev tamamla',
     imagePath: 'assets/badges/read_bookworm.png',
     category: 'Okuma',
-    isUnlocked: (habits) {
-      final readHabits = habits.where((h) => h.category == 'Okuma');
-      final total = readHabits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-      return total >= 5;
-    },
+    isUnlocked: (habits) => _getCategoryCompletions(habits, 'Okuma') >= 5,
   ),
   HabitBadge(
     id: 'read_sage',
@@ -232,11 +199,7 @@ final List<HabitBadge> allBadges = [
     description: 'Okuma kategorisinde 15 görev tamamla',
     imagePath: 'assets/badges/read_sage.png',
     category: 'Okuma',
-    isUnlocked: (habits) {
-      final readHabits = habits.where((h) => h.category == 'Okuma');
-      final total = readHabits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-      return total >= 15;
-    },
+    isUnlocked: (habits) => _getCategoryCompletions(habits, 'Okuma') >= 15,
   ),
 
   // 🦉 7. GİZLİ BAŞARIMLAR

@@ -7,6 +7,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ShareService {
+  // 🛠️ Nesne türetilmesini engeller
+  ShareService._();
+
   static Future<void> shareWidgetAsImage(GlobalKey globalKey) async {
     try {
       final boundary = globalKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
@@ -25,7 +28,7 @@ class ShareService {
           mimeType: 'image/png',
           name: 'my_routine_stats.png',
         );
-        
+
         await SharePlus.instance.share(
           ShareParams(
             files: [xFile],
@@ -39,7 +42,7 @@ class ShareService {
         await file.writeAsBytes(pngBytes);
 
         final xFile = XFile(file.path);
-        
+
         await SharePlus.instance.share(
           ShareParams(
             files: [xFile],
@@ -48,7 +51,9 @@ class ShareService {
         );
       }
     } catch (e) {
-      debugPrint('Paylaşım hatası: $e');
+      if (kDebugMode) {
+        debugPrint('Paylaşım hatası: $e');
+      }
     }
   }
 }

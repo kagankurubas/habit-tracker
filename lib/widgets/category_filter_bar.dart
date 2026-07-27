@@ -1,4 +1,4 @@
-import 'package:flutter/gestures.dart'; // ⚡ 1. SÜRÜKLEME DESTEĞİ İÇİN EKLENDİ
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/category_model.dart';
@@ -70,12 +70,11 @@ class CategoryFilterBar extends StatelessWidget {
 
             return SizedBox(
               height: 38,
-              // ⚡ 2. SCROLLCONFIGURATION ILE LISTVIEW SARMALANDI (Hata Çözümü)
               child: ScrollConfiguration(
                 behavior: ScrollConfiguration.of(context).copyWith(
                   dragDevices: {
                     PointerDeviceKind.touch,
-                    PointerDeviceKind.mouse, // 👈 Fare ile basılı tutup sürüklemeyi etkinleştirir
+                    PointerDeviceKind.mouse,
                   },
                 ),
                 child: ListView.builder(
@@ -186,7 +185,7 @@ class CategoryFilterBar extends StatelessWidget {
   }) {
     final Color activeBgColor = chipColor;
     final Color unselectedBgColor = isLight ? Colors.white.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.08);
-    final Color activeTextColor = Colors.white;
+    const Color activeTextColor = Colors.white;
     final Color unselectedTextColor = isLight ? const Color(0xFF0F172A) : Colors.white.withValues(alpha: 0.8);
 
     return Padding(

@@ -1,5 +1,3 @@
-// lib/services/stats_service.dart
-
 import '../models/habit.dart';
 
 class DayPerformance {
@@ -8,7 +6,7 @@ class DayPerformance {
   final int completedCount;
   final int targetCount;
 
-  DayPerformance({
+  const DayPerformance({
     required this.weekday,
     required this.dayName,
     required this.completedCount,
@@ -25,7 +23,7 @@ class InsightResult {
   final String message;
   final String emoji;
 
-  InsightResult({
+  const InsightResult({
     this.worstDay,
     this.bestDay,
     required this.message,
@@ -34,6 +32,9 @@ class InsightResult {
 }
 
 class StatsService {
+  // 🛠️ Nesne türetilmesini engeller
+  StatsService._();
+
   static const Map<int, String> dayNames = {
     1: 'Pazartesi',
     2: 'Salı',
@@ -47,22 +48,24 @@ class StatsService {
   /// Son [daysBack] gün içindeki haftalık performans analizi
   static InsightResult analyzeWeeklyPerformance(List<Habit> habits, {int daysBack = 30}) {
     if (habits.isEmpty) {
-      return InsightResult(
+      return const InsightResult(
         message: 'Henüz yeterli alışkanlık verisi yok. Görevlerini tamamladıkça sana özel analizler burada görünecek!',
         emoji: '📊',
       );
     }
 
-    final today = DateTime.now();
+    final now = DateTime.now();
+    final todayNormalized = DateTime(now.year, now.month, now.day);
+
     final Map<int, int> completedPerDay = {for (var i = 1; i <= 7; i++) i: 0};
     final Map<int, int> targetPerDay = {for (var i = 1; i <= 7; i++) i: 0};
 
     // Son X günün her bir gününü kontrol et
     for (int i = 0; i < daysBack; i++) {
-      final date = DateTime(today.year, today.month, today.day).subtract(Duration(days: i));
+      final date = todayNormalized.subtract(Duration(days: i));
       final weekday = date.weekday;
 
-      for (var habit in habits) {
+      for (final habit in habits) {
         if (habit.isTargetDate(date)) {
           targetPerDay[weekday] = (targetPerDay[weekday] ?? 0) + 1;
           if (habit.isCompletedOn(date)) {
@@ -72,22 +75,23 @@ class StatsService {
       }
     }
 
-    List<DayPerformance> performances = [];
+    final List<DayPerformance> performances = [];
     for (int day = 1; day <= 7; day++) {
-      if ((targetPerDay[day] ?? 0) > 0) {
+      final targets = targetPerDay[day] ?? 0;
+      if (targets > 0) {
         performances.add(
           DayPerformance(
             weekday: day,
-            dayName: dayNames[day]!,
+            dayName: dayNames[day] ?? '',
             completedCount: completedPerDay[day] ?? 0,
-            targetCount: targetPerDay[day] ?? 0,
+            targetCount: targets,
           ),
         );
       }
     }
 
     if (performances.isEmpty) {
-      return InsightResult(
+      return const InsightResult(
         message: 'Alışkanlık takibine devam et, ilk haftalık analizini hazırlıyoruz!',
         emoji: '🌱',
       );

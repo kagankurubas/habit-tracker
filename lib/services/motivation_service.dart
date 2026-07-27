@@ -1,7 +1,12 @@
 import 'dart:math';
 
 class MotivationService {
-  static final List<String> _quotes = [
+  // 🛠️ Yanlışlıkla nesne üretilmesini engeller
+  MotivationService._();
+
+  static final Random _random = Random();
+
+  static const List<String> _quotes = [
     "Zinciri kırma, bugün de hedefine bir adım daha yaklaş!",
     "Küçük adımlar, büyük zaferler getirir. Başlayalım mı?",
     "Bugünün disiplini, yarının başarısıdır!",
@@ -10,8 +15,8 @@ class MotivationService {
     "Rutinlerine sahip çık, geleceğini inşa et!",
   ];
 
+  /// 🎲 Rastgele bir motivasyon sözü döndürür
   static String getRandomQuote() {
-    final random = Random();
-    return _quotes[random.nextInt(_quotes.length)];
+    return _quotes[_random.nextInt(_quotes.length)];
   }
 }

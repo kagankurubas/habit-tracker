@@ -41,6 +41,8 @@ class StatMetricCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: subtextColor,
                     fontSize: 14,
@@ -48,15 +50,20 @@ class StatMetricCard extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(width: 4),
               Icon(icon, color: color, size: 24),
             ],
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
           ),
           Text(

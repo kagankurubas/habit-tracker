@@ -18,7 +18,6 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ⚡ Ayarlar kutumuzu açıyoruz (Varsayılan ad: 'settings')
     final settingsBox = Hive.box('settings');
 
     return ValueListenableBuilder<Color>(
@@ -43,7 +42,7 @@ class SettingsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             children: [
               // 🎨 GÖRÜNÜM & TEMA SEKSİYONU
-              _buildSectionTitle('Görünüm', textColor),
+              _SectionTitle(title: 'Görünüm', textColor: textColor),
               const SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
@@ -62,8 +61,8 @@ class SettingsScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // 🔊 SES & GERİ BİLDİRİM SEKSİYONU (YENİ EKLENDİ)
-              _buildSectionTitle('Ses & Geri Bildirim', textColor),
+              // 🔊 SES & GERİ BİLDİRİM SEKSİYONU
+              _SectionTitle(title: 'Ses & Geri Bildirim', textColor: textColor),
               const SizedBox(height: 8),
               ValueListenableBuilder<Box>(
                 valueListenable: settingsBox.listenable(),
@@ -124,7 +123,7 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               // 💾 VERİ & YEDEKLEME SEKSİYONU
-              _buildSectionTitle('Veri & Yedekleme', textColor),
+              _SectionTitle(title: 'Veri & Yedekleme', textColor: textColor),
               const SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
@@ -197,7 +196,7 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               // ℹ️ UYGULAMA BİLGİSİ
-              _buildSectionTitle('Hakkında', textColor),
+              _SectionTitle(title: 'Hakkında', textColor: textColor),
               const SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
@@ -217,8 +216,20 @@ class SettingsScreen extends StatelessWidget {
       },
     );
   }
+}
 
-  Widget _buildSectionTitle(String title, Color textColor) {
+// 🛠️ BAŞLIK WIDGET'I (Re-render performans desteği ile ayrıştırıldı)
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  final Color textColor;
+
+  const _SectionTitle({
+    required this.title,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 4.0),
       child: Text(

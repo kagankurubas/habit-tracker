@@ -15,6 +15,9 @@ class StatsScreen extends StatelessWidget {
   final Box<Habit> habitsBox;
   final GlobalKey _shareCardKey = GlobalKey();
 
+  // ⚡ Static gün isimleri listesi (Bellek tasarrufu)
+  static const List<String> _dayLabels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+
   StatsScreen({super.key, required this.habitsBox});
 
   void _showShareDialog(
@@ -115,14 +118,12 @@ class StatsScreen extends StatelessWidget {
               final todayCompleted = todayTargets.where((h) => h.isCompletedOn(todayNormalized)).length;
               final todayProgress = todayTargets.isNotEmpty ? (todayCompleted / todayTargets.length) : 0.0;
 
-              int totalCompletions = 0;
-              for (var h in habits) {
-                totalCompletions += h.completedDatesList.length;
-              }
+              // ⚡ Fold ile optimize edilmiş toplam tamamlama sayısı
+              final int totalCompletions = habits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
 
               Habit? bestStreakHabit;
               int maxStreak = 0;
-              for (var h in habits) {
+              for (final h in habits) {
                 final s = h.currentStreak;
                 if (s > maxStreak) {
                   maxStreak = s;
@@ -130,12 +131,11 @@ class StatsScreen extends StatelessWidget {
                 }
               }
 
-              List<double> last7DaysRatios = [];
-              List<String> last7DaysLabels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
-              List<String> current7DaysLabels = [];
+              final List<double> last7DaysRatios = [];
+              final List<String> current7DaysLabels = [];
 
               for (int i = 6; i >= 0; i--) {
-                final checkDate = DateTime(today.year, today.month, today.day).subtract(Duration(days: i));
+                final checkDate = todayNormalized.subtract(Duration(days: i));
 
                 final dayTargets = habits.where((h) {
                   final isTarget = h.isTargetDate(checkDate);
@@ -145,10 +145,10 @@ class StatsScreen extends StatelessWidget {
 
                 final dayDone = dayTargets.where((h) => h.isCompletedOn(checkDate)).length;
 
-                double ratio = dayTargets.isNotEmpty ? (dayDone / dayTargets.length) : 0.0;
+                final double ratio = dayTargets.isNotEmpty ? (dayDone / dayTargets.length) : 0.0;
                 last7DaysRatios.add(ratio);
 
-                final weekdayName = last7DaysLabels[checkDate.weekday - 1];
+                final weekdayName = _dayLabels[checkDate.weekday - 1];
                 current7DaysLabels.add(i == 0 ? 'Bugün' : weekdayName);
               }
 

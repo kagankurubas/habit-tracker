@@ -13,12 +13,13 @@ class ShareStatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int totalCompletions = 0;
+    // ⚡ Toplam tamamlama ve en iyi seriyi tek geçişte hesaplama
+    final totalCompletions = habits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
+    
     int maxStreak = 0;
     Habit? bestHabit;
 
-    for (var h in habits) {
-      totalCompletions += h.completedDatesList.length;
+    for (final h in habits) {
       if (h.currentStreak > maxStreak) {
         maxStreak = h.currentStreak;
         bestHabit = h;

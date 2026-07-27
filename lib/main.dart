@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:timezone/data/latest_all.dart' as tz; 
-import 'package:timezone/timezone.dart' as tz;          
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 import 'models/habit.dart';
 import 'screens/home_screen.dart';
 import 'screens/stats_screen.dart';
 import 'services/notification_service.dart';
-import 'services/theme_service.dart'; 
+import 'services/theme_service.dart';
 import 'app_themes.dart';
 import 'models/category_model.dart';
 
@@ -35,20 +35,20 @@ void main() async {
 
   // Varsayılan Kategoriler
   if (categoriesBox.isEmpty) {
-    final defaultCategories = [
-      CategoryModel(id: '1', name: 'Genel', icon: '📌'),
-      CategoryModel(id: '2', name: 'Kodlama', icon: '💻'),
-      CategoryModel(id: '3', name: 'Müzik', icon: '🎸'),
-      CategoryModel(id: '4', name: 'Oyun Dev.', icon: '🎮'),
-      CategoryModel(id: '5', name: 'Spor', icon: '🏃'),
-      CategoryModel(id: '6', name: 'Okuma', icon: '📚'),
-      CategoryModel(id: '7', name: 'Sağlık', icon: '🧘'),
-    ];
+      final defaultCategories = [
+        CategoryModel(id: '1', name: 'Genel', icon: '📌'),
+        CategoryModel(id: '2', name: 'Kodlama', icon: '💻'),
+        CategoryModel(id: '3', name: 'Müzik', icon: '🎸'),
+        CategoryModel(id: '4', name: 'Oyun Dev.', icon: '🎮'),
+        CategoryModel(id: '5', name: 'Spor', icon: '🏃'),
+        CategoryModel(id: '6', name: 'Okuma', icon: '📚'),
+        CategoryModel(id: '7', name: 'Sağlık', icon: '🧘'),
+      ];
 
-    for (var cat in defaultCategories) {
-      await categoriesBox.add(cat);
+      for (final cat in defaultCategories) {
+        await categoriesBox.add(cat);
+      }
     }
-  }
 
   // 3. Tema servisini başlat
   await ThemeService.init();
@@ -94,7 +94,13 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
-  final Box<Habit> _habitsBox = Hive.box<Habit>('habits');
+  late final Box<Habit> _habitsBox;
+
+  @override
+  void initState() {
+    super.initState();
+    _habitsBox = Hive.box<Habit>('habits');
+  }
 
   @override
   Widget build(BuildContext context) {

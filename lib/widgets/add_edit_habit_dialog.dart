@@ -122,6 +122,8 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
               runSpacing: 8,
               children: _availableIcons.map((iconData) {
                 final isSelected = _selectedIconCodePoint == iconData.codePoint;
+                final activeColor = Color(_selectedColorValue);
+
                 return InkWell(
                   onTap: () {
                     setState(() {
@@ -132,16 +134,16 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: isSelected ? Color(_selectedColorValue).withValues(alpha: 0.2) : Colors.white10,
+                      color: isSelected ? activeColor.withValues(alpha: 0.2) : Colors.white10,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isSelected ? Color(_selectedColorValue) : Colors.transparent,
+                        color: isSelected ? activeColor : Colors.transparent,
                         width: 2,
                       ),
                     ),
                     child: Icon(
                       iconData,
-                      color: isSelected ? Color(_selectedColorValue) : Colors.grey,
+                      color: isSelected ? activeColor : Colors.grey,
                       size: 22,
                     ),
                   ),
@@ -155,11 +157,13 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: _availableColors.map((color) {
-                final isSelected = _selectedColorValue == color.toARGB32();
+                final colorVal = color.toARGB32();
+                final isSelected = _selectedColorValue == colorVal;
+
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      _selectedColorValue = color.toARGB32();
+                      _selectedColorValue = colorVal;
                     });
                   },
                   child: AnimatedContainer(
@@ -335,6 +339,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                             context: context,
                             initialTime: _selectedTime ?? TimeOfDay.now(),
                           );
+                          if (!mounted) return;
                           if (picked != null) {
                             setState(() {
                               _selectedTime = picked;
@@ -363,7 +368,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
           onPressed: _isTitleValid
               ? () {
                   widget.onSave(
-                    title: _controller.text,
+                    title: _controller.text.trim(),
                     frequencyType: _selectedFrequency,
                     intervalDays: _intervalDays,
                     selectedWeekdays: _selectedWeekdays,

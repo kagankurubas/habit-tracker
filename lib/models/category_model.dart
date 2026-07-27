@@ -28,26 +28,24 @@ class CategoryModel extends HiveObject {
     this.iconCodePoint = 0xe3af,
   });
 
-  // 🎨 İsme göre akıllı renk eşlemesi (Eğer hep aynı renk kaydedildiyse isme göre esneklik sağlar)
+  // 🎨 İsme göre akıllı renk eşlemesi
   Color get color {
-    // Eğer kullanıcı özel bir renk seçtiyse ve varsayılan mor değilse onu kullan
     if (colorValue != 0xFF6366F1) return Color(colorValue);
 
-    // Kategori adına göre şık varsayılan renkler
-    switch (name.toLowerCase()) {
+    switch (name.trim().toLowerCase()) {
       case 'kodlama':
-        return const Color(0xFF3B82F6); // Mavi
+        return const Color(0xFF3B82F6);
       case 'müzik':
-        return const Color(0xFF8B5CF6); // Mor
+        return const Color(0xFF8B5CF6);
       case 'oyun dev.':
       case 'oyun dev':
-        return const Color(0xFFF59E0B); // Turuncu
+        return const Color(0xFFF59E0B);
       case 'spor':
-        return const Color(0xFF10B981); // Yeşil
+        return const Color(0xFF10B981);
       case 'okuma':
-        return const Color(0xFF06B6D4); // Cyan
+        return const Color(0xFF06B6D4);
       case 'sağlık':
-        return const Color(0xFFEF4444); // Kırmızı
+        return const Color(0xFFEF4444);
       default:
         return Color(colorValue);
     }
@@ -55,8 +53,7 @@ class CategoryModel extends HiveObject {
 
   // 🎭 İsme göre akıllı ikon eşlemesi
   IconData get iconData {
-    // Kategori adına göre otomatik doğru ikonu seçelim
-    switch (name.toLowerCase()) {
+    switch (name.trim().toLowerCase()) {
       case 'genel':
         return Icons.push_pin_rounded;
       case 'kodlama':
@@ -73,7 +70,6 @@ class CategoryModel extends HiveObject {
       case 'sağlık':
         return Icons.local_hospital_rounded;
       default:
-        // Kaydedilmiş özel bir ikon varsa onu ver, yoksa yıldız
         return _iconMap[iconCodePoint] ?? Icons.star_rounded;
     }
   }

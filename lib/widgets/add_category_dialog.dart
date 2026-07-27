@@ -11,7 +11,7 @@ class AddCategoryDialog extends StatefulWidget {
 
 class _AddCategoryDialogState extends State<AddCategoryDialog> {
   final TextEditingController _nameController = TextEditingController();
-  
+
   final List<Color> _availableColors = const [
     Color(0xFF6366F1),
     Color(0xFF10B981),
@@ -46,6 +46,13 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
     _selectedIconCodePoint = _availableIcons[0].codePoint;
   }
 
+  // ⚡ MEMORY LEAK ÖNLEYİCİ DISPOSE METODU
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -57,6 +64,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
           children: [
             TextField(
               controller: _nameController,
+              autofocus: true,
               decoration: const InputDecoration(
                 hintText: 'Kategori Adı',
                 border: OutlineInputBorder(),
@@ -71,11 +79,12 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: _availableColors.map((color) {
-                  final isSelected = _selectedColorValue == color.toARGB32();
+                  final colorValue = color.toARGB32();
+                  final isSelected = _selectedColorValue == colorValue;
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        _selectedColorValue = color.toARGB32();
+                        _selectedColorValue = colorValue;
                       });
                     },
                     child: Container(
@@ -108,6 +117,8 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               runSpacing: 8,
               children: _availableIcons.map((iconData) {
                 final isSelected = _selectedIconCodePoint == iconData.codePoint;
+                final activeColor = Color(_selectedColorValue);
+
                 return InkWell(
                   onTap: () {
                     setState(() {
@@ -119,17 +130,17 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? Color(_selectedColorValue).withValues(alpha: 0.2)
+                          ? activeColor.withValues(alpha: 0.2)
                           : Colors.white10,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isSelected ? Color(_selectedColorValue) : Colors.transparent,
+                        color: isSelected ? activeColor : Colors.transparent,
                         width: 2,
                       ),
                     ),
                     child: Icon(
                       iconData,
-                      color: isSelected ? Color(_selectedColorValue) : Colors.grey,
+                      color: isSelected ? activeColor : Colors.grey,
                       size: 22,
                     ),
                   ),
@@ -147,9 +158,10 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: Color(_selectedColorValue)),
           onPressed: () {
-            if (_nameController.text.trim().isNotEmpty) {
+            final categoryName = _nameController.text.trim();
+            if (categoryName.isNotEmpty) {
               widget.onSave(
-                _nameController.text.trim(),
+                categoryName,
                 _selectedColorValue,
                 _selectedIconCodePoint,
               );

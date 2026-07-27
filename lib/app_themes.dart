@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppThemes {
+  // 🛠️ Nesne türetilmesini engeller
+  AppThemes._();
+
   static const Color defaultBg = Color(0xFF0F172A);
 
   static const List<Color> backgroundPalette = [
@@ -34,21 +37,19 @@ class AppThemes {
         : Colors.grey.shade400;    // Koyu zemin için açık gri
   }
 
-  // 🃏 Dinamik Kart Rengi (Arka plan açıkken kartları hafif koyu/saydam yapalım ki görünsün)
+  // 🃏 Dinamik Kart Rengi
   static Color getCardColor(Color backgroundColor) {
     return isLightBackground(backgroundColor)
         ? Colors.black.withValues(alpha: 0.05)
         : Colors.white.withValues(alpha: 0.08);
   }
 
-  // 🧭 Alt Navigasyon Çubuğu İçin Akıllı Tonlama (Seçilen rengin birkaç ton koyusu/açığı)
+  // 🧭 Alt Navigasyon Çubuğu İçin Akıllı Tonlama
   static Color getNavBarColor(Color backgroundColor) {
     final hsl = HSLColor.fromColor(backgroundColor);
     if (isLightBackground(backgroundColor)) {
-      // Açık renkler için biraz daha koyulaştırıyoruz (Lightness'ı düşür)
       return hsl.withLightness((hsl.lightness - 0.12).clamp(0.0, 1.0)).toColor();
     } else {
-      // Koyu renkler için biraz daha derinleştiriyoruz
       return hsl.withLightness((hsl.lightness - 0.06).clamp(0.0, 1.0)).toColor();
     }
   }

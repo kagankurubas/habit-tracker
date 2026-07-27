@@ -23,7 +23,7 @@ class BadgesSection extends StatefulWidget {
 class _BadgesSectionState extends State<BadgesSection> {
   String _selectedBadgeCategory = 'Tüm Rozetler';
 
-  final List<String> _badgeCategories = const [
+  static const List<String> _badgeCategories = [
     'Tüm Rozetler',
     'Genel',
     'Kodlama',
@@ -35,7 +35,7 @@ class _BadgesSectionState extends State<BadgesSection> {
   ];
 
   // ⚡ KATEGORİ TEMİZLEME (Boşluk / Nokta Toleransı)
-  String _normalizeCategory(String text) {
+  static String _normalizeCategory(String text) {
     return text.replaceAll('.', '').trim().toLowerCase();
   }
 
@@ -47,10 +47,15 @@ class _BadgesSectionState extends State<BadgesSection> {
             return _normalizeCategory(b.category) == _normalizeCategory(_selectedBadgeCategory);
           }).toList();
 
+    // ⚡ OPTİMİZE EDİLDİ: isUnlocked kontrolü her karşılaştırma için tekrar çalışmasın diye Map ile önceden hesaplanır
+    final unlockedStatus = {
+      for (final badge in filteredBadges) badge.id: badge.isUnlocked(widget.habits)
+    };
+
     final sortedBadges = List<HabitBadge>.from(filteredBadges)
       ..sort((a, b) {
-        final aUnlocked = a.isUnlocked(widget.habits);
-        final bUnlocked = b.isUnlocked(widget.habits);
+        final aUnlocked = unlockedStatus[a.id] ?? false;
+        final bUnlocked = unlockedStatus[b.id] ?? false;
         if (aUnlocked && !bUnlocked) return -1;
         if (!aUnlocked && bUnlocked) return 1;
         return 0;
@@ -100,7 +105,7 @@ class _BadgesSectionState extends State<BadgesSection> {
         ),
         const SizedBox(height: 16),
 
-        // ROZET GRID LISTESI
+        // ROZET GRID LISTESİ
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -113,10 +118,10 @@ class _BadgesSectionState extends State<BadgesSection> {
           itemCount: sortedBadges.length,
           itemBuilder: (context, index) {
             final badge = sortedBadges[index];
-            final unlocked = badge.isUnlocked(widget.habits);
+            final unlocked = unlockedStatus[badge.id] ?? false;
             final isHiddenCategory = _normalizeCategory(badge.category) == 'gizli';
 
-            // 🕵️ GİZLİ ROZET ADI MANTIGI (Kilitliyse Gizemli Görünsün)
+            // 🕵️ GİZLİ ROZET ADI MANTIGI
             final displayTitle = (isHiddenCategory && !unlocked) ? '???' : badge.title;
             final displayDesc = (isHiddenCategory && !unlocked)
                 ? 'Bu sürpriz ve gizli bir rozettir! Doğru zamanda kendiliğinden açılacak.'
