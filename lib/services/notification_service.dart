@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart'; // 🚀 kIsWeb kontrolü için eklendi
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -51,7 +51,7 @@ class NotificationService {
 
   // 🚀 Cold Start (Kapalıyken açılma) kontrolü
   static Future<String?> getInitialNotificationPayload() async {
-    if (kIsWeb) return null; // 🌐 Web'de çalışıyorsa null dön
+    if (kIsWeb) return null;
 
     final NotificationAppLaunchDetails? notificationAppLaunchDetails =
         await NotificationService()._notificationsPlugin.getNotificationAppLaunchDetails();
@@ -71,13 +71,15 @@ class NotificationService {
     if (kIsWeb) return;
 
     if (response.payload != null) {
+      // ⚡ Tıklandığında eğer rutin bugün tamamlandıysa direkt detaya yönlendir, 
+      // tamamlanmadıysa kullanıcı zaten tamamlayabilir.
       selectNotificationStream.value = response.payload;
     }
   }
 
   // 🧪 Test Bildirimi
   Future<void> showInstantTestNotification() async {
-    if (kIsWeb) return; // 🌐 Web'de çalışıyorsa çalıştırma
+    if (kIsWeb) return;
 
     const androidDetails = AndroidNotificationDetails(
       'habit_reminders',
@@ -93,11 +95,10 @@ class NotificationService {
     );
   }
 
-  // 🔕 Bildirimi İptal Et (Seçili günlerin tüm ID'lerini temizler)
+  // 🔕 Bildirimi İptal Et
   Future<void> cancelHabitNotification(Habit habit) async {
     if (kIsWeb) return;
 
-    // Özel gün seçildiyse her günün ID'sini iptal et
     if (habit.selectedWeekdays.isNotEmpty) {
       for (int weekday in habit.selectedWeekdays) {
         final notificationId = (habit.id.hashCode ^ weekday).abs();
@@ -108,11 +109,19 @@ class NotificationService {
     }
   }
 
-  // 🔔 Rutin Zamanla (Sadece Hedef Günlerde Çalar)
+  // 🔔 Rutin Zamanla (⚡ Zaten o gün tamamlandıysa bildirim içeriğini / gönderimini bloke eder)
   Future<void> scheduleHabitNotification(Habit habit) async {
     if (kIsWeb) return;
 
-    // Bildirim kapalıysa veya saat tanımlanmamışsa iptal etip çık
+    // ⚡ ÖNEMLİ KONTROL: Rutin bugün için zaten tamamlandıysa, bildirim kurmayı atla veya iptal et!
+    final nowCheck = DateTime.now();
+    final todayNormalized = DateTime(nowCheck.year, nowCheck.month, nowCheck.day);
+    if (habit.isCompletedOn(todayNormalized)) {
+      await cancelHabitNotification(habit);
+      return;
+    }
+
+    // Bildirim kapalıysa veya saat tanımlanmamışsa iptal edip çık
     if (!habit.isNotificationEnabled ||
         habit.notificationHour == null ||
         habit.notificationMinute == null) {
@@ -149,10 +158,9 @@ class NotificationService {
       iOS: DarwinNotificationDetails(),
     );
 
-    // 🗓️ A) ÖZEL GÜNLER SEÇİLDİYSE (Sadece O Günlerde Çal)
-    if ( habit.selectedWeekdays.isNotEmpty) {
+    // 🗓️ A) ÖZEL GÜNLER SEÇİLDİYSE
+    if (habit.selectedWeekdays.isNotEmpty) {
       for (int weekday in habit.selectedWeekdays) {
-        // weekday: 1 (Pazartesi) .. 7 (Pazar)
         var scheduledDate = tz.TZDateTime(
           location,
           now.year,
@@ -162,12 +170,10 @@ class NotificationService {
           habit.notificationMinute!,
         );
 
-        // Hedef güne kadar tarihi ileri saralım
         while (scheduledDate.weekday != weekday || scheduledDate.isBefore(now)) {
           scheduledDate = scheduledDate.add(const Duration(days: 1));
         }
 
-        // Her gün için çakışmayan benzersiz ID
         final notificationId = (habit.id.hashCode ^ weekday).abs();
 
         await _notificationsPlugin.zonedSchedule(
@@ -177,13 +183,12 @@ class NotificationService {
           scheduledDate: scheduledDate,
           notificationDetails: notificationDetails,
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime, // 👈 SADECE SEÇİLİ HAFTANIN GÜNÜNDE
+          matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
           payload: habit.id,
         );
-
       }
     } 
-    // 📆 B) ÖZEL GÜN SEÇİLMEDİYSE (Her Gün Çal)
+    // 📆 B) ÖZEL GÜN SEÇİLMEDİYSE (Her Gün)
     else {
       var scheduledDate = tz.TZDateTime(
         location,
@@ -207,7 +212,7 @@ class NotificationService {
         scheduledDate: scheduledDate,
         notificationDetails: notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time, // 👈 HER GÜN
+        matchDateTimeComponents: DateTimeComponents.time,
         payload: habit.id,
       );
     }

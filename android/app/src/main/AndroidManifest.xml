@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
-        android:label="habit_tracker"
+        android:label="HABITTO - Habit Tracker"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         
