@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/habit.dart';
+import '../models/category_model.dart';
 import '../widgets/add_edit_habit_dialog.dart';
 import '../widgets/category_filter_bar.dart';
 import '../widgets/habit_tile.dart';
@@ -8,6 +9,7 @@ import '../services/notification_service.dart';
 import '../services/theme_service.dart';
 import '../app_themes.dart';
 import 'habit_detail_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,12 +20,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Box<Habit> _habitsBox;
+  late Box<CategoryModel> _categoriesBox;
   String _selectedFilterCategory = 'Tüm Görevler';
 
   @override
   void initState() {
     super.initState();
     _habitsBox = Hive.box<Habit>('habits');
+    _categoriesBox = Hive.box<CategoryModel>('categories');
     NotificationService.selectNotificationStream.addListener(_handleNotificationClick);
   }
 
@@ -135,12 +139,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 🚀 DİNAMİK ARKA PLAN İÇİN SCAFFOLD'U VALUE LISTENABLE İLE SARMALAYALIM
     return ValueListenableBuilder<Color>(
       valueListenable: ThemeService.currentColor,
       builder: (context, bgColor, child) {
         return Scaffold(
-          backgroundColor: bgColor, // 👈 Ekranın arka planı dinamik oldu
+          backgroundColor: bgColor,
           resizeToAvoidBottomInset: false,
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -161,13 +164,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundColor: Colors.transparent,
                   elevation: 0,
                   actions: [
+                    // ⚙️ AYARLAR EKRANI BUTONU
                     IconButton(
                       icon: Icon(
-                        Icons.palette_outlined,
+                        Icons.settings_outlined,
                         color: textColor,
                       ),
-                      tooltip: 'Tema Rengi Değiştir',
-                      onPressed: () => ThemeService.showThemeSelector(context),
+                      tooltip: 'Ayarlar',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SettingsScreen(
+                              habitsBox: _habitsBox,
+                              categoriesBox: _categoriesBox,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(width: 8),
                   ],
@@ -236,7 +250,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // 🚀 DİNAMİK TEMALI FLOATING ACTION BUTTON
           floatingActionButton: ValueListenableBuilder<Color>(
             valueListenable: ThemeService.currentColor,
             builder: (context, bgColor, child) {
