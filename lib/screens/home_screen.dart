@@ -134,9 +134,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // ⚡ NOKTA VE BOŞLUK FARKLARINI YOK SAYAN TEMİZLİK METODU
+  String _normalizeCategory(String text) {
+    return text.replaceAll('.', '').trim().toLowerCase();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // ⚡ TEK ÜST DİNLENİCİ: Ekranın tamamı için temayı yalnızca en tepede 1 kez dinler
     return ValueListenableBuilder<Color>(
       valueListenable: ThemeService.currentColor,
       builder: (context, bgColor, child) {
@@ -187,9 +191,10 @@ class _HomeScreenState extends State<HomeScreen> {
           body: ValueListenableBuilder<Box<Habit>>(
             valueListenable: _habitsBox.listenable(),
             builder: (context, box, _) {
+              // ⚡ FİLTRELEME MANTIĞI ESNETİLDİ (Nokta ve Büyük/Küçük Harf Toleranslı)
               final habits = box.values.where((h) {
                 if (_selectedFilterCategory == 'Tüm Görevler') return true;
-                return h.category == _selectedFilterCategory;
+                return _normalizeCategory(h.category) == _normalizeCategory(_selectedFilterCategory);
               }).toList();
 
               return Column(

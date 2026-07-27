@@ -7,6 +7,7 @@ import '../widgets/stats/stat_metric_card.dart';
 import '../widgets/stats/smart_insight_card.dart';
 import '../widgets/stats/weekly_performance_chart.dart';
 import '../widgets/stats/badges_section.dart';
+import '../widgets/stats/category_distribution_chart.dart'; // 🍩 1. IMPORT EKLENDİ
 
 class StatsScreen extends StatelessWidget {
   final Box<Habit> habitsBox;
@@ -163,6 +164,16 @@ class StatsScreen extends StatelessWidget {
                     WeeklyPerformanceChart(
                       last7DaysRatios: last7DaysRatios,
                       current7DaysLabels: current7DaysLabels,
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      subtextColor: subtextColor,
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // 🍩 2. KATEGORİ DAĞILIM GRAFİĞİ (DONUT CHART) EKLENDİ
+                    CategoryDistributionChart(
+                      habits: habits,
                       cardColor: cardColor,
                       textColor: textColor,
                       subtextColor: subtextColor,
