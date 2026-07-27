@@ -34,11 +34,18 @@ class _BadgesSectionState extends State<BadgesSection> {
     'Gizli',
   ];
 
+  // ⚡ KATEGORİ TEMİZLEME (Boşluk / Nokta Toleransı)
+  String _normalizeCategory(String text) {
+    return text.replaceAll('.', '').trim().toLowerCase();
+  }
+
   @override
   Widget build(BuildContext context) {
     final filteredBadges = _selectedBadgeCategory == 'Tüm Rozetler'
         ? allBadges
-        : allBadges.where((b) => b.category == _selectedBadgeCategory).toList();
+        : allBadges.where((b) {
+            return _normalizeCategory(b.category) == _normalizeCategory(_selectedBadgeCategory);
+          }).toList();
 
     final sortedBadges = List<HabitBadge>.from(filteredBadges)
       ..sort((a, b) {
@@ -107,6 +114,13 @@ class _BadgesSectionState extends State<BadgesSection> {
           itemBuilder: (context, index) {
             final badge = sortedBadges[index];
             final unlocked = badge.isUnlocked(widget.habits);
+            final isHiddenCategory = _normalizeCategory(badge.category) == 'gizli';
+
+            // 🕵️ GİZLİ ROZET ADI MANTIGI (Kilitliyse Gizemli Görünsün)
+            final displayTitle = (isHiddenCategory && !unlocked) ? '???' : badge.title;
+            final displayDesc = (isHiddenCategory && !unlocked)
+                ? 'Bu sürpriz ve gizli bir rozettir! Doğru zamanda kendiliğinden açılacak.'
+                : badge.description;
 
             return GestureDetector(
               onTap: () {
@@ -117,11 +131,16 @@ class _BadgesSectionState extends State<BadgesSection> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     title: Row(
                       children: [
-                        Image.asset(badge.imagePath, width: 44, height: 44),
+                        Image.asset(
+                          badge.imagePath,
+                          width: 44,
+                          height: 44,
+                          errorBuilder: (_, __, ___) => const Icon(Icons.stars_rounded, size: 44, color: Colors.amber),
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            badge.title,
+                            displayTitle,
                             style: TextStyle(color: widget.textColor, fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -132,7 +151,7 @@ class _BadgesSectionState extends State<BadgesSection> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          badge.description,
+                          displayDesc,
                           style: TextStyle(color: widget.subtextColor, fontSize: 14),
                         ),
                         const SizedBox(height: 12),
@@ -190,7 +209,7 @@ class _BadgesSectionState extends State<BadgesSection> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      badge.title,
+                      displayTitle,
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

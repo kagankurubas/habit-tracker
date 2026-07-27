@@ -78,14 +78,16 @@ final List<HabitBadge> allBadges = [
   HabitBadge(
     id: 'perfect_day',
     title: 'Mükemmel Gün',
-    description: 'Bugünkü tüm rutinlerini tamamla',
+    description: 'Bugün planladığın en az 3 hedefi eksiksiz tamamla',
     imagePath: 'assets/badges/perfect_day.png',
     category: 'Genel',
     isUnlocked: (habits) {
       final today = DateTime.now();
-      final todayTargets = habits.where((h) => h.isTargetDate(today)).toList();
-      if (todayTargets.isEmpty) return false;
-      return todayTargets.every((h) => h.isCompletedOn(today));
+      final todayNormalized = DateTime(today.year, today.month, today.day);
+      final todayTargets = habits.where((h) => h.isTargetDate(todayNormalized)).toList();
+
+      if (todayTargets.length < 3) return false;
+      return todayTargets.every((h) => h.isCompletedOn(todayNormalized));
     },
   ),
 
@@ -239,6 +241,21 @@ final List<HabitBadge> allBadges = [
 
   // 🦉 7. GİZLİ BAŞARIMLAR
   HabitBadge(
+    id: 'secret_early_bird',
+    title: 'Erkenci Kuş',
+    description: 'Sabah 05:00 - 08:00 saatleri arasında bir görev tamamla',
+    imagePath: 'assets/badges/secret_early_bird.png',
+    category: 'Gizli',
+    isUnlocked: (habits) {
+      return habits.any((h) {
+        return h.completedDatesList.any((d) {
+          final local = d.toLocal();
+          return local.hour >= 5 && local.hour < 8;
+        });
+      });
+    },
+  ),
+  HabitBadge(
     id: 'secret_night_owl',
     title: 'Gece Kuşu',
     description: 'Gece 00:00 - 05:00 saatleri arasında bir görev tamamla',
@@ -248,7 +265,6 @@ final List<HabitBadge> allBadges = [
       return habits.any((h) {
         return h.completedDatesList.any((d) {
           final local = d.toLocal();
-          // Gece yarısı 00:00 ile 04:59 arası VE saatin tam 00:00:00.000 olmaması şartı
           final isExactlyMidnight = local.hour == 0 && local.minute == 0 && local.second == 0;
           return !isExactlyMidnight && (local.hour >= 0 && local.hour < 5);
         });
