@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart'; // 🚀 kIsWeb kontrolü için eklendi
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -17,6 +18,8 @@ class NotificationService {
   static final ValueNotifier<String?> selectNotificationStream = ValueNotifier(null);
 
   Future<void> init() async {
+    if (kIsWeb) return; // 🌐 Web'de çalışıyorsa bildirimi es geç
+
     tz.initializeTimeZones();
 
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -46,17 +49,37 @@ class NotificationService {
     }
   }
 
+  // 🚀 Cold Start (Kapalıyken açılma) kontrolü
+  static Future<String?> getInitialNotificationPayload() async {
+    if (kIsWeb) return null; // 🌐 Web'de çalışıyorsa null dön
+
+    final NotificationAppLaunchDetails? notificationAppLaunchDetails =
+        await NotificationService()._notificationsPlugin.getNotificationAppLaunchDetails();
+
+    if (notificationAppLaunchDetails != null &&
+        notificationAppLaunchDetails.didNotificationLaunchApp) {
+      final response = notificationAppLaunchDetails.notificationResponse;
+      if (response != null && response.payload != null) {
+        return response.payload;
+      }
+    }
+    return null;
+  }
+
   // 🖱️ Action Button veya Bildirime Tıklandığında Tetiklenen Metod
   static Future<void> _onNotificationResponse(NotificationResponse response) async {
+    if (kIsWeb) return;
+
     if (response.payload != null) {
       print('🚀 Bildirim tıklandı, Habit ID: ${response.payload}');
-      // ID'yi akışa veriyoruz, böylece ekran tespiti yapabilecek
       selectNotificationStream.value = response.payload;
     }
   }
 
   // 🧪 Test Bildirimi
   Future<void> showInstantTestNotification() async {
+    if (kIsWeb) return; // 🌐 Web'de çalışıyorsa çalıştırma
+
     const androidDetails = AndroidNotificationDetails(
       'habit_reminders',
       'Rutin Hatırlatıcıları',
@@ -73,12 +96,16 @@ class NotificationService {
 
   // 🔕 Bildirimi İptal Et
   Future<void> cancelHabitNotification(Habit habit) async {
+    if (kIsWeb) return; // 🌐 Web'de çalışıyorsa iptal metodunu es geç
+
     await _notificationsPlugin.cancel(id: habit.id.hashCode);
     print('🔕 Bildirim İptal Edildi: ${habit.title}');
   }
 
   // 🔔 Rutin Zamanla
   Future<void> scheduleHabitNotification(Habit habit) async {
+    if (kIsWeb) return; // 🌐 Web'de çalışıyorsa zamanlamayı es geç
+
     if (!habit.isNotificationEnabled ||
         habit.notificationHour == null ||
         habit.notificationMinute == null) {
@@ -117,7 +144,7 @@ class NotificationService {
         const AndroidNotificationAction(
           'open_habit',
           '🔍 Detayı Aç',
-          showsUserInterface: true, // Uygulamayı ön plana getirir
+          showsUserInterface: true,
           cancelNotification: true,
         ),
       ],

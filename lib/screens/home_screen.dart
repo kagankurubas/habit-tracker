@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/habit.dart';
 import '../widgets/add_edit_habit_dialog.dart';
-import 'habit_detail_screen.dart';
+import '../widgets/category_filter_bar.dart';
 import '../widgets/habit_tile.dart';
 import '../services/notification_service.dart';
+import '../services/theme_service.dart';
+import '../app_themes.dart';
+import 'habit_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,34 +24,27 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _habitsBox = Hive.box<Habit>('habits');
-
-    // 🔔 Bildirim Tıklamalarını Güvenli Şekilde Dinleme
     NotificationService.selectNotificationStream.addListener(_handleNotificationClick);
   }
 
   @override
   void dispose() {
-    // Memory leak önlemek için listener'ı temizliyoruz
     NotificationService.selectNotificationStream.removeListener(_handleNotificationClick);
     super.dispose();
   }
 
-  // 🚀 Bildirim Tıklandığında Çalışacak Güvenli Yönlendirme
   void _handleNotificationClick() {
     final habitId = NotificationService.selectNotificationStream.value;
     if (habitId == null) return;
 
-    // Flutter'ın ilk karesini çizmesini bekleyip sayfayı öyle açıyoruz (Kırmızı ekranı önleyen kısım!)
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
 
-      // Tıklanan habit.id'ye karşılık gelen Habit nesnesini kutudan buluyoruz
       final habit = _habitsBox.values.firstWhere(
         (h) => h.id == habitId,
-        orElse: () => _habitsBox.values.first, // Bulunamazsa varsayılan
+        orElse: () => _habitsBox.values.first,
       );
 
-      // İlgili alışkanlığın Detay Sayfasına yönlendiriyoruz
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -56,45 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
 
-      // Stream'i tekrar tetiklenmemesi için sıfırlıyoruz
       NotificationService.selectNotificationStream.value = null;
       setState(() {});
     });
-  }
-
-  void _addNewHabit({
-    required String title,
-    required int frequencyType,
-    required int intervalDays,
-    required List<int> selectedWeekdays,
-    required int colorValue,
-    required int iconCodePoint,
-    required String category,
-    required bool isNotificationEnabled,
-    int? notificationHour,
-    int? notificationMinute,
-  }) async {
-    if (title.trim().isEmpty) return;
-
-    final newHabit = Habit(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: title,
-      colorValue: colorValue,
-      iconCodePoint: iconCodePoint,
-      frequencyType: frequencyType,
-      intervalDays: intervalDays,
-      selectedWeekdays: selectedWeekdays,
-      category: category,
-      isNotificationEnabled: isNotificationEnabled,
-      notificationHour: notificationHour,
-      notificationMinute: notificationMinute,
-    );
-
-    await _habitsBox.add(newHabit);
-    await _habitsBox.flush();
-
-    // 🔔 BİLDİRİM ZAMANLAMASINI ÇAĞIR
-    await NotificationService().scheduleHabitNotification(newHabit);
   }
 
   void _showAddHabitDialog() {
@@ -112,19 +72,26 @@ class _HomeScreenState extends State<HomeScreen> {
           required isNotificationEnabled,
           notificationHour,
           notificationMinute,
-        }) {
-          _addNewHabit(
+        }) async {
+          if (title.trim().isEmpty) return;
+
+          final newHabit = Habit(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
             title: title,
+            colorValue: colorValue,
+            iconCodePoint: iconCodePoint,
             frequencyType: frequencyType,
             intervalDays: intervalDays,
             selectedWeekdays: selectedWeekdays,
-            colorValue: colorValue,
-            iconCodePoint: iconCodePoint,
             category: category,
             isNotificationEnabled: isNotificationEnabled,
             notificationHour: notificationHour,
             notificationMinute: notificationMinute,
           );
+
+          await _habitsBox.add(newHabit);
+          await _habitsBox.flush();
+          await NotificationService().scheduleHabitNotification(newHabit);
         },
       ),
     );
@@ -160,8 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
           await habit.save();
           await _habitsBox.flush();
-
-          // 🔔 DÜZENLENEN BİLDİRİMİ YENİDEN ZAMANLA
           await NotificationService().scheduleHabitNotification(habit);
         },
       ),
@@ -170,136 +135,129 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Rutin & Alışkanlık Takibi', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-      ),
-      body: ValueListenableBuilder<Box<Habit>>(
-        valueListenable: _habitsBox.listenable(),
-        builder: (context, box, _) {
-          final habits = box.values.where((h) {
-            if (_selectedFilterCategory == 'Tüm Görevler') return true;
-            return h.category == _selectedFilterCategory;
-          }).toList();
+    // 🚀 DİNAMİK ARKA PLAN İÇİN SCAFFOLD'U VALUE LISTENABLE İLE SARMALAYALIM
+    return ValueListenableBuilder<Color>(
+      valueListenable: ThemeService.currentColor,
+      builder: (context, bgColor, child) {
+        return Scaffold(
+          backgroundColor: bgColor, // 👈 Ekranın arka planı dinamik oldu
+          resizeToAvoidBottomInset: false,
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(kToolbarHeight),
+            child: ValueListenableBuilder<Color>(
+              valueListenable: ThemeService.currentColor,
+              builder: (context, bgColor, child) {
+                final textColor = AppThemes.getTextColor(bgColor);
 
-          return Column(
-            children: [
-              Center(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ChoiceChip(
-                          label: const Text('✨ Tüm Görevler'),
-                          selected: _selectedFilterCategory == 'Tüm Görevler',
-                          showCheckmark: false,
-                          labelStyle: TextStyle(
-                            color: _selectedFilterCategory == 'Tüm Görevler' ? Colors.white : Colors.grey[400],
-                            fontWeight: _selectedFilterCategory == 'Tüm Görevler' ? FontWeight.bold : FontWeight.normal,
-                            fontSize: 13,
-                          ),
-                          selectedColor: Colors.blueAccent.withValues(alpha: 0.3),
-                          backgroundColor: Colors.white.withValues(alpha: 0.05),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            side: BorderSide(
-                              color: _selectedFilterCategory == 'Tüm Görevler' ? Colors.blueAccent : Colors.transparent,
-                            ),
-                          ),
-                          onSelected: (selected) {
-                            if (selected) {
-                              setState(() {
-                                _selectedFilterCategory = 'Tüm Görevler';
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      ...availableCategories.map((cat) {
-                        final isSelected = _selectedFilterCategory == cat.name;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: ChoiceChip(
-                            label: Text('${cat.icon} ${cat.name}'),
-                            selected: isSelected,
-                            showCheckmark: false,
-                            labelStyle: TextStyle(
-                              color: isSelected ? Colors.white : Colors.grey[400],
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              fontSize: 13,
-                            ),
-                            selectedColor: Colors.blueAccent.withValues(alpha: 0.3),
-                            backgroundColor: Colors.white.withValues(alpha: 0.05),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              side: BorderSide(
-                                color: isSelected ? Colors.blueAccent : Colors.transparent,
-                              ),
-                            ),
-                            onSelected: (selected) {
-                              if (selected) {
-                                setState(() {
-                                  _selectedFilterCategory = cat.name;
-                                });
-                              }
-                            },
-                          ),
-                        );
-                      }),
-                    ],
+                return AppBar(
+                  title: Text(
+                    'Rutin & Alışkanlık Takibi',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: habits.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'Bu kategoride henüz görev yok!\nAşağıdaki butonla yeni görev ekleyebilirsin.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: habits.length,
-                        itemBuilder: (context, index) {
-                          final habit = habits[index];
+                  centerTitle: true,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  actions: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.palette_outlined,
+                        color: textColor,
+                      ),
+                      tooltip: 'Tema Rengi Değiştir',
+                      onPressed: () => ThemeService.showThemeSelector(context),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                );
+              },
+            ),
+          ),
+          body: ValueListenableBuilder<Box<Habit>>(
+            valueListenable: _habitsBox.listenable(),
+            builder: (context, box, _) {
+              final habits = box.values.where((h) {
+                if (_selectedFilterCategory == 'Tüm Görevler') return true;
+                return h.category == _selectedFilterCategory;
+              }).toList();
 
-                          return HabitTile(
-                            habit: habit,
-                            index: index,
-                            habitsBox: _habitsBox,
-                            onEdit: () => _showEditHabitDialog(habit),
-                            onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HabitDetailScreen(habit: habit),
+              return Column(
+                children: [
+                  CategoryFilterBar(
+                    selectedCategory: _selectedFilterCategory,
+                    onCategorySelected: (category) {
+                      setState(() {
+                        _selectedFilterCategory = category;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: habits.isEmpty
+                        ? ValueListenableBuilder<Color>(
+                            valueListenable: ThemeService.currentColor,
+                            builder: (context, bgColor, _) {
+                              final subtextColor = AppThemes.getSubtextColor(bgColor);
+                              return Center(
+                                child: Text(
+                                  'Bu kategoride henüz görev yok!\nAşağıdaki butonla yeni görev ekleyebilirsin.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: subtextColor),
                                 ),
                               );
-                              setState(() {});
                             },
-                          );
-                        },
-                      ),
-              ),
-            ],
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showAddHabitDialog,
-        icon: const Icon(Icons.add),
-        label: const Text('Yeni Görev'),
-      ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: habits.length,
+                            itemBuilder: (context, index) {
+                              final habit = habits[index];
+                              return HabitTile(
+                                habit: habit,
+                                index: index,
+                                habitsBox: _habitsBox,
+                                onEdit: () => _showEditHabitDialog(habit),
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => HabitDetailScreen(habit: habit),
+                                    ),
+                                  );
+                                  setState(() {});
+                                },
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              );
+            },
+          ),
+          // 🚀 DİNAMİK TEMALI FLOATING ACTION BUTTON
+          floatingActionButton: ValueListenableBuilder<Color>(
+            valueListenable: ThemeService.currentColor,
+            builder: (context, bgColor, child) {
+              final isLight = AppThemes.isLightBackground(bgColor);
+              final btnBgColor = isLight ? const Color(0xFF1E293B) : const Color(0xFF6366F1);
+
+              return FloatingActionButton.extended(
+                onPressed: _showAddHabitDialog,
+                backgroundColor: btnBgColor,
+                foregroundColor: Colors.white,
+                elevation: 4,
+                icon: const Icon(Icons.add),
+                label: const Text(
+                  'Yeni Görev',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:timezone/data/latest_all.dart' as tz; // 1. TIMEZONE DATA IMPORT
-import 'package:timezone/timezone.dart' as tz;          // 2. TIMEZONE CORE IMPORT
+import 'package:timezone/data/latest_all.dart' as tz; 
+import 'package:timezone/timezone.dart' as tz;          
 import 'models/habit.dart';
 import 'screens/home_screen.dart';
 import 'screens/stats_screen.dart';
 import 'services/notification_service.dart';
-
+import 'services/theme_service.dart'; 
+import 'app_themes.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -19,7 +20,10 @@ void main() async {
   Hive.registerAdapter(HabitAdapter());
   await Hive.openBox<Habit>('habits');
 
-  // 3. Bildirim servisini başlat
+  // 3. Tema servisini başlat (settings box'ını bu metod içinde açıyoruz)
+  await ThemeService.init();
+
+  // 4. Bildirim servisini başlat
   await NotificationService().init();
 
   runApp(const HabitTrackerApp());
@@ -30,18 +34,24 @@ class HabitTrackerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Habit Tracker',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6366F1),
-          brightness: Brightness.dark,
-        ),
-        scaffoldBackgroundColor: const Color(0xFF0F172A),
-      ),
-      home: const MainNavigationScreen(),
+    // 🚀 Dinamik renk değişimi için ThemeService.currentColor değerini dinliyoruz
+    return ValueListenableBuilder<Color>(
+      valueListenable: ThemeService.currentColor,
+      builder: (context, bgColor, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Habit Tracker',
+          theme: ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF6366F1),
+              brightness: Brightness.dark,
+            ),
+            scaffoldBackgroundColor: bgColor, // 👈 Arka plan seçilen renge göre anında değişir
+          ),
+          home: const MainNavigationScreen(),
+        );
+      },
     );
   }
 }
@@ -64,34 +74,43 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       StatsScreen(habitsBox: _habitsBox),
     ];
 
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: screens,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        backgroundColor: const Color(0xFF1E293B),
-        selectedItemColor: const Color(0xFF6366F1),
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.check_box_outlined),
-            activeIcon: Icon(Icons.check_box_rounded),
-            label: 'Rutinlerim',
+    // 🚀 Tema rengini dinleyip nav bar rengini otomatik hesaplıyoruz
+    return ValueListenableBuilder<Color>(
+      valueListenable: ThemeService.currentColor,
+      builder: (context, bgColor, child) {
+        final navBarBg = AppThemes.getNavBarColor(bgColor);
+        final textColor = AppThemes.getTextColor(bgColor);
+
+        return Scaffold(
+          body: IndexedStack(
+            index: _currentIndex,
+            children: screens,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart_outlined),
-            activeIcon: Icon(Icons.bar_chart_rounded),
-            label: 'İstatistikler',
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            backgroundColor: navBarBg, // 👈 Dinamik uyumlu ton
+            selectedItemColor: AppThemes.isLightBackground(bgColor) ? Colors.indigo.shade700 : const Color(0xFF6366F1),
+            unselectedItemColor: textColor.withValues(alpha: 0.6),
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.check_box_outlined),
+                activeIcon: Icon(Icons.check_box_rounded),
+                label: 'Rutinlerim',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.bar_chart_outlined),
+                activeIcon: Icon(Icons.bar_chart_rounded),
+                label: 'İstatistikler',
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
