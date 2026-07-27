@@ -7,12 +7,59 @@ import '../widgets/stats/stat_metric_card.dart';
 import '../widgets/stats/smart_insight_card.dart';
 import '../widgets/stats/weekly_performance_chart.dart';
 import '../widgets/stats/badges_section.dart';
-import '../widgets/stats/category_distribution_chart.dart'; // 🍩 1. IMPORT EKLENDİ
+import '../widgets/stats/category_distribution_chart.dart';
+import '../widgets/stats/share_stats_card.dart';
+import '../services/share_service.dart';
 
 class StatsScreen extends StatelessWidget {
   final Box<Habit> habitsBox;
+  final GlobalKey _shareCardKey = GlobalKey();
 
-  const StatsScreen({super.key, required this.habitsBox});
+  StatsScreen({super.key, required this.habitsBox});
+
+  void _showShareDialog(
+      BuildContext context, List<Habit> habits, Color cardColor, Color textColor, Color subtextColor) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        contentPadding: const EdgeInsets.all(16),
+        title: Text(
+          'Gelişimini Paylaş 🚀',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ShareStatsCard(
+              habits: habits,
+              globalKey: _shareCardKey,
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  await ShareService.shareWidgetAsImage(_shareCardKey);
+                },
+                icon: const Icon(Icons.ios_share_rounded, size: 20),
+                label: const Text('Görsel Olarak Paylaş', style: TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6366F1),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +79,19 @@ class StatsScreen extends StatelessWidget {
             ),
             backgroundColor: Colors.transparent,
             elevation: 0,
+            actions: [
+              IconButton(
+                icon: Icon(Icons.share_outlined, color: textColor),
+                tooltip: 'İstatistikleri Paylaş',
+                onPressed: () {
+                  final habits = habitsBox.values.toList();
+                  if (habits.isNotEmpty) {
+                    _showShareDialog(context, habits, cardColor, textColor, subtextColor);
+                  }
+                },
+              ),
+              const SizedBox(width: 8),
+            ],
           ),
           body: ValueListenableBuilder(
             valueListenable: habitsBox.listenable(),
@@ -171,7 +231,7 @@ class StatsScreen extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    // 🍩 2. KATEGORİ DAĞILIM GRAFİĞİ (DONUT CHART) EKLENDİ
+                    // 4. KATEGORİ DAĞILIM GRAFİĞİ
                     CategoryDistributionChart(
                       habits: habits,
                       cardColor: cardColor,
@@ -181,7 +241,7 @@ class StatsScreen extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    // 4. BAŞARIMLAR VE ROZETLER SEKSİYONU
+                    // 5. BAŞARIMLAR VE ROZETLER SEKSİYONU
                     BadgesSection(
                       habits: habits,
                       cardColor: cardColor,
