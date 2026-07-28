@@ -112,7 +112,7 @@ class SettingsScreen extends StatelessWidget {
                         children: [
                           // 🔊 Ses Efekti Switch
                           SwitchListTile(
-                            activeColor: const Color(0xFF6366F1),
+                            activeThumbColor: const Color(0xFF6366F1),
                             secondary: const Icon(
                               Icons.volume_up_rounded,
                               color: Color(0xFF6366F1),
@@ -143,7 +143,7 @@ class SettingsScreen extends StatelessWidget {
 
                           // 📳 Haptik Titreşim Switch
                           SwitchListTile(
-                            activeColor: const Color(0xFF6366F1),
+                            activeThumbColor: const Color(0xFF6366F1),
                             secondary: const Icon(
                               Icons.vibration_rounded,
                               color: Color(0xFF10B981),

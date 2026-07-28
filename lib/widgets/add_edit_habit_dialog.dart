@@ -219,7 +219,8 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: availableCategories.any((c) => c.name == _selectedCategory)
+              initialValue:
+                  availableCategories.any((c) => c.name == _selectedCategory)
                   ? _selectedCategory
                   : 'Genel',
               isExpanded: true,
@@ -252,7 +253,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<int>(
-              value: _selectedFrequency,
+              initialValue: _selectedFrequency,
               isExpanded: true,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -288,7 +289,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
               ),
               const SizedBox(height: 6),
               DropdownButtonFormField<int>(
-                value: _intervalDays,
+                initialValue: _intervalDays,
                 isExpanded: true,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
@@ -367,7 +368,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                       ),
                     ),
                     value: _isNotificationEnabled,
-                    activeColor: Color(_selectedColorValue),
+                    activeThumbColor: Color(_selectedColorValue),
                     onChanged: (bool value) {
                       setState(() {
                         _isNotificationEnabled = value;

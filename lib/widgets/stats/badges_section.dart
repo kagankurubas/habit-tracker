@@ -173,7 +173,7 @@ class _BadgesSectionState extends State<BadgesSection> {
                                   child: Image.asset(
                                     badge.imagePath,
                                     fit: BoxFit.contain,
-                                    errorBuilder: (_, __, ___) {
+                                    errorBuilder: (_, _, _) {
                                       return Icon(
                                         Icons.stars_rounded,
                                         size: 80,

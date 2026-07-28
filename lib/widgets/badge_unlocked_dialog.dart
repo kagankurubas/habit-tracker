@@ -57,7 +57,7 @@ class BadgeUnlockedDialog extends StatelessWidget {
                         child: Image.asset(
                           imagePath,
                           fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => Icon(
+                          errorBuilder: (_, _, _) => Icon(
                             Icons.stars_rounded,
                             size: 200,
                             color: badgeColor,

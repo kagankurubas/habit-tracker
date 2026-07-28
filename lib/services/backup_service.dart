@@ -70,9 +70,12 @@ class BackupService {
       final file = File(filePath);
       await file.writeAsString(jsonString);
 
-      await Share.shareXFiles([
-        XFile(filePath),
-      ], text: 'Habit Tracker Veri Yedeği (JSON)');
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(filePath)],
+          text: 'Habitto Veri Yedeği (JSON)',
+        ),
+      );
     } catch (e) {
       if (kDebugMode) {
         debugPrint('Dışa aktarma sırasında hata: $e');
