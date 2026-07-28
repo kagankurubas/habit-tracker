@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.habit_tracker"
+    namespace = "com.kagankurubas.habitto"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -16,7 +16,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.habit_tracker"
+        applicationId = "com.kagankurubas.habitto"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
