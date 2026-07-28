@@ -20,7 +20,22 @@
 </p>
 
 ---
+<p align="center">
+  <a href="https://github.com/kagankurubas/habitto/releases/download/v1.0.0/Habitto-v1.0.0.apk">
+    <img
+      src="https://img.shields.io/badge/Download-Android_APK-3DDC84?style=for-the-badge&logo=android&logoColor=white"
+      alt="Download Habitto APK"
+    >
+  </a>
+  <a href="https://github.com/kagankurubas/habitto/releases/latest">
+    <img
+      src="https://img.shields.io/github/v/release/kagankurubas/habitto?style=for-the-badge"
+      alt="Latest Release"
+    >
+  </a>
+</p>
 
+---
 ## About
 
 **HABITTO** is a customizable habit and routine tracker designed to make consistency visible, motivating, and rewarding.
@@ -34,6 +49,27 @@ The application stores its data locally using Hive, providing a fast, offline-fi
 <p align="center">
   <img src="assets/readme/demo.gif" alt="HABITTO application demo" width="320">
 </p>
+
+## Download
+
+The latest Android release is available through GitHub Releases.
+
+<p align="center">
+  <a href="https://github.com/kagankurubas/habitto/releases/download/v1.0.0/Habitto-v1.0.0.apk">
+    <strong>Download Habitto v1.0.0 for Android</strong>
+  </a>
+</p>
+
+### Installation
+
+1. Download the APK file.
+2. Open `Habitto-v1.0.0.apk` on your Android device.
+3. Allow installation from your browser or file manager if Android requests permission.
+4. Install Habitto.
+5. Grant notification permission to receive habit reminders.
+
+> Habitto is currently distributed directly through GitHub and is not yet
+> available on Google Play.
 
 ## Application Preview
 
@@ -319,7 +355,7 @@ Deleting the application or clearing its local storage may remove existing data 
 - [x] Add application demo GIF
 - [ ] Expand automated unit and widget tests
 - [ ] Add GitHub Actions for analysis and build validation
-- [ ] Publish downloadable releases
+- [x] Publish downloadable Android releases
 - [ ] Add additional language support
 - [ ] Improve accessibility support
 - [ ] Explore optional encrypted backup support
