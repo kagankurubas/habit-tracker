@@ -16,12 +16,25 @@ class StatsScreen extends StatelessWidget {
   final GlobalKey _shareCardKey = GlobalKey();
 
   // ⚡ Static gün isimleri listesi (Bellek tasarrufu)
-  static const List<String> _dayLabels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+  static const List<String> _dayLabels = [
+    'Pzt',
+    'Sal',
+    'Çar',
+    'Per',
+    'Cum',
+    'Cmt',
+    'Paz',
+  ];
 
   StatsScreen({super.key, required this.habitsBox});
 
   void _showShareDialog(
-      BuildContext context, List<Habit> habits, Color cardColor, Color textColor, Color subtextColor) {
+    BuildContext context,
+    List<Habit> habits,
+    Color cardColor,
+    Color textColor,
+    Color subtextColor,
+  ) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -31,15 +44,16 @@ class StatsScreen extends StatelessWidget {
         title: Text(
           'Gelişimini Paylaş 🚀',
           textAlign: TextAlign.center,
-          style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(
+            color: textColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ShareStatsCard(
-              habits: habits,
-              globalKey: _shareCardKey,
-            ),
+            ShareStatsCard(habits: habits, globalKey: _shareCardKey),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
@@ -49,12 +63,17 @@ class StatsScreen extends StatelessWidget {
                   await ShareService.shareWidgetAsImage(_shareCardKey);
                 },
                 icon: const Icon(Icons.ios_share_rounded, size: 20),
-                label: const Text('Görsel Olarak Paylaş', style: TextStyle(fontWeight: FontWeight.bold)),
+                label: const Text(
+                  'Görsel Olarak Paylaş',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF6366F1),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
             ),
@@ -89,7 +108,13 @@ class StatsScreen extends StatelessWidget {
                 onPressed: () {
                   final habits = habitsBox.values.toList();
                   if (habits.isNotEmpty) {
-                    _showShareDialog(context, habits, cardColor, textColor, subtextColor);
+                    _showShareDialog(
+                      context,
+                      habits,
+                      cardColor,
+                      textColor,
+                      subtextColor,
+                    );
                   }
                 },
               ),
@@ -112,14 +137,27 @@ class StatsScreen extends StatelessWidget {
               }
 
               final today = DateTime.now();
-              final todayNormalized = DateTime(today.year, today.month, today.day);
+              final todayNormalized = DateTime(
+                today.year,
+                today.month,
+                today.day,
+              );
 
-              final todayTargets = habits.where((h) => h.isTargetDate(todayNormalized)).toList();
-              final todayCompleted = todayTargets.where((h) => h.isCompletedOn(todayNormalized)).length;
-              final todayProgress = todayTargets.isNotEmpty ? (todayCompleted / todayTargets.length) : 0.0;
+              final todayTargets = habits
+                  .where((h) => h.isTargetDate(todayNormalized))
+                  .toList();
+              final todayCompleted = todayTargets
+                  .where((h) => h.isCompletedOn(todayNormalized))
+                  .length;
+              final todayProgress = todayTargets.isNotEmpty
+                  ? (todayCompleted / todayTargets.length)
+                  : 0.0;
 
               // ⚡ Fold ile optimize edilmiş toplam tamamlama sayısı
-              final int totalCompletions = habits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
+              final int totalCompletions = habits.fold<int>(
+                0,
+                (sum, h) => sum + h.completedDatesList.length,
+              );
 
               Habit? bestStreakHabit;
               int maxStreak = 0;
@@ -143,9 +181,13 @@ class StatsScreen extends StatelessWidget {
                   return isTarget || isDoneOnDate;
                 }).toList();
 
-                final dayDone = dayTargets.where((h) => h.isCompletedOn(checkDate)).length;
+                final dayDone = dayTargets
+                    .where((h) => h.isCompletedOn(checkDate))
+                    .length;
 
-                final double ratio = dayTargets.isNotEmpty ? (dayDone / dayTargets.length) : 0.0;
+                final double ratio = dayTargets.isNotEmpty
+                    ? (dayDone / dayTargets.length)
+                    : 0.0;
                 last7DaysRatios.add(ratio);
 
                 final weekdayName = _dayLabels[checkDate.weekday - 1];
@@ -169,7 +211,8 @@ class StatsScreen extends StatelessWidget {
                         StatMetricCard(
                           title: 'Bugünkü Başarı',
                           value: '%${(todayProgress * 100).toInt()}',
-                          subtitle: '${todayTargets.length} Görevden $todayCompleted Yapıldı',
+                          subtitle:
+                              '${todayTargets.length} Görevden $todayCompleted Yapıldı',
                           icon: Icons.donut_large_rounded,
                           color: const Color(0xFF10B981),
                           cardColor: cardColor,
@@ -179,7 +222,9 @@ class StatsScreen extends StatelessWidget {
                         StatMetricCard(
                           title: 'En Uzun Zincir',
                           value: '🔥 $maxStreak Gün',
-                          subtitle: bestStreakHabit != null ? bestStreakHabit.title : 'Henüz Yok',
+                          subtitle: bestStreakHabit != null
+                              ? bestStreakHabit.title
+                              : 'Henüz Yok',
                           icon: Icons.local_fire_department_rounded,
                           color: const Color(0xFFF59E0B),
                           cardColor: cardColor,

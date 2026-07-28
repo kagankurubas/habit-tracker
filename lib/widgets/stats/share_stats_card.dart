@@ -14,8 +14,11 @@ class ShareStatsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // ⚡ Toplam tamamlama ve en iyi seriyi tek geçişte hesaplama
-    final totalCompletions = habits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
-    
+    final totalCompletions = habits.fold<int>(
+      0,
+      (sum, h) => sum + h.completedDatesList.length,
+    );
+
     int maxStreak = 0;
     Habit? bestHabit;
 
@@ -43,7 +46,7 @@ class ShareStatsCard extends StatelessWidget {
               color: Colors.indigo.withValues(alpha: 0.4),
               blurRadius: 20,
               offset: const Offset(0, 10),
-            )
+            ),
           ],
         ),
         child: Column(
@@ -56,7 +59,11 @@ class ShareStatsCard extends StatelessWidget {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.auto_awesome_rounded, color: Color(0xFFA5B4FC), size: 24),
+                    Icon(
+                      Icons.auto_awesome_rounded,
+                      color: Color(0xFFA5B4FC),
+                      size: 24,
+                    ),
                     SizedBox(width: 8),
                     Text(
                       'Rutin Takibi',
@@ -69,14 +76,21 @@ class ShareStatsCard extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
                     'İstikrar Raporu',
-                    style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -89,7 +103,11 @@ class ShareStatsCard extends StatelessWidget {
                 children: [
                   const Text(
                     '🔥 En Uzun Seri',
-                    style: TextStyle(color: Color(0xFFC7D2FE), fontSize: 13, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      color: Color(0xFFC7D2FE),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -105,9 +123,13 @@ class ShareStatsCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       bestHabit.title,
-                      style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ]
+                  ],
                 ],
               ),
             ),
@@ -122,7 +144,9 @@ class ShareStatsCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.15),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,7 +175,9 @@ class ShareStatsCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.15),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

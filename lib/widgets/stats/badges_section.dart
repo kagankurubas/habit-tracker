@@ -44,12 +44,14 @@ class _BadgesSectionState extends State<BadgesSection> {
     final filteredBadges = _selectedBadgeCategory == 'Tüm Rozetler'
         ? allBadges
         : allBadges.where((b) {
-            return _normalizeCategory(b.category) == _normalizeCategory(_selectedBadgeCategory);
+            return _normalizeCategory(b.category) ==
+                _normalizeCategory(_selectedBadgeCategory);
           }).toList();
 
     // ⚡ OPTİMİZE EDİLDİ: isUnlocked kontrolü her karşılaştırma için tekrar çalışmasın diye Map ile önceden hesaplanır
     final unlockedStatus = {
-      for (final badge in filteredBadges) badge.id: badge.isUnlocked(widget.habits)
+      for (final badge in filteredBadges)
+        badge.id: badge.isUnlocked(widget.habits),
     };
 
     final sortedBadges = List<HabitBadge>.from(filteredBadges)
@@ -66,7 +68,11 @@ class _BadgesSectionState extends State<BadgesSection> {
       children: [
         Text(
           'Başarımlar & Rozetler 🏆',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: widget.textColor),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: widget.textColor,
+          ),
         ),
         const SizedBox(height: 12),
 
@@ -90,7 +96,9 @@ class _BadgesSectionState extends State<BadgesSection> {
                   showCheckmark: false,
                   labelStyle: TextStyle(
                     color: isSelected ? Colors.white : widget.textColor,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                     fontSize: 12,
                   ),
                   onSelected: (selected) {
@@ -119,76 +127,151 @@ class _BadgesSectionState extends State<BadgesSection> {
           itemBuilder: (context, index) {
             final badge = sortedBadges[index];
             final unlocked = unlockedStatus[badge.id] ?? false;
-            final isHiddenCategory = _normalizeCategory(badge.category) == 'gizli';
+            final isHiddenCategory =
+                _normalizeCategory(badge.category) == 'gizli';
 
             // 🕵️ GİZLİ ROZET ADI MANTIGI
-            final displayTitle = (isHiddenCategory && !unlocked) ? '???' : badge.title;
+            final displayTitle = (isHiddenCategory && !unlocked)
+                ? '???'
+                : badge.title;
             final displayDesc = (isHiddenCategory && !unlocked)
                 ? 'Bu sürpriz ve gizli bir rozettir! Doğru zamanda kendiliğinden açılacak.'
                 : badge.description;
 
             return GestureDetector(
               onTap: () {
-                showDialog(
+                final dialogBackground = Color.alphaBlend(
+                  widget.cardColor,
+                  Theme.of(context).scaffoldBackgroundColor,
+                );
+
+                showDialog<void>(
                   context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: widget.cardColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    title: Row(
-                      children: [
-                        Image.asset(
-                          badge.imagePath,
-                          width: 44,
-                          height: 44,
-                          errorBuilder: (_, __, ___) => const Icon(Icons.stars_rounded, size: 44, color: Colors.amber),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            displayTitle,
-                            style: TextStyle(color: widget.textColor, fontSize: 18, fontWeight: FontWeight.bold),
+                  barrierColor: Colors.black.withValues(alpha: 0.72),
+                  builder: (dialogContext) {
+                    return Dialog(
+                      backgroundColor: dialogBackground,
+                      insetPadding: const EdgeInsets.symmetric(
+                        horizontal: 28,
+                        vertical: 24,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 360),
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 120,
+                                height: 120,
+                                child: Opacity(
+                                  opacity: unlocked ? 1 : 0.4,
+                                  child: Image.asset(
+                                    badge.imagePath,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) {
+                                      return Icon(
+                                        Icons.stars_rounded,
+                                        size: 80,
+                                        color: unlocked
+                                            ? Colors.amber
+                                            : widget.subtextColor,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                displayTitle,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: widget.textColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                displayDesc,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: widget.subtextColor,
+                                  fontSize: 14,
+                                  height: 1.4,
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 7,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: unlocked
+                                      ? Colors.green.withValues(alpha: 0.18)
+                                      : Colors.red.withValues(alpha: 0.18),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: unlocked
+                                        ? Colors.greenAccent.withValues(
+                                            alpha: 0.5,
+                                          )
+                                        : Colors.redAccent.withValues(
+                                            alpha: 0.5,
+                                          ),
+                                  ),
+                                ),
+                                child: Text(
+                                  unlocked ? 'Kazanıldı 🎉' : 'Kilitli 🔒',
+                                  style: TextStyle(
+                                    color: unlocked
+                                        ? Colors.greenAccent
+                                        : Colors.redAccent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: double.infinity,
+                                child: FilledButton(
+                                  onPressed: () {
+                                    Navigator.pop(dialogContext);
+                                  },
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: const Color(0xFF6366F1),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 13,
+                                    ),
+                                  ),
+                                  child: const Text('Kapat'),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          displayDesc,
-                          style: TextStyle(color: widget.subtextColor, fontSize: 14),
-                        ),
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: unlocked
-                                ? Colors.green.withValues(alpha: 0.2)
-                                : Colors.red.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            unlocked ? 'Kazanıldı 🎉' : 'Kilitli 🔒',
-                            style: TextStyle(
-                              color: unlocked ? Colors.greenAccent : Colors.redAccent,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 8,
+                ),
                 decoration: BoxDecoration(
                   color: widget.cardColor,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: unlocked ? Colors.amber.withValues(alpha: 0.6) : widget.subtextColor.withValues(alpha: 0.15),
+                    color: unlocked
+                        ? Colors.amber.withValues(alpha: 0.6)
+                        : widget.subtextColor.withValues(alpha: 0.15),
                     width: unlocked ? 1.5 : 1,
                   ),
                 ),
@@ -200,13 +283,23 @@ class _BadgesSectionState extends State<BadgesSection> {
                         opacity: unlocked ? 1.0 : 0.35,
                         child: ColorFiltered(
                           colorFilter: unlocked
-                              ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
-                              : const ColorFilter.mode(Colors.grey, BlendMode.saturation),
+                              ? const ColorFilter.mode(
+                                  Colors.transparent,
+                                  BlendMode.dst,
+                                )
+                              : const ColorFilter.mode(
+                                  Colors.grey,
+                                  BlendMode.saturation,
+                                ),
                           child: Image.asset(
                             badge.imagePath,
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.stars_rounded, size: 40, color: Colors.grey);
+                              return const Icon(
+                                Icons.stars_rounded,
+                                size: 40,
+                                color: Colors.grey,
+                              );
                             },
                           ),
                         ),
@@ -219,9 +312,13 @@ class _BadgesSectionState extends State<BadgesSection> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: unlocked ? widget.textColor : widget.subtextColor.withValues(alpha: 0.5),
+                        color: unlocked
+                            ? widget.textColor
+                            : widget.subtextColor.withValues(alpha: 0.5),
                         fontSize: 12,
-                        fontWeight: unlocked ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: unlocked
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   ],

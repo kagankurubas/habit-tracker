@@ -28,12 +28,16 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _habitsBox = Hive.box<Habit>('habits');
     _categoriesBox = Hive.box<CategoryModel>('categories');
-    NotificationService.selectNotificationStream.addListener(_handleNotificationClick);
+    NotificationService.selectNotificationStream.addListener(
+      _handleNotificationClick,
+    );
   }
 
   @override
   void dispose() {
-    NotificationService.selectNotificationStream.removeListener(_handleNotificationClick);
+    NotificationService.selectNotificationStream.removeListener(
+      _handleNotificationClick,
+    );
     super.dispose();
   }
 
@@ -64,37 +68,38 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AddEditHabitDialog(
-        onSave: ({
-          required String title,
-          required int frequencyType,
-          required int intervalDays,
-          required List<int> selectedWeekdays,
-          required int colorValue,
-          required int iconCodePoint,
-          required String category,
-          required bool isNotificationEnabled,
-          int? notificationHour,
-          int? notificationMinute,
-        }) async {
-          if (title.trim().isEmpty) return;
+        onSave:
+            ({
+              required String title,
+              required int frequencyType,
+              required int intervalDays,
+              required List<int> selectedWeekdays,
+              required int colorValue,
+              required int iconCodePoint,
+              required String category,
+              required bool isNotificationEnabled,
+              int? notificationHour,
+              int? notificationMinute,
+            }) async {
+              if (title.trim().isEmpty) return;
 
-          final newHabit = Habit(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            title: title.trim(),
-            colorValue: colorValue,
-            iconCodePoint: iconCodePoint,
-            frequencyType: frequencyType,
-            intervalDays: intervalDays,
-            selectedWeekdays: selectedWeekdays,
-            category: category,
-            isNotificationEnabled: isNotificationEnabled,
-            notificationHour: notificationHour,
-            notificationMinute: notificationMinute,
-          );
+              final newHabit = Habit(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                title: title.trim(),
+                colorValue: colorValue,
+                iconCodePoint: iconCodePoint,
+                frequencyType: frequencyType,
+                intervalDays: intervalDays,
+                selectedWeekdays: selectedWeekdays,
+                category: category,
+                isNotificationEnabled: isNotificationEnabled,
+                notificationHour: notificationHour,
+                notificationMinute: notificationMinute,
+              );
 
-          await _habitsBox.add(newHabit);
-          await NotificationService().scheduleHabitNotification(newHabit);
-        },
+              await _habitsBox.add(newHabit);
+              await NotificationService().scheduleHabitNotification(newHabit);
+            },
       ),
     );
   }
@@ -104,32 +109,33 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (ctx) => AddEditHabitDialog(
         habit: habit,
-        onSave: ({
-          required String title,
-          required int frequencyType,
-          required int intervalDays,
-          required List<int> selectedWeekdays,
-          required int colorValue,
-          required int iconCodePoint,
-          required String category,
-          required bool isNotificationEnabled,
-          int? notificationHour,
-          int? notificationMinute,
-        }) async {
-          habit.title = title.trim();
-          habit.category = category;
-          habit.colorValue = colorValue;
-          habit.iconCodePoint = iconCodePoint;
-          habit.frequencyType = frequencyType;
-          habit.intervalDays = intervalDays;
-          habit.selectedWeekdays = selectedWeekdays;
-          habit.isNotificationEnabled = isNotificationEnabled;
-          habit.notificationHour = notificationHour;
-          habit.notificationMinute = notificationMinute;
+        onSave:
+            ({
+              required String title,
+              required int frequencyType,
+              required int intervalDays,
+              required List<int> selectedWeekdays,
+              required int colorValue,
+              required int iconCodePoint,
+              required String category,
+              required bool isNotificationEnabled,
+              int? notificationHour,
+              int? notificationMinute,
+            }) async {
+              habit.title = title.trim();
+              habit.category = category;
+              habit.colorValue = colorValue;
+              habit.iconCodePoint = iconCodePoint;
+              habit.frequencyType = frequencyType;
+              habit.intervalDays = intervalDays;
+              habit.selectedWeekdays = selectedWeekdays;
+              habit.isNotificationEnabled = isNotificationEnabled;
+              habit.notificationHour = notificationHour;
+              habit.notificationMinute = notificationMinute;
 
-          await habit.save();
-          await NotificationService().scheduleHabitNotification(habit);
-        },
+              await habit.save();
+              await NotificationService().scheduleHabitNotification(habit);
+            },
       ),
     );
   }
@@ -147,7 +153,9 @@ class _HomeScreenState extends State<HomeScreen> {
         final textColor = AppThemes.getTextColor(bgColor);
         final subtextColor = AppThemes.getSubtextColor(bgColor);
         final isLight = AppThemes.isLightBackground(bgColor);
-        final btnBgColor = isLight ? const Color(0xFF1E293B) : const Color(0xFF6366F1);
+        final btnBgColor = isLight
+            ? const Color(0xFF1E293B)
+            : const Color(0xFF6366F1);
 
         return Scaffold(
           backgroundColor: bgColor,
@@ -157,20 +165,14 @@ class _HomeScreenState extends State<HomeScreen> {
             child: AppBar(
               title: Text(
                 'Rutin & Alışkanlık Takibi',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
               ),
               centerTitle: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
               actions: [
                 IconButton(
-                  icon: Icon(
-                    Icons.settings_outlined,
-                    color: textColor,
-                  ),
+                  icon: Icon(Icons.settings_outlined, color: textColor),
                   tooltip: 'Ayarlar',
                   onPressed: () {
                     Navigator.push(
@@ -193,7 +195,8 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (context, box, _) {
               final habits = box.values.where((h) {
                 if (_selectedFilterCategory == 'Tüm Görevler') return true;
-                return _normalizeCategory(h.category) == _normalizeCategory(_selectedFilterCategory);
+                return _normalizeCategory(h.category) ==
+                    _normalizeCategory(_selectedFilterCategory);
               }).toList();
 
               return Column(
@@ -231,7 +234,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => HabitDetailScreen(habit: habit),
+                                      builder: (context) =>
+                                          HabitDetailScreen(habit: habit),
                                     ),
                                   );
                                 },

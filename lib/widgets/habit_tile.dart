@@ -33,8 +33,10 @@ class HabitTile extends StatelessWidget {
 
     final bool isSettingsOpen = Hive.isBoxOpen('settings');
     final Box? settingsBox = isSettingsOpen ? Hive.box('settings') : null;
-    final bool isSoundEnabled = settingsBox?.get('isSoundEnabled', defaultValue: true) ?? true;
-    final bool isHapticEnabled = settingsBox?.get('isHapticEnabled', defaultValue: true) ?? true;
+    final bool isSoundEnabled =
+        settingsBox?.get('isSoundEnabled', defaultValue: true) ?? true;
+    final bool isHapticEnabled =
+        settingsBox?.get('isHapticEnabled', defaultValue: true) ?? true;
 
     if (willComplete) {
       if (isHapticEnabled) HapticFeedback.mediumImpact();
@@ -64,30 +66,67 @@ class HabitTile extends StatelessWidget {
   // 🏆 ROZET KONTROLÜ VE SIRALI POP-UP GÖSTERİMİ
   void _checkBadgeUnlocked(BuildContext context) async {
     final int streak = habit.currentStreak;
-    final int totalCompletions = habitsBox.values.fold(0, (sum, h) => sum + h.completedDatesList.length);
+    final int totalCompletions = habitsBox.values.fold(
+      0,
+      (sum, h) => sum + h.completedDatesList.length,
+    );
 
     final now = DateTime.now();
     final todayNormalized = DateTime(now.year, now.month, now.day);
     final allHabits = habitsBox.values.toList();
-    final todayTargets = allHabits.where((h) => h.isTargetDate(todayNormalized)).toList();
-    final isPerfectDay = todayTargets.length >= 3 && todayTargets.every((h) => h.isCompletedOn(todayNormalized));
+    final todayTargets = allHabits
+        .where((h) => h.isTargetDate(todayNormalized))
+        .toList();
+    final isPerfectDay =
+        todayTargets.length >= 3 &&
+        todayTargets.every((h) => h.isCompletedOn(todayNormalized));
 
     final List<Map<String, dynamic>> badges = [];
 
     if (totalCompletions == 1) {
-      badges.add({'title': 'İlk Adım', 'desc': 'İlk rutinini başarıyla tamamladın!', 'imagePath': 'assets/badges/first_step.png', 'color': const Color(0xFF10B981)});
+      badges.add({
+        'title': 'İlk Adım',
+        'desc': 'İlk rutinini başarıyla tamamladın!',
+        'imagePath': 'assets/badges/first_step.png',
+        'color': const Color(0xFF10B981),
+      });
     }
     if (isPerfectDay) {
-      badges.add({'title': 'Mükemmel Gün', 'desc': 'Bugünkü tüm hedefleri eksiksiz tamamladın!', 'imagePath': 'assets/badges/perfect_day.png', 'color': const Color(0xFFF59E0B)});
+      badges.add({
+        'title': 'Mükemmel Gün',
+        'desc': 'Bugünkü tüm hedefleri eksiksiz tamamladın!',
+        'imagePath': 'assets/badges/perfect_day.png',
+        'color': const Color(0xFFF59E0B),
+      });
     }
     if (streak == 3) {
-      badges.add({'title': 'Alev Alev', 'desc': '3 gün üst üste harika seri!', 'imagePath': 'assets/badges/streak_3.png', 'color': const Color(0xFF3B82F6)});
+      badges.add({
+        'title': 'Alev Alev',
+        'desc': '3 gün üst üste harika seri!',
+        'imagePath': 'assets/badges/streak_3.png',
+        'color': const Color(0xFF3B82F6),
+      });
     } else if (streak == 7) {
-      badges.add({'title': 'İrade Ustası', 'desc': 'Aralıksız 1 hafta disiplin!', 'imagePath': 'assets/badges/streak_7.png', 'color': const Color(0xFF8B5CF6)});
+      badges.add({
+        'title': 'İrade Ustası',
+        'desc': 'Aralıksız 1 hafta disiplin!',
+        'imagePath': 'assets/badges/streak_7.png',
+        'color': const Color(0xFF8B5CF6),
+      });
     } else if (streak == 30) {
-      badges.add({'title': 'Alışkanlık Canavarı', 'desc': 'Tam 30 günlük efsane seri!', 'imagePath': 'assets/badges/completion_50.png', 'color': const Color(0xFFEC4899)});
+      badges.add({
+        'title': 'Alışkanlık Canavarı',
+        'desc': 'Tam 30 günlük efsane seri!',
+        'imagePath': 'assets/badges/completion_50.png',
+        'color': const Color(0xFFEC4899),
+      });
     } else if (totalCompletions == 50) {
-      badges.add({'title': 'Efsane', 'desc': 'Toplamda 50 kez tamamladın!', 'imagePath': 'assets/badges/completion_50.png', 'color': const Color(0xFFF59E0B)});
+      badges.add({
+        'title': 'Efsane',
+        'desc': 'Toplamda 50 kez tamamladın!',
+        'imagePath': 'assets/badges/completion_50.png',
+        'color': const Color(0xFFF59E0B),
+      });
     }
 
     for (final b in badges) {
@@ -107,7 +146,9 @@ class HabitTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Box<Habit>>(
-      valueListenable: habitsBox.listenable(keys: habit.key != null ? [habit.key] : null),
+      valueListenable: habitsBox.listenable(
+        keys: habit.key != null ? [habit.key] : null,
+      ),
       builder: (context, box, _) {
         final currentHabit = box.get(habit.key) ?? habit;
         final isDoneToday = currentHabit.isCompletedOn(DateTime.now());
@@ -121,16 +162,23 @@ class HabitTile extends StatelessWidget {
 
             return Card(
               margin: const EdgeInsets.only(bottom: 12),
-              color: isLight ? Colors.black.withValues(alpha: 0.05) : currentHabit.color.withValues(alpha: 0.12),
+              color: isLight
+                  ? Colors.black.withValues(alpha: 0.05)
+                  : currentHabit.color.withValues(alpha: 0.12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(
-                  color: isDoneToday ? Colors.greenAccent : currentHabit.color.withValues(alpha: 0.4),
+                  color: isDoneToday
+                      ? Colors.greenAccent
+                      : currentHabit.color.withValues(alpha: 0.4),
                   width: isDoneToday ? 2.0 : 1.0,
                 ),
               ),
               child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 leading: _LeadingCheck(
                   habit: currentHabit,
                   isDoneToday: isDoneToday,
@@ -186,7 +234,10 @@ class _LeadingCheck extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(color: habit.color.withValues(alpha: 0.2), shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: habit.color.withValues(alpha: 0.2),
+            shape: BoxShape.circle,
+          ),
           child: Icon(habit.icon, color: habit.color, size: 18),
         ),
         const SizedBox(width: 6),
@@ -198,9 +249,16 @@ class _LeadingCheck extends StatelessWidget {
             decoration: BoxDecoration(
               color: isDoneToday ? Colors.greenAccent : Colors.transparent,
               shape: BoxShape.circle,
-              border: Border.all(color: isDoneToday ? Colors.greenAccent : subtextColor, width: 2),
+              border: Border.all(
+                color: isDoneToday ? Colors.greenAccent : subtextColor,
+                width: 2,
+              ),
             ),
-            child: Icon(Icons.check, size: 16, color: isDoneToday ? Colors.black : Colors.transparent),
+            child: Icon(
+              Icons.check,
+              size: 16,
+              color: isDoneToday ? Colors.black : Colors.transparent,
+            ),
           ),
         ),
       ],
@@ -245,10 +303,15 @@ class _TitleAndCategory extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           decoration: BoxDecoration(
-            color: isLight ? Colors.black.withValues(alpha: 0.08) : Colors.white.withValues(alpha: 0.1),
+            color: isLight
+                ? Colors.black.withValues(alpha: 0.08)
+                : Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Text(habit.category, style: TextStyle(fontSize: 9, color: subtextColor)),
+          child: Text(
+            habit.category,
+            style: TextStyle(fontSize: 9, color: subtextColor),
+          ),
         ),
         if (streak > 0) ...[
           const SizedBox(width: 4),
@@ -259,7 +322,14 @@ class _TitleAndCategory extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.orange, width: 1),
             ),
-            child: Text('🔥 $streak', style: const TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 9)),
+            child: Text(
+              '🔥 $streak',
+              style: const TextStyle(
+                color: Colors.orangeAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 9,
+              ),
+            ),
           ),
         ],
       ],
@@ -292,20 +362,46 @@ class _SubtitleProgress extends StatelessWidget {
               Expanded(
                 child: Row(
                   children: [
-                    Flexible(child: Text('Son 30 Gün', overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 10, color: subtextColor))),
-                    if (habit.isNotificationEnabled && habit.notificationHour != null) ...[
+                    Flexible(
+                      child: Text(
+                        'Son 30 Gün',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 10, color: subtextColor),
+                      ),
+                    ),
+                    if (habit.isNotificationEnabled &&
+                        habit.notificationHour != null) ...[
                       const SizedBox(width: 4),
-                      Icon(Icons.alarm, size: 11, color: isLight ? Colors.amber.shade800 : Colors.amberAccent),
+                      Icon(
+                        Icons.alarm,
+                        size: 11,
+                        color: isLight
+                            ? Colors.amber.shade800
+                            : Colors.amberAccent,
+                      ),
                       const SizedBox(width: 2),
                       Text(
                         '${habit.notificationHour.toString().padLeft(2, '0')}:${habit.notificationMinute.toString().padLeft(2, '0')}',
-                        style: TextStyle(fontSize: 9, color: isLight ? Colors.amber.shade900 : Colors.amberAccent, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: isLight
+                              ? Colors.amber.shade900
+                              : Colors.amberAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ],
                 ),
               ),
-              Text('%${rate.toStringAsFixed(0)}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: habit.color)),
+              Text(
+                '%${rate.toStringAsFixed(0)}',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: habit.color,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),
@@ -313,7 +409,9 @@ class _SubtitleProgress extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: rate / 100,
-              backgroundColor: isLight ? Colors.black.withValues(alpha: 0.1) : Colors.white10,
+              backgroundColor: isLight
+                  ? Colors.black.withValues(alpha: 0.1)
+                  : Colors.white10,
               valueColor: AlwaysStoppedAnimation<Color>(habit.color),
               minHeight: 4,
             ),
@@ -343,14 +441,22 @@ class _TrailingActions extends StatelessWidget {
         IconButton(
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
-          icon: const Icon(Icons.edit_outlined, color: Colors.blueAccent, size: 18),
+          icon: const Icon(
+            Icons.edit_outlined,
+            color: Colors.blueAccent,
+            size: 18,
+          ),
           onPressed: onEdit,
         ),
         const SizedBox(width: 6),
         IconButton(
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
-          icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
+          icon: const Icon(
+            Icons.delete_outline,
+            color: Colors.redAccent,
+            size: 18,
+          ),
           onPressed: () async {
             await NotificationService().cancelHabitNotification(habit);
             await habit.delete();

@@ -73,7 +73,10 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
             const SizedBox(height: 16),
 
             // 🎨 RENK SEÇİMİ
-            const Text('Kategori Rengi:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const Text(
+              'Kategori Rengi:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
             const SizedBox(height: 8),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -100,7 +103,11 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
                         ),
                       ),
                       child: isSelected
-                          ? const Icon(Icons.check, color: Colors.white, size: 18)
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 18,
+                            )
                           : null,
                     ),
                   );
@@ -110,7 +117,10 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
             const SizedBox(height: 16),
 
             // 🎭 İKON SEÇİMİ
-            const Text('İkon Seç:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const Text(
+              'İkon Seç:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -156,7 +166,9 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
           child: const Text('İptal'),
         ),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: Color(_selectedColorValue)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(_selectedColorValue),
+          ),
           onPressed: () {
             final categoryName = _nameController.text.trim();
             if (categoryName.isNotEmpty) {

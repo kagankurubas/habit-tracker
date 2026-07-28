@@ -35,7 +35,10 @@ class BadgeUnlockedDialog extends StatelessWidget {
                 key: _shareKey,
                 child: Container(
                   width: 320,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 24,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF131138),
                     borderRadius: BorderRadius.circular(24),
@@ -121,7 +124,10 @@ class BadgeUnlockedDialog extends StatelessWidget {
                           ),
                           elevation: 0,
                         ),
-                        child: const Text('Harika!', style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          'Harika!',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -133,7 +139,10 @@ class BadgeUnlockedDialog extends StatelessWidget {
                           await ShareService.shareWidgetAsImage(_shareKey);
                         },
                         icon: const Icon(Icons.share_rounded, size: 18),
-                        label: const Text('Paylaş', style: TextStyle(fontWeight: FontWeight.bold)),
+                        label: const Text(
+                          'Paylaş',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: badgeColor,
                           foregroundColor: Colors.white,

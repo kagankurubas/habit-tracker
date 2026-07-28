@@ -40,10 +40,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
-        Text(
-          label,
-          style: TextStyle(fontSize: 12, color: subtextColor),
-        ),
+        Text(label, style: TextStyle(fontSize: 12, color: subtextColor)),
       ],
     );
   }
@@ -71,7 +68,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 Expanded(
                   child: Text(
                     widget.habit.title,
-                    style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -96,14 +96,14 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     gradient: LinearGradient(
-                      colors: [
-                        themeColor.withValues(alpha: 0.25),
-                        cardColor,
-                      ],
+                      colors: [themeColor.withValues(alpha: 0.25), cardColor],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    border: Border.all(color: themeColor.withValues(alpha: 0.3), width: 1.5),
+                    border: Border.all(
+                      color: themeColor.withValues(alpha: 0.3),
+                      width: 1.5,
+                    ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
@@ -114,7 +114,13 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                           children: [
                             Column(
                               children: [
-                                Text('Mevcut Zincir', style: TextStyle(color: subtextColor, fontSize: 13)),
+                                Text(
+                                  'Mevcut Zincir',
+                                  style: TextStyle(
+                                    color: subtextColor,
+                                    fontSize: 13,
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
                                 Text(
                                   '🔥 $streak Gün',
@@ -126,10 +132,20 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 ),
                               ],
                             ),
-                            Container(height: 30, width: 1, color: subtextColor.withValues(alpha: 0.2)),
+                            Container(
+                              height: 30,
+                              width: 1,
+                              color: subtextColor.withValues(alpha: 0.2),
+                            ),
                             Column(
                               children: [
-                                Text('Sıklık', style: TextStyle(color: subtextColor, fontSize: 13)),
+                                Text(
+                                  'Sıklık',
+                                  style: TextStyle(
+                                    color: subtextColor,
+                                    fontSize: 13,
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
                                 Text(
                                   '🔄 ${widget.habit.frequencyText}',
@@ -141,10 +157,20 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 ),
                               ],
                             ),
-                            Container(height: 30, width: 1, color: subtextColor.withValues(alpha: 0.2)),
+                            Container(
+                              height: 30,
+                              width: 1,
+                              color: subtextColor.withValues(alpha: 0.2),
+                            ),
                             Column(
                               children: [
-                                Text('Toplam', style: TextStyle(color: subtextColor, fontSize: 13)),
+                                Text(
+                                  'Toplam',
+                                  style: TextStyle(
+                                    color: subtextColor,
+                                    fontSize: 13,
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
                                 Text(
                                   '✅ ${widget.habit.totalCompletedDays} Gün',
@@ -165,7 +191,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                           width: double.infinity,
                           child: ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isDoneToday ? Colors.green : themeColor,
+                              backgroundColor: isDoneToday
+                                  ? Colors.green
+                                  : themeColor,
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -178,11 +206,15 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               await widget.habit.save();
                             },
                             icon: Icon(
-                              isDoneToday ? Icons.check_circle : Icons.add_circle_outline,
+                              isDoneToday
+                                  ? Icons.check_circle
+                                  : Icons.add_circle_outline,
                               color: Colors.white,
                             ),
                             label: Text(
-                              isDoneToday ? 'Bugün Tamamlandı 🎉' : 'Bugün Tamamlandı Olarak İşaretle',
+                              isDoneToday
+                                  ? 'Bugün Tamamlandı 🎉'
+                                  : 'Bugün Tamamlandı Olarak İşaretle',
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -203,13 +235,20 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                   children: [
                     Text(
                       'İstikrar Raporu',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: textColor),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: textColor,
+                      ),
                     ),
                     SegmentedButton<int>(
                       segments: const [
                         ButtonSegment(
                           value: 0,
-                          label: Text('Heatmap', style: TextStyle(fontSize: 12)),
+                          label: Text(
+                            'Heatmap',
+                            style: TextStyle(fontSize: 12),
+                          ),
                           icon: Icon(Icons.grid_on, size: 16),
                         ),
                         ButtonSegment(
@@ -233,7 +272,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 Card(
                   color: cardColor,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: _selectedViewIndex == 0
@@ -249,9 +290,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               showText: true,
                               scrollable: true,
                               size: 28,
-                              colorsets: {
-                                1: themeColor,
-                              },
+                              colorsets: {1: themeColor},
                             ),
                           )
                         : Column(
@@ -263,64 +302,106 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 headerStyle: HeaderStyle(
                                   formatButtonVisible: false,
                                   titleCentered: true,
-                                  titleTextStyle: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16),
-                                  leftChevronIcon: Icon(Icons.chevron_left, color: textColor),
-                                  rightChevronIcon: Icon(Icons.chevron_right, color: textColor),
+                                  titleTextStyle: TextStyle(
+                                    color: textColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                  leftChevronIcon: Icon(
+                                    Icons.chevron_left,
+                                    color: textColor,
+                                  ),
+                                  rightChevronIcon: Icon(
+                                    Icons.chevron_right,
+                                    color: textColor,
+                                  ),
                                 ),
                                 calendarBuilders: CalendarBuilders(
-                                  prioritizedBuilder: (context, day, focusedDay) {
-                                    final isDone = widget.habit.isCompletedOn(day);
-                                    final isTarget = widget.habit.isTargetDate(day);
+                                  prioritizedBuilder:
+                                      (context, day, focusedDay) {
+                                        final isDone = widget.habit
+                                            .isCompletedOn(day);
+                                        final isTarget = widget.habit
+                                            .isTargetDate(day);
 
-                                    Color itemBgColor = Colors.transparent;
-                                    Color itemTextColor = subtextColor.withValues(alpha: 0.6);
+                                        Color itemBgColor = Colors.transparent;
+                                        Color itemTextColor = subtextColor
+                                            .withValues(alpha: 0.6);
 
-                                    if (isDone) {
-                                      itemBgColor = Colors.green;
-                                      itemTextColor = Colors.white;
-                                    } else if (isTarget) {
-                                      itemBgColor = targetDayColor.withValues(alpha: 0.85);
-                                      itemTextColor = Colors.white;
-                                    }
+                                        if (isDone) {
+                                          itemBgColor = Colors.green;
+                                          itemTextColor = Colors.white;
+                                        } else if (isTarget) {
+                                          itemBgColor = targetDayColor
+                                              .withValues(alpha: 0.85);
+                                          itemTextColor = Colors.white;
+                                        }
 
-                                    return Container(
-                                      margin: const EdgeInsets.all(4),
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: itemBgColor,
-                                        shape: BoxShape.circle,
-                                        border: isSameDay(day, DateTime.now()) && !isDone
-                                            ? Border.all(color: targetDayColor, width: 2)
-                                            : null,
-                                      ),
-                                      child: Text(
-                                        '${day.day}',
-                                        style: TextStyle(
-                                          color: itemTextColor,
-                                          fontWeight: isTarget || isDone ? FontWeight.bold : FontWeight.normal,
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                        return Container(
+                                          margin: const EdgeInsets.all(4),
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            color: itemBgColor,
+                                            shape: BoxShape.circle,
+                                            border:
+                                                isSameDay(
+                                                      day,
+                                                      DateTime.now(),
+                                                    ) &&
+                                                    !isDone
+                                                ? Border.all(
+                                                    color: targetDayColor,
+                                                    width: 2,
+                                                  )
+                                                : null,
+                                          ),
+                                          child: Text(
+                                            '${day.day}',
+                                            style: TextStyle(
+                                              color: itemTextColor,
+                                              fontWeight: isTarget || isDone
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                 ),
                                 onDaySelected: (selectedDay, focusedDay) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text('Takvim görsel takiptir. Tamamlamaları üstteki butondan yapabilirsiniz!'),
+                                      content: Text(
+                                        'Takvim görsel takiptir. Tamamlamaları üstteki butondan yapabilirsiniz!',
+                                      ),
                                       duration: Duration(seconds: 2),
                                     ),
                                   );
                                 },
                               ),
                               const SizedBox(height: 12),
-                              Divider(color: subtextColor.withValues(alpha: 0.2)),
+                              Divider(
+                                color: subtextColor.withValues(alpha: 0.2),
+                              ),
                               const SizedBox(height: 8),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  _buildLegendItem(Colors.green, 'Yapıldı', subtextColor),
-                                  _buildLegendItem(targetDayColor, 'Hedef Gün', subtextColor),
-                                  _buildLegendItem(subtextColor.withValues(alpha: 0.4), 'Rutin Dışı', subtextColor),
+                                  _buildLegendItem(
+                                    Colors.green,
+                                    'Yapıldı',
+                                    subtextColor,
+                                  ),
+                                  _buildLegendItem(
+                                    targetDayColor,
+                                    'Hedef Gün',
+                                    subtextColor,
+                                  ),
+                                  _buildLegendItem(
+                                    subtextColor.withValues(alpha: 0.4),
+                                    'Rutin Dışı',
+                                    subtextColor,
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -337,9 +418,14 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                       child: Card(
                         color: cardColor,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12.0,
+                            horizontal: 8.0,
+                          ),
                           child: Column(
                             children: [
                               Text(
@@ -353,7 +439,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               const SizedBox(height: 4),
                               Text(
                                 'Aylık Başarı',
-                                style: TextStyle(fontSize: 11, color: subtextColor),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: subtextColor,
+                                ),
                               ),
                             ],
                           ),
@@ -365,9 +454,14 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                       child: Card(
                         color: cardColor,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12.0,
+                            horizontal: 8.0,
+                          ),
                           child: Column(
                             children: [
                               Text(
@@ -381,7 +475,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               const SizedBox(height: 4),
                               Text(
                                 'Son 7 Gün',
-                                style: TextStyle(fontSize: 11, color: subtextColor),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: subtextColor,
+                                ),
                               ),
                             ],
                           ),
@@ -393,9 +490,14 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                       child: Card(
                         color: cardColor,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12.0,
+                            horizontal: 8.0,
+                          ),
                           child: Column(
                             children: [
                               Text(
@@ -409,7 +511,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               const SizedBox(height: 4),
                               Text(
                                 'Toplam Gün',
-                                style: TextStyle(fontSize: 11, color: subtextColor),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: subtextColor,
+                                ),
                               ),
                             ],
                           ),

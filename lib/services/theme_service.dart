@@ -8,8 +8,9 @@ class ThemeService {
   static const String _boxName = 'settings';
   static const String _colorKey = 'bg_color';
 
-  static final ValueNotifier<Color> currentColor =
-      ValueNotifier<Color>(AppThemes.defaultBg);
+  static final ValueNotifier<Color> currentColor = ValueNotifier<Color>(
+    AppThemes.defaultBg,
+  );
 
   static Future<void> init() async {
     final box = await Hive.openBox(_boxName);
@@ -37,7 +38,8 @@ class ThemeService {
         return ValueListenableBuilder<Color>(
           valueListenable: currentColor,
           builder: (context, activeColor, _) {
-            return SafeArea( // 📌 Alttaki sistem tuşlarıyla çakışmayı önlemek için eklendi
+            return SafeArea(
+              // 📌 Alttaki sistem tuşlarıyla çakışmayı önlemek için eklendi
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -60,7 +62,8 @@ class ThemeService {
                         itemCount: AppThemes.backgroundPalette.length,
                         itemBuilder: (context, index) {
                           final color = AppThemes.backgroundPalette[index];
-                          final isSelected = activeColor.toARGB32() == color.toARGB32();
+                          final isSelected =
+                              activeColor.toARGB32() == color.toARGB32();
 
                           return GestureDetector(
                             onTap: () async {
@@ -75,7 +78,9 @@ class ThemeService {
                                 color: color,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: isSelected ? Colors.amber : Colors.white24,
+                                  color: isSelected
+                                      ? Colors.amber
+                                      : Colors.white24,
                                   width: isSelected ? 3 : 1,
                                 ),
                               ),

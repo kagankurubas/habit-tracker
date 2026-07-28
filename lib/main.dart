@@ -12,7 +12,7 @@ import 'models/category_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // 1. Zaman dilimlerini yükle ve varsayılan lokasyonu ayarla
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
@@ -30,32 +30,37 @@ void main() async {
   }
 
   // Kutuları Açalım
-  await Hive.openBox<Habit>('habits');
+  final habitsBox = await Hive.openBox<Habit>('habits');
   final categoriesBox = await Hive.openBox<CategoryModel>('categories');
 
   // Varsayılan Kategoriler
   if (categoriesBox.isEmpty) {
-      final defaultCategories = [
-        CategoryModel(id: '1', name: 'Genel', icon: '📌'),
-        CategoryModel(id: '2', name: 'Kodlama', icon: '💻'),
-        CategoryModel(id: '3', name: 'Müzik', icon: '🎸'),
-        CategoryModel(id: '4', name: 'Oyun Dev.', icon: '🎮'),
-        CategoryModel(id: '5', name: 'Spor', icon: '🏃'),
-        CategoryModel(id: '6', name: 'Okuma', icon: '📚'),
-        CategoryModel(id: '7', name: 'Sağlık', icon: '🧘'),
-      ];
+    final defaultCategories = [
+      CategoryModel(id: '1', name: 'Genel', icon: '📌'),
+      CategoryModel(id: '2', name: 'Kodlama', icon: '💻'),
+      CategoryModel(id: '3', name: 'Müzik', icon: '🎸'),
+      CategoryModel(id: '4', name: 'Oyun Dev.', icon: '🎮'),
+      CategoryModel(id: '5', name: 'Spor', icon: '🏃'),
+      CategoryModel(id: '6', name: 'Okuma', icon: '📚'),
+      CategoryModel(id: '7', name: 'Sağlık', icon: '🧘'),
+    ];
 
-      for (final cat in defaultCategories) {
-        await categoriesBox.add(cat);
-      }
+    for (final cat in defaultCategories) {
+      await categoriesBox.add(cat);
     }
+  }
 
   // 3. Tema servisini başlat
   await ThemeService.init();
 
   // 4. Bildirim servisini başlat
-  await NotificationService().init();
+  final notificationService = NotificationService();
 
+  await notificationService.init();
+
+  for (final habit in habitsBox.values) {
+    await notificationService.scheduleHabitNotification(habit);
+  }
   runApp(const HabitTrackerApp());
 }
 
@@ -116,14 +121,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         final textColor = AppThemes.getTextColor(bgColor);
 
         return Scaffold(
-          body: IndexedStack(
-            index: _currentIndex,
-            children: screens,
-          ),
+          body: IndexedStack(index: _currentIndex, children: screens),
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: _currentIndex,
             backgroundColor: navBarBg,
-            selectedItemColor: AppThemes.isLightBackground(bgColor) ? Colors.indigo.shade700 : const Color(0xFF6366F1),
+            selectedItemColor: AppThemes.isLightBackground(bgColor)
+                ? Colors.indigo.shade700
+                : const Color(0xFF6366F1),
             unselectedItemColor: textColor.withValues(alpha: 0.6),
             onTap: (index) {
               setState(() {

@@ -71,7 +71,8 @@ class SmartInsightCard extends StatelessWidget {
     }
 
     String emoji = '💡';
-    String message = 'Verilerinizi analiz ediyoruz. Rutinlerinizi aksatmadan tamamlamaya devam edin!';
+    String message =
+        'Verilerinizi analiz ediyoruz. Rutinlerinizi aksatmadan tamamlamaya devam edin!';
     Color accentColor = const Color(0xFF6366F1);
 
     if (worstDay != null && lowestRate < 60) {
@@ -79,12 +80,14 @@ class SmartInsightCard extends StatelessWidget {
       final dropPercent = (100 - lowestRate).toInt();
       emoji = '⚠️';
       accentColor = Colors.orangeAccent;
-      message = '$dayName günleri alışkanlıklarını %$dropPercent oranında aksatıyorsun! Bugünlere biraz daha odaklanmaya ne dersin?';
+      message =
+          '$dayName günleri alışkanlıklarını %$dropPercent oranında aksatıyorsun! Bugünlere biraz daha odaklanmaya ne dersin?';
     } else if (bestDay != null && highestRate >= 80) {
       final dayName = _dayNames[bestDay] ?? '';
       emoji = '⚡';
       accentColor = const Color(0xFF10B981);
-      message = 'Süper performans! En verimli günün %${highestRate.toInt()} başarı oranıyla $dayName.';
+      message =
+          'Süper performans! En verimli günün %${highestRate.toInt()} başarı oranıyla $dayName.';
     }
 
     return Container(
@@ -92,7 +95,10 @@ class SmartInsightCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: accentColor.withValues(alpha: 0.4), width: 1.5),
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.4),
+          width: 1.5,
+        ),
       ),
       child: Row(
         children: [

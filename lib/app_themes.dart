@@ -27,14 +27,14 @@ class AppThemes {
   static Color getTextColor(Color backgroundColor) {
     return isLightBackground(backgroundColor)
         ? const Color(0xFF0F172A) // Açık zemin için koyu lacivert
-        : Colors.white;            // Koyu zemin için beyaz
+        : Colors.white; // Koyu zemin için beyaz
   }
 
   // 🖋️ Dinamik İkincil Metin Rengi (Subtitle)
   static Color getSubtextColor(Color backgroundColor) {
     return isLightBackground(backgroundColor)
         ? const Color(0xFF475569) // Açık zemin için koyu gri
-        : Colors.grey.shade400;    // Koyu zemin için açık gri
+        : Colors.grey.shade400; // Koyu zemin için açık gri
   }
 
   // 🃏 Dinamik Kart Rengi
@@ -48,9 +48,13 @@ class AppThemes {
   static Color getNavBarColor(Color backgroundColor) {
     final hsl = HSLColor.fromColor(backgroundColor);
     if (isLightBackground(backgroundColor)) {
-      return hsl.withLightness((hsl.lightness - 0.12).clamp(0.0, 1.0)).toColor();
+      return hsl
+          .withLightness((hsl.lightness - 0.12).clamp(0.0, 1.0))
+          .toColor();
     } else {
-      return hsl.withLightness((hsl.lightness - 0.06).clamp(0.0, 1.0)).toColor();
+      return hsl
+          .withLightness((hsl.lightness - 0.06).clamp(0.0, 1.0))
+          .toColor();
     }
   }
 }

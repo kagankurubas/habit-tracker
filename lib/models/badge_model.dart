@@ -89,7 +89,9 @@ final List<HabitBadge> allBadges = [
     isUnlocked: (habits) {
       final now = DateTime.now();
       final todayNormalized = DateTime(now.year, now.month, now.day);
-      final todayTargets = habits.where((h) => h.isTargetDate(todayNormalized)).toList();
+      final todayTargets = habits
+          .where((h) => h.isTargetDate(todayNormalized))
+          .toList();
 
       if (todayTargets.length < 3) return false;
       return todayTargets.every((h) => h.isCompletedOn(todayNormalized));
@@ -103,7 +105,9 @@ final List<HabitBadge> allBadges = [
     description: 'Kodlama kategorisinde ilk görevini tamamla',
     imagePath: 'assets/badges/code_first.png',
     category: 'Kodlama',
-    isUnlocked: (habits) => habits.any((h) => h.category == 'Kodlama' && h.completedDatesList.isNotEmpty),
+    isUnlocked: (habits) => habits.any(
+      (h) => h.category == 'Kodlama' && h.completedDatesList.isNotEmpty,
+    ),
   ),
   HabitBadge(
     id: 'code_bug_hunter',
@@ -129,7 +133,9 @@ final List<HabitBadge> allBadges = [
     description: 'Müzik kategorisinde ilk pratik yapışın',
     imagePath: 'assets/badges/music_first.png',
     category: 'Müzik',
-    isUnlocked: (habits) => habits.any((h) => h.category == 'Müzik' && h.completedDatesList.isNotEmpty),
+    isUnlocked: (habits) => habits.any(
+      (h) => h.category == 'Müzik' && h.completedDatesList.isNotEmpty,
+    ),
   ),
   HabitBadge(
     id: 'music_virtuoso',
@@ -155,7 +161,9 @@ final List<HabitBadge> allBadges = [
     description: 'Oyun Dev. kategorisinde ilk görevini tamamla',
     imagePath: 'assets/badges/gamedev_builder.png',
     category: 'Oyun Dev.',
-    isUnlocked: (habits) => habits.any((h) => h.category == 'Oyun Dev.' && h.completedDatesList.isNotEmpty),
+    isUnlocked: (habits) => habits.any(
+      (h) => h.category == 'Oyun Dev.' && h.completedDatesList.isNotEmpty,
+    ),
   ),
   HabitBadge(
     id: 'gamedev_level_up',
@@ -228,7 +236,8 @@ final List<HabitBadge> allBadges = [
       return habits.any((h) {
         return h.completedDatesList.any((d) {
           final local = d.toLocal();
-          final isExactlyMidnight = local.hour == 0 && local.minute == 0 && local.second == 0;
+          final isExactlyMidnight =
+              local.hour == 0 && local.minute == 0 && local.second == 0;
           return !isExactlyMidnight && (local.hour >= 0 && local.hour < 5);
         });
       });

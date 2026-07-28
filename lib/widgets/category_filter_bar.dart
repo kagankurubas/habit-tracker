@@ -16,7 +16,11 @@ class CategoryFilterBar extends StatelessWidget {
     required this.onCategorySelected,
   });
 
-  void _showDeleteDialog(BuildContext context, CategoryModel category, Color bgColor) {
+  void _showDeleteDialog(
+    BuildContext context,
+    CategoryModel category,
+    Color bgColor,
+  ) {
     final textColor = AppThemes.getTextColor(bgColor);
     final subtextColor = AppThemes.getSubtextColor(bgColor);
 
@@ -105,34 +109,48 @@ class CategoryFilterBar extends StatelessWidget {
                             showDialog(
                               context: context,
                               builder: (ctx) => AddCategoryDialog(
-                                onSave: (name, colorValue, iconCodePoint) async {
-                                  final newCategory = CategoryModel(
-                                    id: DateTime.now().millisecondsSinceEpoch.toString(),
-                                    name: name,
-                                    colorValue: colorValue,
-                                    iconCodePoint: iconCodePoint,
-                                  );
-                                  await categoriesBox.add(newCategory);
-                                },
+                                onSave:
+                                    (name, colorValue, iconCodePoint) async {
+                                      final newCategory = CategoryModel(
+                                        id: DateTime.now()
+                                            .millisecondsSinceEpoch
+                                            .toString(),
+                                        name: name,
+                                        colorValue: colorValue,
+                                        iconCodePoint: iconCodePoint,
+                                      );
+                                      await categoriesBox.add(newCategory);
+                                    },
                               ),
                             );
                           },
                           borderRadius: BorderRadius.circular(20),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
                               color: isLight
                                   ? Colors.indigo.shade50
-                                  : const Color(0xFF6366F1).withValues(alpha: 0.2),
+                                  : const Color(
+                                      0xFF6366F1,
+                                    ).withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: const Color(0xFF6366F1).withValues(alpha: 0.5),
+                                color: const Color(
+                                  0xFF6366F1,
+                                ).withValues(alpha: 0.5),
                                 width: 1.5,
                               ),
                             ),
                             child: const Row(
                               children: [
-                                Icon(Icons.add, size: 16, color: Color(0xFF6366F1)),
+                                Icon(
+                                  Icons.add,
+                                  size: 16,
+                                  color: Color(0xFF6366F1),
+                                ),
                                 SizedBox(width: 4),
                                 Text(
                                   'Ekle',
@@ -161,7 +179,8 @@ class CategoryFilterBar extends StatelessWidget {
                       isSelected: isSelected,
                       isLight: isLight,
                       onTap: () => onCategorySelected(category.name),
-                      onLongPress: () => _showDeleteDialog(context, category, bgColor),
+                      onLongPress: () =>
+                          _showDeleteDialog(context, category, bgColor),
                     );
                   },
                 ),
@@ -184,9 +203,13 @@ class CategoryFilterBar extends StatelessWidget {
     VoidCallback? onLongPress,
   }) {
     final Color activeBgColor = chipColor;
-    final Color unselectedBgColor = isLight ? Colors.white.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.08);
+    final Color unselectedBgColor = isLight
+        ? Colors.white.withValues(alpha: 0.5)
+        : Colors.white.withValues(alpha: 0.08);
     const Color activeTextColor = Colors.white;
-    final Color unselectedTextColor = isLight ? const Color(0xFF0F172A) : Colors.white.withValues(alpha: 0.8);
+    final Color unselectedTextColor = isLight
+        ? const Color(0xFF0F172A)
+        : Colors.white.withValues(alpha: 0.8);
 
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
@@ -202,7 +225,9 @@ class CategoryFilterBar extends StatelessWidget {
             border: Border.all(
               color: isSelected
                   ? Colors.transparent
-                  : (isLight ? Colors.black.withValues(alpha: 0.1) : Colors.white.withValues(alpha: 0.15)),
+                  : (isLight
+                        ? Colors.black.withValues(alpha: 0.1)
+                        : Colors.white.withValues(alpha: 0.15)),
               width: 1,
             ),
           ),
@@ -212,7 +237,9 @@ class CategoryFilterBar extends StatelessWidget {
               Icon(
                 iconData,
                 size: 15,
-                color: isSelected ? Colors.white : (isLight ? chipColor : chipColor.withValues(alpha: 0.9)),
+                color: isSelected
+                    ? Colors.white
+                    : (isLight ? chipColor : chipColor.withValues(alpha: 0.9)),
               ),
               const SizedBox(width: 6),
               Text(

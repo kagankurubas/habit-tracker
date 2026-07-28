@@ -12,7 +12,9 @@ class ShareService {
 
   static Future<void> shareWidgetAsImage(GlobalKey globalKey) async {
     try {
-      final boundary = globalKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      final boundary =
+          globalKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) return;
 
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
@@ -38,7 +40,9 @@ class ShareService {
       } else {
         // 📱 MOBİL / MASAÜSTÜ ORTAMI
         final tempDir = await getTemporaryDirectory();
-        final file = await File('${tempDir.path}/my_routine_stats.png').create();
+        final file = await File(
+          '${tempDir.path}/my_routine_stats.png',
+        ).create();
         await file.writeAsBytes(pngBytes);
 
         final xFile = XFile(file.path);

@@ -3,26 +3,49 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
 import '../models/habit.dart';
 import 'motivation_service.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
+
   factory NotificationService() => _instance;
+
   NotificationService._internal();
 
   final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  // 🚀 Tıklanan bildirimdeki habit.id'yi dinlemek için Notifier
-  static final ValueNotifier<String?> selectNotificationStream = ValueNotifier(null);
+  static final ValueNotifier<String?> selectNotificationStream =
+      ValueNotifier<String?>(null);
+
+  static const String _channelId = 'habit_reminders';
+  static const String _channelName = 'Rutin Hatırlatıcıları';
+
+  static const NotificationDetails _notificationDetails = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _channelId,
+      _channelName,
+      channelDescription: 'Alışkanlıklarınızı hatırlatan bildirimler',
+      importance: Importance.max,
+      priority: Priority.high,
+      playSound: true,
+      enableVibration: true,
+    ),
+    iOS: DarwinNotificationDetails(),
+  );
 
   Future<void> init() async {
-    if (kIsWeb) return; // 🌐 Web'de çalışıyorsa bildirimi es geç
+    if (kIsWeb) return;
 
     tz.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
+
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -39,182 +62,251 @@ class NotificationService {
       onDidReceiveNotificationResponse: _onNotificationResponse,
     );
 
-    final androidImplementation =
-        _notificationsPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    final androidImplementation = _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidImplementation != null) {
-      await androidImplementation.requestNotificationsPermission();
-      await androidImplementation.requestExactAlarmsPermission();
+      final permissionGranted = await androidImplementation
+          .requestNotificationsPermission();
+
+      debugPrint(
+        'Bildirim izni: ${permissionGranted == true ? "verildi" : "verilmedi"}',
+      );
     }
   }
 
-  // 🚀 Cold Start (Kapalıyken açılma) kontrolü
   static Future<String?> getInitialNotificationPayload() async {
     if (kIsWeb) return null;
 
-    final NotificationAppLaunchDetails? notificationAppLaunchDetails =
-        await NotificationService()._notificationsPlugin.getNotificationAppLaunchDetails();
+    final launchDetails = await NotificationService()._notificationsPlugin
+        .getNotificationAppLaunchDetails();
 
-    if (notificationAppLaunchDetails != null &&
-        notificationAppLaunchDetails.didNotificationLaunchApp) {
-      final response = notificationAppLaunchDetails.notificationResponse;
-      if (response != null && response.payload != null) {
-        return response.payload;
-      }
+    if (launchDetails?.didNotificationLaunchApp == true) {
+      return launchDetails?.notificationResponse?.payload;
     }
+
     return null;
   }
 
-  // 🖱️ Action Button veya Bildirime Tıklandığında Tetiklenen Metod
-  static Future<void> _onNotificationResponse(NotificationResponse response) async {
+  static Future<void> _onNotificationResponse(
+    NotificationResponse response,
+  ) async {
     if (kIsWeb) return;
 
-    if (response.payload != null) {
-      // ⚡ Tıklandığında eğer rutin bugün tamamlandıysa direkt detaya yönlendir, 
-      // tamamlanmadıysa kullanıcı zaten tamamlayabilir.
-      selectNotificationStream.value = response.payload;
+    final payload = response.payload;
+
+    if (payload != null && payload.isNotEmpty) {
+      selectNotificationStream.value = payload;
     }
   }
 
-  // 🧪 Test Bildirimi
   Future<void> showInstantTestNotification() async {
     if (kIsWeb) return;
 
-    const androidDetails = AndroidNotificationDetails(
-      'habit_reminders',
-      'Rutin Hatırlatıcıları',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
     await _notificationsPlugin.show(
       id: 999,
-      title: '🧪 Test Bildirimi',
+      title: '🧪 HABITTO Test Bildirimi',
       body: MotivationService.getRandomQuote(),
-      notificationDetails: const NotificationDetails(android: androidDetails),
+      notificationDetails: _notificationDetails,
     );
   }
 
-  // 🔕 Bildirimi İptal Et
   Future<void> cancelHabitNotification(Habit habit) async {
     if (kIsWeb) return;
 
-    if (habit.selectedWeekdays.isNotEmpty) {
-      for (int weekday in habit.selectedWeekdays) {
-        final notificationId = (habit.id.hashCode ^ weekday).abs();
-        await _notificationsPlugin.cancel(id: notificationId);
+    final pendingNotifications = await _notificationsPlugin
+        .pendingNotificationRequests();
+
+    for (final notification in pendingNotifications) {
+      if (notification.payload == habit.id) {
+        await _notificationsPlugin.cancel(id: notification.id);
       }
-    } else {
-      await _notificationsPlugin.cancel(id: habit.id.hashCode.abs());
+    }
+
+    // Eski sürümde oluşturulmuş bildirimleri de temizle.
+    await _notificationsPlugin.cancel(id: habit.id.hashCode.abs());
+
+    for (int weekday = 1; weekday <= 7; weekday++) {
+      await _notificationsPlugin.cancel(
+        id: (habit.id.hashCode ^ weekday).abs(),
+      );
     }
   }
 
-  // 🔔 Rutin Zamanla (⚡ Zaten o gün tamamlandıysa bildirim içeriğini / gönderimini bloke eder)
+  int _createNotificationId(String habitId, int salt) {
+    final id = Object.hash(habitId, salt) & 0x7fffffff;
+    return id == 0 ? 1 : id;
+  }
+
+  tz.TZDateTime _nextNotificationTime(int hour, int minute) {
+    final now = tz.TZDateTime.now(tz.local);
+
+    var scheduledDate = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+
+    if (!scheduledDate.isAfter(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    return scheduledDate;
+  }
+
+  Future<void> _scheduleNotification({
+    required Habit habit,
+    required int id,
+    required tz.TZDateTime date,
+    DateTimeComponents? repeatComponents,
+  }) async {
+    await _notificationsPlugin.zonedSchedule(
+      id: id,
+      title: '🔥 ${habit.title}',
+      body: MotivationService.getRandomQuote(),
+      scheduledDate: date,
+      notificationDetails: _notificationDetails,
+
+      // Habit tracker için tam saniye hassasiyeti gerekmiyor.
+      // Böylece özel exact-alarm iznine bağımlı kalmıyoruz.
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+
+      matchDateTimeComponents: repeatComponents,
+      payload: habit.id,
+    );
+  }
+
   Future<void> scheduleHabitNotification(Habit habit) async {
     if (kIsWeb) return;
 
-    // ⚡ ÖNEMLİ KONTROL: Rutin bugün için zaten tamamlandıysa, bildirim kurmayı atla veya iptal et!
-    final nowCheck = DateTime.now();
-    final todayNormalized = DateTime(nowCheck.year, nowCheck.month, nowCheck.day);
-    if (habit.isCompletedOn(todayNormalized)) {
-      await cancelHabitNotification(habit);
-      return;
-    }
+    await cancelHabitNotification(habit);
 
-    // Bildirim kapalıysa veya saat tanımlanmamışsa iptal edip çık
     if (!habit.isNotificationEnabled ||
         habit.notificationHour == null ||
         habit.notificationMinute == null) {
-      await cancelHabitNotification(habit);
       return;
     }
 
-    // Önce bu habit'e ait eski bildirimleri temizleyelim
-    await cancelHabitNotification(habit);
-
-    final location = tz.getLocation('Europe/Istanbul');
-    final now = tz.TZDateTime.now(location);
-    final String motivationBody = MotivationService.getRandomQuote();
-
-    const androidDetails = AndroidNotificationDetails(
-      'habit_reminders',
-      'Rutin Hatırlatıcıları',
-      channelDescription: 'Alışkanlıklarınızı hatırlatan bildirimler',
-      importance: Importance.max,
-      priority: Priority.high,
-      fullScreenIntent: true,
-      actions: <AndroidNotificationAction>[
-        AndroidNotificationAction(
-          'open_habit',
-          '🔍 Detayı Aç',
-          showsUserInterface: true,
-          cancelNotification: true,
-        ),
-      ],
+    final initialDate = _nextNotificationTime(
+      habit.notificationHour!,
+      habit.notificationMinute!,
     );
 
-    const notificationDetails = NotificationDetails(
-      android: androidDetails,
-      iOS: DarwinNotificationDetails(),
-    );
-
-    // 🗓️ A) ÖZEL GÜNLER SEÇİLDİYSE
-    if (habit.selectedWeekdays.isNotEmpty) {
-      for (int weekday in habit.selectedWeekdays) {
-        var scheduledDate = tz.TZDateTime(
-          location,
-          now.year,
-          now.month,
-          now.day,
-          habit.notificationHour!,
-          habit.notificationMinute!,
+    switch (habit.frequencyType) {
+      // Her gün
+      case 0:
+        await _scheduleNotification(
+          habit: habit,
+          id: _createNotificationId(habit.id, 0),
+          date: initialDate,
+          repeatComponents: DateTimeComponents.time,
         );
+        break;
 
-        while (scheduledDate.weekday != weekday || scheduledDate.isBefore(now)) {
-          scheduledDate = scheduledDate.add(const Duration(days: 1));
-        }
+      // Hafta içi
+      case 1:
+        await _scheduleWeeklyNotifications(habit, initialDate, const [
+          1,
+          2,
+          3,
+          4,
+          5,
+        ]);
+        break;
 
-        final notificationId = (habit.id.hashCode ^ weekday).abs();
+      // Hafta sonu
+      case 2:
+        await _scheduleWeeklyNotifications(habit, initialDate, const [6, 7]);
+        break;
 
-        await _notificationsPlugin.zonedSchedule(
-          id: notificationId,
-          title: '🔥 ${habit.title}',
-          body: motivationBody,
-          scheduledDate: scheduledDate,
-          notificationDetails: notificationDetails,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-          payload: habit.id,
+      // X günde bir
+      case 3:
+        await _scheduleIntervalNotifications(habit, initialDate);
+        break;
+
+      // Haftanın belirli günleri
+      case 4:
+        await _scheduleWeeklyNotifications(
+          habit,
+          initialDate,
+          habit.selectedWeekdays,
         );
+        break;
+
+      default:
+        await _scheduleNotification(
+          habit: habit,
+          id: _createNotificationId(habit.id, 0),
+          date: initialDate,
+          repeatComponents: DateTimeComponents.time,
+        );
+    }
+  }
+
+  Future<void> _scheduleWeeklyNotifications(
+    Habit habit,
+    tz.TZDateTime initialDate,
+    List<int> weekdays,
+  ) async {
+    for (final weekday in weekdays.toSet()) {
+      if (weekday < DateTime.monday || weekday > DateTime.sunday) {
+        continue;
       }
-    } 
-    // 📆 B) ÖZEL GÜN SEÇİLMEDİYSE (Her Gün)
-    else {
-      var scheduledDate = tz.TZDateTime(
-        location,
-        now.year,
-        now.month,
-        now.day,
-        habit.notificationHour!,
-        habit.notificationMinute!,
-      );
 
-      if (scheduledDate.isBefore(now.subtract(const Duration(seconds: 30)))) {
+      var scheduledDate = initialDate;
+
+      while (scheduledDate.weekday != weekday) {
         scheduledDate = scheduledDate.add(const Duration(days: 1));
       }
 
-      final notificationId = habit.id.hashCode.abs();
-
-      await _notificationsPlugin.zonedSchedule(
-        id: notificationId,
-        title: '🔥 ${habit.title}',
-        body: motivationBody,
-        scheduledDate: scheduledDate,
-        notificationDetails: notificationDetails,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time,
-        payload: habit.id,
+      await _scheduleNotification(
+        habit: habit,
+        id: _createNotificationId(habit.id, weekday),
+        date: scheduledDate,
+        repeatComponents: DateTimeComponents.dayOfWeekAndTime,
       );
+    }
+  }
+
+  Future<void> _scheduleIntervalNotifications(
+    Habit habit,
+    tz.TZDateTime initialDate,
+  ) async {
+    var candidateDate = initialDate;
+    int scheduledCount = 0;
+    int scannedDays = 0;
+
+    // Önümüzdeki 30 uygun tarihi zamanla.
+    while (scheduledCount < 30 && scannedDays < 365) {
+      final normalDate = DateTime(
+        candidateDate.year,
+        candidateDate.month,
+        candidateDate.day,
+      );
+
+      if (habit.isTargetDate(normalDate)) {
+        final dateSalt =
+            candidateDate.year * 10000 +
+            candidateDate.month * 100 +
+            candidateDate.day;
+
+        await _scheduleNotification(
+          habit: habit,
+          id: _createNotificationId(habit.id, dateSalt),
+          date: candidateDate,
+        );
+
+        scheduledCount++;
+      }
+
+      candidateDate = candidateDate.add(const Duration(days: 1));
+
+      scannedDays++;
     }
   }
 }

@@ -71,8 +71,8 @@ class Habit extends HiveObject {
     this.isNotificationEnabled = false,
     this.notificationHour,
     this.notificationMinute,
-  })  : selectedWeekdays = selectedWeekdays ?? [1, 3, 5],
-        completedDatesList = completedDates ?? [];
+  }) : selectedWeekdays = selectedWeekdays ?? <int>[],
+       completedDatesList = completedDates ?? [];
 
   Color get color => Color(colorValue);
 
@@ -110,7 +110,10 @@ class Habit extends HiveObject {
       case 3:
         return '$intervalDays Günde Bir';
       case 4:
-        final names = selectedWeekdays.map((d) => _dayNames[d]).whereType<String>().join(', ');
+        final names = selectedWeekdays
+            .map((d) => _dayNames[d])
+            .whereType<String>()
+            .join(', ');
         return names.isEmpty ? 'Haftalık' : names;
       case 0:
       default:
@@ -128,7 +131,9 @@ class Habit extends HiveObject {
   /// ⚡ OPTİMİZE EDİLDİ: Sort yapmadan tek geçişte en eski tarihi bulur
   DateTime get startDate {
     if (completedDatesList.isNotEmpty) {
-      final earliest = completedDatesList.reduce((a, b) => a.isBefore(b) ? a : b);
+      final earliest = completedDatesList.reduce(
+        (a, b) => a.isBefore(b) ? a : b,
+      );
       return _stripTime(earliest);
     }
     return _stripTime(DateTime.now());
@@ -158,14 +163,18 @@ class Habit extends HiveObject {
 
   bool isCompletedOn(DateTime date) {
     final target = _stripTime(date);
-    return completedDatesList.any((d) => _stripTime(d).isAtSameMomentAs(target));
+    return completedDatesList.any(
+      (d) => _stripTime(d).isAtSameMomentAs(target),
+    );
   }
 
   void toggleDate(DateTime date) {
     final target = _stripTime(date);
     final newList = List<DateTime>.from(completedDatesList);
 
-    final index = newList.indexWhere((d) => _stripTime(d).isAtSameMomentAs(target));
+    final index = newList.indexWhere(
+      (d) => _stripTime(d).isAtSameMomentAs(target),
+    );
 
     if (index != -1) {
       newList.removeAt(index);

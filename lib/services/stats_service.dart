@@ -46,10 +46,14 @@ class StatsService {
   };
 
   /// Son [daysBack] gün içindeki haftalık performans analizi
-  static InsightResult analyzeWeeklyPerformance(List<Habit> habits, {int daysBack = 30}) {
+  static InsightResult analyzeWeeklyPerformance(
+    List<Habit> habits, {
+    int daysBack = 30,
+  }) {
     if (habits.isEmpty) {
       return const InsightResult(
-        message: 'Henüz yeterli alışkanlık verisi yok. Görevlerini tamamladıkça sana özel analizler burada görünecek!',
+        message:
+            'Henüz yeterli alışkanlık verisi yok. Görevlerini tamamladıkça sana özel analizler burada görünecek!',
         emoji: '📊',
       );
     }
@@ -92,7 +96,8 @@ class StatsService {
 
     if (performances.isEmpty) {
       return const InsightResult(
-        message: 'Alışkanlık takibine devam et, ilk haftalık analizini hazırlıyoruz!',
+        message:
+            'Alışkanlık takibine devam et, ilk haftalık analizini hazırlıyoruz!',
         emoji: '🌱',
       );
     }
@@ -110,21 +115,24 @@ class StatsService {
         worstDay: worst,
         bestDay: best,
         emoji: '⚠️',
-        message: '${worst.dayName} günleri alışkanlıklarını %$dropPercent oranında aksatıyorsun! Bugünlere biraz daha odaklanmaya ne dersin?',
+        message:
+            '${worst.dayName} günleri alışkanlıklarını %$dropPercent oranında aksatıyorsun! Bugünlere biraz daha odaklanmaya ne dersin?',
       );
     } else if (best.completionRate >= 80) {
       return InsightResult(
         worstDay: worst,
         bestDay: best,
         emoji: '🔥',
-        message: 'Harika gidiyorsun! En verimli günün %${best.completionRate.toStringAsFixed(0)} başarı oranıyla ${best.dayName}.',
+        message:
+            'Harika gidiyorsun! En verimli günün %${best.completionRate.toStringAsFixed(0)} başarı oranıyla ${best.dayName}.',
       );
     } else {
       return InsightResult(
         worstDay: worst,
         bestDay: best,
         emoji: '💪',
-        message: 'Dengeli bir ivme yakaladın. Rutinlerini aksatmadan devam ettir!',
+        message:
+            'Dengeli bir ivme yakaladın. Rutinlerini aksatmadan devam ettir!',
       );
     }
   }

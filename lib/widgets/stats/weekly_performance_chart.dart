@@ -23,7 +23,11 @@ class WeeklyPerformanceChart extends StatelessWidget {
       children: [
         Text(
           'Haftalık Performans Grafiği',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
         ),
         const SizedBox(height: 12),
         Container(
@@ -40,8 +44,14 @@ class WeeklyPerformanceChart extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: List.generate(7, (index) {
                 // ⚡ Liste uzunluğu güvenliği (RangeError önleme)
-                final ratio = (index < last7DaysRatios.length ? last7DaysRatios[index] : 0.0).clamp(0.0, 1.0);
-                final label = index < current7DaysLabels.length ? current7DaysLabels[index] : '';
+                final ratio =
+                    (index < last7DaysRatios.length
+                            ? last7DaysRatios[index]
+                            : 0.0)
+                        .clamp(0.0, 1.0);
+                final label = index < current7DaysLabels.length
+                    ? current7DaysLabels[index]
+                    : '';
                 final isToday = index == 6;
 
                 final barHeight = 90 * ratio < 6 ? 6.0 : 90 * ratio;
@@ -61,8 +71,8 @@ class WeeklyPerformanceChart extends StatelessWidget {
                         color: isToday
                             ? const Color(0xFF10B981)
                             : (ratio > 0
-                                ? const Color(0xFF3B82F6)
-                                : subtextColor.withValues(alpha: 0.15)),
+                                  ? const Color(0xFF3B82F6)
+                                  : subtextColor.withValues(alpha: 0.15)),
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
@@ -71,7 +81,9 @@ class WeeklyPerformanceChart extends StatelessWidget {
                       label,
                       style: TextStyle(
                         color: isToday ? const Color(0xFF10B981) : subtextColor,
-                        fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isToday
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                         fontSize: 12,
                       ),
                     ),

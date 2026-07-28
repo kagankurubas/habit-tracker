@@ -17,7 +17,8 @@ class CategoryDistributionChart extends StatefulWidget {
   });
 
   @override
-  State<CategoryDistributionChart> createState() => _CategoryDistributionChartState();
+  State<CategoryDistributionChart> createState() =>
+      _CategoryDistributionChartState();
 }
 
 class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
@@ -44,7 +45,8 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
       final count = habit.completedDatesList.length;
 
       if (count > 0) {
-        categoryCompletions[categoryName] = (categoryCompletions[categoryName] ?? 0) + count;
+        categoryCompletions[categoryName] =
+            (categoryCompletions[categoryName] ?? 0) + count;
         categoryColors[categoryName] = habit.color;
         totalCount += count;
       }
@@ -61,7 +63,11 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
       children: [
         Text(
           'Kategori Dağılımı',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: widget.textColor),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: widget.textColor,
+          ),
         ),
         const SizedBox(height: 12),
         Container(
@@ -69,7 +75,9 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
           decoration: BoxDecoration(
             color: widget.cardColor,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: widget.subtextColor.withValues(alpha: 0.15)),
+            border: Border.all(
+              color: widget.subtextColor.withValues(alpha: 0.15),
+            ),
           ),
           child: Column(
             children: [
@@ -82,17 +90,20 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
                     PieChart(
                       PieChartData(
                         pieTouchData: PieTouchData(
-                          touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                            setState(() {
-                              if (!event.isInterestedForInteractions ||
-                                  pieTouchResponse == null ||
-                                  pieTouchResponse.touchedSection == null) {
-                                _touchedIndex = -1;
-                                return;
-                              }
-                              _touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-                            });
-                          },
+                          touchCallback:
+                              (FlTouchEvent event, pieTouchResponse) {
+                                setState(() {
+                                  if (!event.isInterestedForInteractions ||
+                                      pieTouchResponse == null ||
+                                      pieTouchResponse.touchedSection == null) {
+                                    _touchedIndex = -1;
+                                    return;
+                                  }
+                                  _touchedIndex = pieTouchResponse
+                                      .touchedSection!
+                                      .touchedSectionIndex;
+                                });
+                              },
                         ),
                         borderData: FlBorderData(show: false),
                         sectionsSpace: 3,
@@ -104,7 +115,9 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
                           final catName = categories[i];
                           final count = categoryCompletions[catName]!;
                           final percentage = (count / totalCount) * 100;
-                          final color = categoryColors[catName] ?? const Color(0xFF6366F1);
+                          final color =
+                              categoryColors[catName] ??
+                              const Color(0xFF6366F1);
 
                           return PieChartSectionData(
                             color: color,
@@ -115,7 +128,9 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
                               fontSize: fontSize,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
-                              shadows: const [Shadow(color: Colors.black45, blurRadius: 2)],
+                              shadows: const [
+                                Shadow(color: Colors.black45, blurRadius: 2),
+                              ],
                             ),
                           );
                         }),
@@ -152,9 +167,11 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
                 runSpacing: 8,
                 alignment: WrapAlignment.center,
                 children: categories.map((catName) {
-                  final color = categoryColors[catName] ?? const Color(0xFF6366F1);
+                  final color =
+                      categoryColors[catName] ?? const Color(0xFF6366F1);
                   final count = categoryCompletions[catName]!;
-                  final percentage = ((count / totalCount) * 100).toStringAsFixed(0);
+                  final percentage = ((count / totalCount) * 100)
+                      .toStringAsFixed(0);
 
                   return Row(
                     mainAxisSize: MainAxisSize.min,

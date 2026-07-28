@@ -12,30 +12,31 @@ import '../models/category_model.dart';
 class BackupService {
   // 📤 1. JSON OLARAK DIŞA AKTAR (WEB + MOBİL UYUMLU)
   static Future<void> exportDataToJson(
-      Box<Habit> habitsBox, Box<CategoryModel> categoriesBox) async {
+    Box<Habit> habitsBox,
+    Box<CategoryModel> categoriesBox,
+  ) async {
     try {
       final habitsData = habitsBox.values
-          .map((h) => {
-                'id': h.id,
-                'title': h.title,
-                'category': h.category,
-                'colorValue': h.colorValue,
-                'frequencyType': h.frequencyType,
-                'intervalDays': h.intervalDays,
-                'iconCodePoint': h.iconCodePoint,
-                'selectedWeekdays': h.selectedWeekdays,
-                'isNotificationEnabled': h.isNotificationEnabled,
-                'completedDates':
-                    h.completedDatesList.map((d) => d.toIso8601String()).toList(),
-              })
+          .map(
+            (h) => {
+              'id': h.id,
+              'title': h.title,
+              'category': h.category,
+              'colorValue': h.colorValue,
+              'frequencyType': h.frequencyType,
+              'intervalDays': h.intervalDays,
+              'iconCodePoint': h.iconCodePoint,
+              'selectedWeekdays': h.selectedWeekdays,
+              'isNotificationEnabled': h.isNotificationEnabled,
+              'completedDates': h.completedDatesList
+                  .map((d) => d.toIso8601String())
+                  .toList(),
+            },
+          )
           .toList();
 
       final categoriesData = categoriesBox.values
-          .map((c) => {
-                'id': c.id,
-                'name': c.name,
-                'icon': c.icon,
-              })
+          .map((c) => {'id': c.id, 'name': c.name, 'icon': c.icon})
           .toList();
 
       final backupData = {
@@ -69,8 +70,9 @@ class BackupService {
       final file = File(filePath);
       await file.writeAsString(jsonString);
 
-      await Share.shareXFiles([XFile(filePath)],
-          text: 'Habit Tracker Veri Yedeği (JSON)');
+      await Share.shareXFiles([
+        XFile(filePath),
+      ], text: 'Habit Tracker Veri Yedeği (JSON)');
     } catch (e) {
       if (kDebugMode) {
         debugPrint('Dışa aktarma sırasında hata: $e');
@@ -81,7 +83,9 @@ class BackupService {
 
   // 📥 2. JSON YEDEĞİNİ İÇE AKTAR (RESTORE)
   static Future<bool> importDataFromJson(
-      Box<Habit> habitsBox, Box<CategoryModel> categoriesBox) async {
+    Box<Habit> habitsBox,
+    Box<CategoryModel> categoriesBox,
+  ) async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -135,8 +139,8 @@ class BackupService {
               isNotificationEnabled: h['isNotificationEnabled'] ?? false,
               completedDates: h['completedDates'] != null
                   ? (h['completedDates'] as List)
-                      .map((d) => DateTime.parse(d))
-                      .toList()
+                        .map((d) => DateTime.parse(d))
+                        .toList()
                   : [],
             );
             await habitsBox.put(habit.id, habit);

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/habit.dart';
 
 class AddEditHabitDialog extends StatefulWidget {
-  final Habit? habit; // Null ise "Yeni Ekle", dolu ise "Düzenle" modunda çalışır.
+  final Habit?
+  habit; // Null ise "Yeni Ekle", dolu ise "Düzenle" modunda çalışır.
   final Function({
     required String title,
     required int frequencyType,
@@ -14,13 +15,10 @@ class AddEditHabitDialog extends StatefulWidget {
     required bool isNotificationEnabled,
     int? notificationHour,
     int? notificationMinute,
-  }) onSave;
+  })
+  onSave;
 
-  const AddEditHabitDialog({
-    super.key,
-    this.habit,
-    required this.onSave,
-  });
+  const AddEditHabitDialog({super.key, this.habit, required this.onSave});
 
   @override
   State<AddEditHabitDialog> createState() => _AddEditHabitDialogState();
@@ -60,7 +58,13 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
   ];
 
   final Map<int, String> _daysMap = const {
-    1: 'Pzt', 2: 'Sal', 3: 'Çar', 4: 'Per', 5: 'Cum', 6: 'Cmt', 7: 'Paz'
+    1: 'Pzt',
+    2: 'Sal',
+    3: 'Çar',
+    4: 'Per',
+    5: 'Cum',
+    6: 'Cmt',
+    7: 'Paz',
   };
 
   @override
@@ -71,14 +75,19 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
     _selectedCategory = h?.category ?? 'Genel';
     _selectedFrequency = h?.frequencyType ?? 0;
     _intervalDays = h?.intervalDays ?? 2;
-    _selectedWeekdays = h != null ? List<int>.from(h.selectedWeekdays) : [1, 3, 5];
+    _selectedWeekdays = h != null
+        ? List<int>.from(h.selectedWeekdays)
+        : [1, 3, 5];
     _isTitleValid = _controller.text.trim().isNotEmpty;
     _selectedColorValue = h?.colorValue ?? _availableColors[0].toARGB32();
     _selectedIconCodePoint = h?.iconCodePoint ?? _availableIcons[0].codePoint;
     _isNotificationEnabled = h?.isNotificationEnabled ?? false;
-    
+
     if (h?.notificationHour != null && h?.notificationMinute != null) {
-      _selectedTime = TimeOfDay(hour: h!.notificationHour!, minute: h.notificationMinute!);
+      _selectedTime = TimeOfDay(
+        hour: h!.notificationHour!,
+        minute: h.notificationMinute!,
+      );
     }
   }
 
@@ -115,7 +124,10 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ),
             const SizedBox(height: 16),
 
-            const Text('İkon Seç:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const Text(
+              'İkon Seç:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -134,7 +146,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: isSelected ? activeColor.withValues(alpha: 0.2) : Colors.white10,
+                      color: isSelected
+                          ? activeColor.withValues(alpha: 0.2)
+                          : Colors.white10,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSelected ? activeColor : Colors.transparent,
@@ -152,7 +166,10 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ),
             const SizedBox(height: 16),
 
-            const Text('Tema Rengi:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const Text(
+              'Tema Rengi:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -178,7 +195,13 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                         width: 3,
                       ),
                       boxShadow: isSelected
-                          ? [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 8, spreadRadius: 2)]
+                          ? [
+                              BoxShadow(
+                                color: color.withValues(alpha: 0.5),
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                              ),
+                            ]
                           : [],
                     ),
                     child: isSelected
@@ -190,14 +213,22 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ),
             const SizedBox(height: 16),
 
-            const Text('Kategori:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const Text(
+              'Kategori:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: availableCategories.any((c) => c.name == _selectedCategory) ? _selectedCategory : 'Genel',
+              value: availableCategories.any((c) => c.name == _selectedCategory)
+                  ? _selectedCategory
+                  : 'Genel',
               isExpanded: true,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
               ),
               items: availableCategories.map((cat) {
                 return DropdownMenuItem<String>(
@@ -215,21 +246,30 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ),
             const SizedBox(height: 16),
 
-            const Text('Tekrar Sıklığı:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const Text(
+              'Tekrar Sıklığı:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
             const SizedBox(height: 8),
             DropdownButtonFormField<int>(
               value: _selectedFrequency,
               isExpanded: true,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
               ),
               items: const [
                 DropdownMenuItem(value: 0, child: Text('Her Gün')),
                 DropdownMenuItem(value: 1, child: Text('Hafta İçi (Pzt-Cum)')),
                 DropdownMenuItem(value: 2, child: Text('Hafta Sonu (Cmt-Paz)')),
                 DropdownMenuItem(value: 3, child: Text('X Günde Bir')),
-                DropdownMenuItem(value: 4, child: Text('Haftanın Belirli Günleri')),
+                DropdownMenuItem(
+                  value: 4,
+                  child: Text('Haftanın Belirli Günleri'),
+                ),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -242,14 +282,20 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             const SizedBox(height: 12),
 
             if (_selectedFrequency == 3) ...[
-              const Text('Kaç günde bir yapılmalı?', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              const Text(
+                'Kaç günde bir yapılmalı?',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
               const SizedBox(height: 6),
               DropdownButtonFormField<int>(
                 value: _intervalDays,
                 isExpanded: true,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
                 ),
                 items: const [
                   DropdownMenuItem(value: 2, child: Text('2 Günde Bir')),
@@ -268,7 +314,10 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ],
 
             if (_selectedFrequency == 4) ...[
-              const Text('Hangi günlerde yapılacak?', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              const Text(
+                'Hangi günlerde yapılacak?',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 6,
@@ -278,7 +327,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                   return FilterChip(
                     label: Text(entry.value),
                     selected: isSelected,
-                    selectedColor: Color(_selectedColorValue).withValues(alpha: 0.3),
+                    selectedColor: Color(
+                      _selectedColorValue,
+                    ).withValues(alpha: 0.3),
                     onSelected: (bool selected) {
                       setState(() {
                         if (selected) {
@@ -308,7 +359,13 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                 children: [
                   SwitchListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 14),
-                    title: const Text('Hatırlatıcı Bildirim', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                    title: const Text(
+                      'Hatırlatıcı Bildirim',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     value: _isNotificationEnabled,
                     activeColor: Color(_selectedColorValue),
                     onChanged: (bool value) {
@@ -320,15 +377,27 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                   if (_isNotificationEnabled) ...[
                     const Divider(color: Colors.white12, height: 1),
                     ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                      leading: const Icon(Icons.alarm, color: Colors.amberAccent),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 4,
+                      ),
+                      leading: const Icon(
+                        Icons.alarm,
+                        color: Colors.amberAccent,
+                      ),
                       title: Text(
                         _selectedTime == null
                             ? 'Hatırlatma Saati Ayarla'
                             : 'Saat: ${_selectedTime!.format(context)}',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      subtitle: const Text('Her gün bu saatte bildirim gönderilir', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                      subtitle: const Text(
+                        'Her gün bu saatte bildirim gönderilir',
+                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                      ),
                       trailing: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(_selectedColorValue),
@@ -346,7 +415,13 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                             });
                           }
                         },
-                        child: Text(_selectedTime == null ? 'Seç' : 'Değiştir', style: const TextStyle(color: Colors.white, fontSize: 12)),
+                        child: Text(
+                          _selectedTime == null ? 'Seç' : 'Değiştir',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -367,11 +442,27 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
           ),
           onPressed: _isTitleValid
               ? () {
+                  if (_isNotificationEnabled && _selectedTime == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Bildirim için bir hatırlatma saati seçmelisin.',
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
                   widget.onSave(
                     title: _controller.text.trim(),
                     frequencyType: _selectedFrequency,
                     intervalDays: _intervalDays,
-                    selectedWeekdays: _selectedWeekdays,
+
+                    // Yalnızca "Haftanın Belirli Günleri" seçildiyse kullan.
+                    selectedWeekdays: _selectedFrequency == 4
+                        ? List<int>.from(_selectedWeekdays)
+                        : <int>[],
+
                     colorValue: _selectedColorValue,
                     iconCodePoint: _selectedIconCodePoint,
                     category: _selectedCategory,
@@ -379,10 +470,14 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                     notificationHour: _selectedTime?.hour,
                     notificationMinute: _selectedTime?.minute,
                   );
+
                   Navigator.pop(context);
                 }
               : null,
-          child: Text(isEditing ? 'Kaydet' : 'Ekle', style: const TextStyle(color: Colors.white)),
+          child: Text(
+            isEditing ? 'Kaydet' : 'Ekle',
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
       ],
     );
