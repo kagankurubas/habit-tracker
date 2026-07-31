@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="assets/icon/app_icon.png" width="140" alt="HABITTO App Icon">
+  <img
+    src="assets/icon/app_icon.png"
+    width="140"
+    alt="Habitto App Icon"
+  >
 </p>
 
 <h1 align="center">HABITTO</h1>
@@ -13,29 +17,45 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter">
-  <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart">
-  <img src="https://img.shields.io/badge/Hive-FFCA28?style=for-the-badge&logoColor=black" alt="Hive">
-  <img src="https://img.shields.io/github/license/kagankurubas/habitto?style=for-the-badge" alt="License">
-</p>
-
----
-<p align="center">
-  <a href="https://github.com/kagankurubas/habitto/releases/download/v1.0.0/Habitto-v1.0.0.apk">
+  <img
+    src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"
+    alt="Flutter"
+  >
+  <img
+    src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white"
+    alt="Dart"
+  >
+  <img
+    src="https://img.shields.io/badge/Hive-FFCA28?style=for-the-badge&logoColor=black"
+    alt="Hive"
+  >
+  <a href="https://github.com/kagankurubas/habitto/actions/workflows/flutter-ci.yml">
     <img
-      src="https://img.shields.io/badge/Download-Android_APK-3DDC84?style=for-the-badge&logo=android&logoColor=white"
-      alt="Download Habitto APK"
+      src="https://github.com/kagankurubas/habitto/actions/workflows/flutter-ci.yml/badge.svg?branch=main"
+      alt="Flutter CI"
     >
   </a>
+  <img
+    src="https://img.shields.io/github/v/release/kagankurubas/habitto?style=for-the-badge"
+    alt="Latest Release"
+  >
+  <img
+    src="https://img.shields.io/github/license/kagankurubas/habitto?style=for-the-badge"
+    alt="License"
+  >
+</p>
+
+<p align="center">
   <a href="https://github.com/kagankurubas/habitto/releases/latest">
     <img
-      src="https://img.shields.io/github/v/release/kagankurubas/habitto?style=for-the-badge"
-      alt="Latest Release"
+      src="https://img.shields.io/badge/Download-Android_APK-3DDC84?style=for-the-badge&logo=android&logoColor=white"
+      alt="Download Habitto for Android"
     >
   </a>
 </p>
 
 ---
+
 ## About
 
 **HABITTO** is a customizable habit and routine tracker designed to make consistency visible, motivating, and rewarding.
@@ -47,26 +67,31 @@ The application stores its data locally using Hive, providing a fast, offline-fi
 ## Demo
 
 <p align="center">
-  <img src="assets/readme/demo.gif" alt="HABITTO application demo" width="320">
+  <img
+    src="assets/readme/demo.gif"
+    alt="Habitto application demo"
+    width="320"
+  >
 </p>
 
 ## Download
 
-The latest Android release is available through GitHub Releases.
+The latest Android version of Habitto is available through GitHub Releases.
 
 <p align="center">
-  <a href="https://github.com/kagankurubas/habitto/releases/download/v1.0.0/Habitto-v1.0.0.apk">
-    <strong>Download Habitto v1.0.0 for Android</strong>
+  <a href="https://github.com/kagankurubas/habitto/releases/latest">
+    <strong>Download the latest Habitto release for Android</strong>
   </a>
 </p>
 
-### Installation
+### Android Installation
 
-1. Download the APK file.
-2. Open `Habitto-v1.0.0.apk` on your Android device.
-3. Allow installation from your browser or file manager if Android requests permission.
-4. Install Habitto.
-5. Grant notification permission to receive habit reminders.
+1. Open the latest release page.
+2. Download the Habitto APK from the **Assets** section.
+3. Open the downloaded APK on your Android device.
+4. Allow installation from your browser or file manager if Android requests permission.
+5. Install and open Habitto.
+6. Grant notification permission to receive habit reminders.
 
 > Habitto is currently distributed directly through GitHub and is not yet
 > available on Google Play.
@@ -76,21 +101,37 @@ The latest Android release is available through GitHub Releases.
 ### Personalized Home Experience
 
 <p align="center">
-  HABITTO offers multiple visual themes while preserving a clean, focused, and consistent habit-tracking experience.
+  Habitto offers multiple visual themes while preserving a clean,
+  focused, and consistent habit-tracking experience.
 </p>
 
 <table align="center">
   <tr>
     <td align="center">
-      <img src="assets/readme/home1.jpg" alt="HABITTO home screen theme preview one" width="220"><br>
+      <img
+        src="assets/readme/home1.jpg"
+        alt="Habitto home screen theme preview one"
+        width="220"
+      >
+      <br>
       <strong>Theme Preview I</strong>
     </td>
     <td align="center">
-      <img src="assets/readme/home2.jpg" alt="HABITTO home screen theme preview two" width="220"><br>
+      <img
+        src="assets/readme/home2.jpg"
+        alt="Habitto home screen theme preview two"
+        width="220"
+      >
+      <br>
       <strong>Theme Preview II</strong>
     </td>
     <td align="center">
-      <img src="assets/readme/home3.jpg" alt="HABITTO home screen theme preview three" width="220"><br>
+      <img
+        src="assets/readme/home3.jpg"
+        alt="Habitto home screen theme preview three"
+        width="220"
+      >
+      <br>
       <strong>Theme Preview III</strong>
     </td>
   </tr>
@@ -101,15 +142,30 @@ The latest Android release is available through GitHub Releases.
 <table align="center">
   <tr>
     <td align="center">
-      <img src="assets/readme/create_habit.jpg" alt="HABITTO create habit screen" width="220"><br>
+      <img
+        src="assets/readme/create_habit.jpg"
+        alt="Habitto create habit screen"
+        width="220"
+      >
+      <br>
       <strong>Create Habits</strong>
     </td>
     <td align="center">
-      <img src="assets/readme/statistics.jpg" alt="HABITTO statistics screen" width="220"><br>
+      <img
+        src="assets/readme/statistics.jpg"
+        alt="Habitto statistics screen"
+        width="220"
+      >
+      <br>
       <strong>Track Progress</strong>
     </td>
     <td align="center">
-      <img src="assets/readme/achievements.jpg" alt="HABITTO achievements screen" width="220"><br>
+      <img
+        src="assets/readme/achievements.jpg"
+        alt="Habitto achievements screen"
+        width="220"
+      >
+      <br>
       <strong>Unlock Achievements</strong>
     </td>
   </tr>
@@ -118,11 +174,16 @@ The latest Android release is available through GitHub Releases.
 ### Theme Customization
 
 <p align="center">
-  <img src="assets/readme/themes.jpg" alt="HABITTO theme customization screen" width="240">
+  <img
+    src="assets/readme/themes.jpg"
+    alt="Habitto theme customization screen"
+    width="240"
+  >
 </p>
 
 <p align="center">
-  Choose from multiple visual themes and appearance options to personalize the application while keeping habits clear and easy to manage.
+  Choose from multiple visual themes and appearance options to personalize
+  the application while keeping habits clear and easy to manage.
 </p>
 
 ## Features
@@ -138,7 +199,7 @@ The latest Android release is available through GitHub Releases.
 
 ### Flexible Scheduling
 
-HABITTO supports multiple routine frequencies:
+Habitto supports multiple routine frequencies:
 
 - Every day
 - Weekdays
@@ -170,6 +231,7 @@ HABITTO supports multiple routine frequencies:
 - Custom reminder times for individual habits
 - Motivational notification messages
 - Notification navigation directly to the related habit
+- Notifications while the application is open, in the background, or closed
 
 ### Personalization
 
@@ -202,6 +264,7 @@ HABITTO supports multiple routine frequencies:
 | File Picker | JSON backup file selection |
 | AudioPlayers | Completion sound effects |
 | Path Provider | Platform-specific storage paths |
+| GitHub Actions | Automated analysis, testing, and build validation |
 
 ## Project Structure
 
@@ -292,7 +355,7 @@ flutter run -d windows
 
 ## Code Generation
 
-HABITTO uses generated Hive adapters.
+Habitto uses generated Hive adapters.
 
 When a Hive model is changed, regenerate the adapter files with:
 
@@ -336,9 +399,47 @@ flutter build windows
 
 Platform-specific features such as notifications, file selection, sharing, and local storage may behave differently depending on the selected platform.
 
+## Continuous Integration
+
+Habitto uses GitHub Actions to validate every push and pull request targeting the `main` branch.
+
+The workflow automatically performs the following checks:
+
+```bash
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze
+flutter test
+flutter build apk --debug
+```
+
+A green CI status indicates that:
+
+- Source code formatting is valid
+- Flutter analysis completes without issues
+- Automated tests pass
+- The Android debug application builds successfully
+
+The workflow can also be started manually through the GitHub Actions page.
+
+## Testing
+
+Run all automated tests:
+
+```bash
+flutter test
+```
+
+Run a specific test file:
+
+```bash
+flutter test test/habit_test.dart
+```
+
+Current automated tests cover initial habit model behavior. Additional unit and widget test coverage is planned.
+
 ## Data and Privacy
 
-HABITTO is designed as a local-first application.
+Habitto is designed as a local-first application.
 
 - Habit data is stored locally using Hive
 - No user account is required
@@ -353,8 +454,9 @@ Deleting the application or clearing its local storage may remove existing data 
 
 - [x] Add application screenshots
 - [x] Add application demo GIF
-- [ ] Expand automated unit and widget tests
-- [ ] Add GitHub Actions for analysis and build validation
+- [x] Add initial unit tests
+- [ ] Expand unit and widget test coverage
+- [x] Add GitHub Actions for analysis, tests, and build validation
 - [x] Publish downloadable Android releases
 - [ ] Add additional language support
 - [ ] Improve accessibility support
@@ -365,32 +467,38 @@ Deleting the application or clearing its local storage may remove existing data 
 Contributions, bug reports, and feature suggestions are welcome.
 
 1. Fork the repository.
+
 2. Create a new branch:
 
 ```bash
 git checkout -b feature/my-feature
 ```
 
-3. Commit your changes:
+3. Make your changes.
+
+4. Format and validate the project:
+
+```bash
+dart format lib test
+flutter analyze
+flutter test
+```
+
+5. Commit your changes:
 
 ```bash
 git commit -m "Add my feature"
 ```
 
-4. Push the branch:
+6. Push the branch:
 
 ```bash
 git push origin feature/my-feature
 ```
 
-5. Open a pull request.
+7. Open a pull request.
 
-Please keep changes focused and run the following commands before submitting:
-
-```bash
-flutter analyze
-flutter test
-```
+Please keep pull requests focused and make sure the GitHub Actions workflow passes before requesting a review.
 
 ## License
 
@@ -402,10 +510,16 @@ Developed by **Nuri Kağan Kurubaş**.
 
 <p>
   <a href="https://github.com/kagankurubas">
-    <img src="https://img.shields.io/badge/GitHub-kagankurubas-181717?style=for-the-badge&logo=github" alt="GitHub Profile">
+    <img
+      src="https://img.shields.io/badge/GitHub-kagankurubas-181717?style=for-the-badge&logo=github"
+      alt="GitHub Profile"
+    >
   </a>
   <a href="https://kagankurubas.github.io">
-    <img src="https://img.shields.io/badge/Portfolio-Visit-6C63FF?style=for-the-badge" alt="Portfolio Website">
+    <img
+      src="https://img.shields.io/badge/Portfolio-Visit-6C63FF?style=for-the-badge"
+      alt="Portfolio Website"
+    >
   </a>
 </p>
 
