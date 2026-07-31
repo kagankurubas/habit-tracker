@@ -25,24 +25,18 @@
     src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white"
     alt="Dart"
   >
-  <img
-    src="https://img.shields.io/badge/Hive-FFCA28?style=for-the-badge&logoColor=black"
-    alt="Hive"
-  >
   <a href="https://github.com/kagankurubas/habitto/actions/workflows/flutter-ci.yml">
     <img
-      src="https://github.com/kagankurubas/habitto/actions/workflows/flutter-ci.yml/badge.svg?branch=main"
+      src="https://img.shields.io/github/actions/workflow/status/kagankurubas/habitto/flutter-ci.yml?branch=main&style=for-the-badge&label=CI"
       alt="Flutter CI"
     >
   </a>
-  <img
-    src="https://img.shields.io/github/v/release/kagankurubas/habitto?style=for-the-badge"
-    alt="Latest Release"
-  >
-  <img
-    src="https://img.shields.io/github/license/kagankurubas/habitto?style=for-the-badge"
-    alt="License"
-  >
+  <a href="https://github.com/kagankurubas/habitto/releases/latest">
+    <img
+      src="https://img.shields.io/github/v/release/kagankurubas/habitto?style=for-the-badge&label=Release"
+      alt="Latest Release"
+    >
+  </a>
 </p>
 
 <p align="center">
@@ -58,11 +52,11 @@
 
 ## About
 
-**HABITTO** is a customizable habit and routine tracker designed to make consistency visible, motivating, and rewarding.
+**Habitto** is a customizable habit and routine tracker designed to make consistency visible, motivating, and rewarding.
 
 Users can create routines, organize them into categories, receive reminders, track streaks, review detailed statistics, unlock achievements, and back up their data without creating an account or depending on a remote server.
 
-The application stores its data locally using Hive, providing a fast, offline-first, and privacy-friendly experience.
+Habitto stores its data locally using Hive, providing a fast, offline-first, and privacy-focused experience.
 
 ## Demo
 
@@ -93,8 +87,7 @@ The latest Android version of Habitto is available through GitHub Releases.
 5. Install and open Habitto.
 6. Grant notification permission to receive habit reminders.
 
-> Habitto is currently distributed directly through GitHub and is not yet
-> available on Google Play.
+> Habitto is currently distributed directly through GitHub and is not yet available on Google Play.
 
 ## Application Preview
 
@@ -307,9 +300,9 @@ lib/
 Before running the project, make sure the following tools are installed:
 
 - Flutter SDK
-- Dart SDK `3.12.2` or newer
+- Dart SDK included with Flutter
 - Android Studio, Visual Studio Code, or another Flutter-compatible IDE
-- An Android emulator, iOS simulator, web browser, Windows device, or physical mobile device
+- An Android emulator or physical Android device
 
 ### Installation
 
@@ -346,11 +339,10 @@ Run the application on a specific device:
 flutter run -d <device-id>
 ```
 
-Examples:
+Example:
 
 ```bash
-flutter run -d chrome
-flutter run -d windows
+flutter run -d android
 ```
 
 ## Code Generation
@@ -385,19 +377,7 @@ build/app/outputs/flutter-apk/app-release.apk
 flutter build appbundle --release
 ```
 
-### Web
-
-```bash
-flutter build web
-```
-
-### Windows
-
-```bash
-flutter build windows
-```
-
-Platform-specific features such as notifications, file selection, sharing, and local storage may behave differently depending on the selected platform.
+Platform-specific features such as notifications, sharing, file selection, and local storage may behave differently depending on the target platform.
 
 ## Continuous Integration
 
@@ -435,7 +415,7 @@ Run a specific test file:
 flutter test test/habit_test.dart
 ```
 
-Current automated tests cover initial habit model behavior. Additional unit and widget test coverage is planned.
+Current automated tests cover the initial habit model behavior. Additional unit and widget test coverage is planned.
 
 ## Data and Privacy
 
