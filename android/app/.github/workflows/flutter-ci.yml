@@ -1,0 +1,53 @@
+name: Flutter CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flutter-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Analyze, Test and Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Show Flutter version
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check code formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analyze source code
+        run: flutter analyze
+
+      - name: Run automated tests
+        run: flutter test
+
+      - name: Validate Android debug build
+        run: flutter build apk --debug

@@ -1,0 +1,6 @@
+# Unix/Gradle scripts must use LF
+android/gradlew text eol=lf
+*.sh text eol=lf
+
+# Windows scripts use CRLF
+*.bat text eol=crlf
