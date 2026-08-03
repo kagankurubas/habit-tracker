@@ -57,7 +57,9 @@ class SettingsScreen extends StatelessWidget {
                   color: cardColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: subtextColor.withValues(alpha: 0.15)),
+                    side: BorderSide(
+                      color: subtextColor.withValues(alpha: 0.15),
+                    ),
                   ),
                   child: ListTile(
                     leading: const Icon(
@@ -95,7 +97,9 @@ class SettingsScreen extends StatelessWidget {
                   color: cardColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: subtextColor.withValues(alpha: 0.15)),
+                    side: BorderSide(
+                      color: subtextColor.withValues(alpha: 0.15),
+                    ),
                   ),
                   child: ListTile(
                     leading: const Icon(

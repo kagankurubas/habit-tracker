@@ -45,7 +45,9 @@ class NotificationService {
       tz.setLocalLocation(tz.getLocation(currentTimeZone.toString()));
       debugPrint('🔔 Bildirimler için Saat Dilimi ayarlandı: $currentTimeZone');
     } catch (e) {
-      debugPrint('⚠️ Saat dilimi bulunamadı, ofset ile bulunmaya çalışılıyor. Hata: $e');
+      debugPrint(
+        '⚠️ Saat dilimi bulunamadı, ofset ile bulunmaya çalışılıyor. Hata: $e',
+      );
       try {
         final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds;
         tz.Location? bestLocation;
@@ -57,7 +59,9 @@ class NotificationService {
         }
         if (bestLocation != null) {
           tz.setLocalLocation(bestLocation);
-          debugPrint('🔔 Ofset ile saat dilimi ayarlandı: ${bestLocation.name}');
+          debugPrint(
+            '🔔 Ofset ile saat dilimi ayarlandı: ${bestLocation.name}',
+          );
         } else {
           tz.setLocalLocation(tz.getLocation('UTC'));
         }
@@ -203,7 +207,9 @@ class NotificationService {
       );
       debugPrint('✅ Bildirim başarıyla planlandı: ${habit.title} -> $date');
     } catch (e) {
-      debugPrint('⚠️ Tam saatli bildirim kurulamadı, esnek saate geçiliyor. Hata: $e');
+      debugPrint(
+        '⚠️ Tam saatli bildirim kurulamadı, esnek saate geçiliyor. Hata: $e',
+      );
       await _notificationsPlugin.zonedSchedule(
         id: id,
         title: '🔥 ${habit.title}',
