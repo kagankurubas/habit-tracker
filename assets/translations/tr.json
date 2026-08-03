@@ -246,5 +246,10 @@
   "days": "Gün",
   "frequency": "Sıklık",
   "total": "Toplam",
-  "restore_cancelled": "İçe aktarma iptal edildi veya seçilen dosya geçersiz."
+  "restore_cancelled": "İçe aktarma iptal edildi veya seçilen dosya geçersiz.",
+  "set_reminder_time": "Hatırlatma Saati Ayarla",
+  "reminder_time_value": "Saat: {}",
+  "reminder_daily_desc": "Her gün bu saatte bildirim gönderilir",
+  "select_button": "Seç",
+  "change": "Değiştir"
 }

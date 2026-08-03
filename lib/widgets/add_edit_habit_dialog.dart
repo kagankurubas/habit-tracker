@@ -395,20 +395,27 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                       ),
                       title: Text(
                         _selectedTime == null
-                            ? 'Hatırlatma Saati Ayarla'
-                            : 'Saat: ${_selectedTime!.format(context)}',
+                            ? context.tr('set_reminder_time')
+                            : context.tr(
+                                'reminder_time_value',
+                                args: [_selectedTime!.format(context)],
+                              ),
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      subtitle: const Text(
-                        'Her gün bu saatte bildirim gönderilir',
-                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                      subtitle: Text(
+                        context.tr('reminder_daily_desc'),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey,
+                        ),
                       ),
                       trailing: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(_selectedColorValue),
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                         ),
                         onPressed: () async {
@@ -424,7 +431,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                           }
                         },
                         child: Text(
-                          _selectedTime == null ? 'Seç' : 'Değiştir',
+                          _selectedTime == null
+                              ? context.tr('select_button')
+                              : context.tr('change'),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,

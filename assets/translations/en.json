@@ -246,5 +246,10 @@
   "days": "Days",
   "frequency": "Frequency",
   "total": "Total",
-  "restore_cancelled": "Import was cancelled or the selected file is invalid."
+  "restore_cancelled": "Import was cancelled or the selected file is invalid.",
+  "set_reminder_time": "Set Reminder Time",
+  "reminder_time_value": "Time: {}",
+  "reminder_daily_desc": "A notification will be sent every day at this time",
+  "select_button": "Select",
+  "change": "Change"
 }
