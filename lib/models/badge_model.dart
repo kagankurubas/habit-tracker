@@ -18,13 +18,21 @@ class HabitBadge {
   });
 }
 
+String _normalizeCategory(String category) {
+  return category.replaceAll('.', '').trim().toLowerCase();
+}
+
+bool _isInCategory(Habit habit, String category) {
+  return _normalizeCategory(habit.category) == _normalizeCategory(category);
+}
+
 int _getTotalCompletions(List<Habit> habits) {
   return habits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
 }
 
 int _getCategoryCompletions(List<Habit> habits, String category) {
   return habits
-      .where((h) => h.category == category)
+      .where((h) => _isInCategory(h, category))
       .fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
 }
 
@@ -104,7 +112,7 @@ final List<HabitBadge> allBadges = [
     imagePath: 'assets/badges/code_first.png',
     category: 'Kodlama',
     isUnlocked: (habits) => habits.any(
-      (h) => h.category == 'Kodlama' && h.completedDatesList.isNotEmpty,
+      (h) => _isInCategory(h, 'Kodlama') && h.completedDatesList.isNotEmpty,
     ),
   ),
   HabitBadge(
@@ -131,7 +139,7 @@ final List<HabitBadge> allBadges = [
     imagePath: 'assets/badges/music_first.png',
     category: 'Müzik',
     isUnlocked: (habits) => habits.any(
-      (h) => h.category == 'Müzik' && h.completedDatesList.isNotEmpty,
+      (h) => _isInCategory(h, 'Müzik') && h.completedDatesList.isNotEmpty,
     ),
   ),
   HabitBadge(
@@ -158,7 +166,7 @@ final List<HabitBadge> allBadges = [
     imagePath: 'assets/badges/gamedev_builder.png',
     category: 'Oyun Dev.',
     isUnlocked: (habits) => habits.any(
-      (h) => h.category == 'Oyun Dev.' && h.completedDatesList.isNotEmpty,
+      (h) => _isInCategory(h, 'Oyun Dev.') && h.completedDatesList.isNotEmpty,
     ),
   ),
   HabitBadge(

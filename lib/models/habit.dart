@@ -169,13 +169,13 @@ class Habit extends HiveObject {
     final newList = List<DateTime>.from(completedDatesList);
 
     final index = newList.indexWhere(
-      (d) => _stripTime(d).isAtSameMomentAs(target),
+      (completedDate) => _stripTime(completedDate).isAtSameMomentAs(target),
     );
 
     if (index != -1) {
       newList.removeAt(index);
     } else {
-      newList.add(target);
+      newList.add(date);
     }
 
     completedDatesList = newList;

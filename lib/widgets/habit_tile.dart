@@ -8,6 +8,7 @@ import '../services/notification_service.dart';
 import '../services/theme_service.dart';
 import '../app_themes.dart';
 import 'badge_unlocked_dialog.dart';
+import '../services/badge_service.dart';
 
 class HabitTile extends StatelessWidget {
   final Habit habit;
@@ -29,17 +30,25 @@ class HabitTile extends StatelessWidget {
   Future<void> _handleToggle(BuildContext context, Habit currentHabit) async {
     final now = DateTime.now();
     final todayNormalized = DateTime(now.year, now.month, now.day);
+
     final willComplete = !currentHabit.isCompletedOn(todayNormalized);
 
-    final bool isSettingsOpen = Hive.isBoxOpen('settings');
-    final Box? settingsBox = isSettingsOpen ? Hive.box('settings') : null;
-    final bool isSoundEnabled =
+    final isSettingsOpen = Hive.isBoxOpen('settings');
+    final Box<dynamic>? settingsBox = isSettingsOpen
+        ? Hive.box<dynamic>('settings')
+        : null;
+
+    final isSoundEnabled =
         settingsBox?.get('isSoundEnabled', defaultValue: true) ?? true;
-    final bool isHapticEnabled =
+
+    final isHapticEnabled =
         settingsBox?.get('isHapticEnabled', defaultValue: true) ?? true;
 
     if (willComplete) {
-      if (isHapticEnabled) HapticFeedback.mediumImpact();
+      if (isHapticEnabled) {
+        HapticFeedback.mediumImpact();
+      }
+
       if (isSoundEnabled) {
         try {
           await _audioPlayer.stop();
@@ -50,7 +59,8 @@ class HabitTile extends StatelessWidget {
       HapticFeedback.lightImpact();
     }
 
-    currentHabit.toggleDate(todayNormalized);
+    // Gerçek saat korunarak tamamlanır.
+    currentHabit.toggleDate(now);
 
     if (currentHabit.key != null) {
       await habitsBox.put(currentHabit.key, currentHabit);
@@ -58,96 +68,126 @@ class HabitTile extends StatelessWidget {
       await habitsBox.putAt(index, currentHabit);
     }
 
-    if (willComplete && context.mounted) {
-      _checkBadgeUnlocked(context);
+    if (!willComplete || !context.mounted) {
+      return;
     }
+
+    await _checkBadgeUnlocked(context, currentHabit);
   }
 
-  // 🏆 BADGE CONTROL AND SEQUENTIAL POP-UP DISPLAY
-  void _checkBadgeUnlocked(BuildContext context) async {
-    final int streak = habit.currentStreak;
-    final int totalCompletions = habitsBox.values.fold(
+  Future<void> _checkBadgeUnlocked(
+    BuildContext context,
+    Habit completedHabit,
+  ) async {
+    final streak = completedHabit.currentStreak;
+
+    final totalCompletions = habitsBox.values.fold<int>(
       0,
-      (sum, h) => sum + h.completedDatesList.length,
+      (sum, habit) => sum + habit.completedDatesList.length,
     );
 
     final now = DateTime.now();
     final todayNormalized = DateTime(now.year, now.month, now.day);
+
     final allHabits = habitsBox.values.toList();
+
     final todayTargets = allHabits
-        .where((h) => h.isTargetDate(todayNormalized))
+        .where((habit) => habit.isTargetDate(todayNormalized))
         .toList();
+
     final isPerfectDay =
         todayTargets.length >= 3 &&
-        todayTargets.every((h) => h.isCompletedOn(todayNormalized));
+        todayTargets.every((habit) => habit.isCompletedOn(todayNormalized));
 
-    final List<Map<String, dynamic>> badges = [];
+    // Çevirileri herhangi bir async boşluktan önce alıyoruz.
+    final firstStepTitle = context.tr('First Step');
+    final firstStepDescription = context.tr('first_step_desc');
 
-    final settingsBox = Hive.box('settings');
-    bool shouldShow(String badgeId) {
-      final key = 'badge_shown_$badgeId';
-      if (settingsBox.get(key, defaultValue: false) == true) {
-        return false;
-      }
-      settingsBox.put(key, true);
-      return true;
+    final perfectDayTitle = context.tr('Perfect Day');
+    final perfectDayDescription = context.tr('perfect_day_desc');
+
+    final streak3Title = context.tr('On Fire');
+    final streak3Description = context.tr('on_fire_desc');
+
+    final streak7Title = context.tr('Willpower Master');
+    final streak7Description = context.tr('willpower_master_desc');
+
+    final streak30Title = context.tr('habit_monster_title');
+    final streak30Description = context.tr('habit_monster_desc');
+
+    final completion50Title = context.tr('Legend');
+    final completion50Description = context.tr('legend_desc');
+
+    final badges = <Map<String, dynamic>>[];
+
+    final settingsBox = Hive.box<dynamic>('settings');
+
+    Future<bool> shouldShow(String badgeId) {
+      return BadgeService.claimIfNew(settingsBox, badgeId);
     }
 
-    if (totalCompletions == 1 && shouldShow('first_step')) {
+    if (totalCompletions == 1 && await shouldShow('first_step')) {
       badges.add({
-        'title': context.tr('First Step'),
-        'desc': context.tr('first_step_desc'),
+        'title': firstStepTitle,
+        'desc': firstStepDescription,
         'imagePath': 'assets/badges/first_step.png',
         'color': const Color(0xFF10B981),
       });
     }
-    if (isPerfectDay && shouldShow('perfect_day')) {
+
+    if (isPerfectDay && await shouldShow('perfect_day')) {
       badges.add({
-        'title': context.tr('Perfect Day'),
-        'desc': context.tr('perfect_day_desc'),
+        'title': perfectDayTitle,
+        'desc': perfectDayDescription,
         'imagePath': 'assets/badges/perfect_day.png',
         'color': const Color(0xFFF59E0B),
       });
     }
-    if (streak == 3 && shouldShow('streak_3')) {
+
+    if (streak == 3 && await shouldShow('streak_3')) {
       badges.add({
-        'title': context.tr('On Fire'),
-        'desc': context.tr('on_fire_desc'),
+        'title': streak3Title,
+        'desc': streak3Description,
         'imagePath': 'assets/badges/streak_3.png',
         'color': const Color(0xFF3B82F6),
       });
-    } else if (streak == 7 && shouldShow('streak_7')) {
+    } else if (streak == 7 && await shouldShow('streak_7')) {
       badges.add({
-        'title': context.tr('Willpower Master'),
-        'desc': context.tr('willpower_master_desc'),
+        'title': streak7Title,
+        'desc': streak7Description,
         'imagePath': 'assets/badges/streak_7.png',
         'color': const Color(0xFF8B5CF6),
       });
-    } else if (streak == 30 && shouldShow('streak_30')) {
+    } else if (streak == 30 && await shouldShow('streak_30')) {
       badges.add({
-        'title': context.tr('habit_monster_title'),
-        'desc': context.tr('habit_monster_desc'),
+        'title': streak30Title,
+        'desc': streak30Description,
         'imagePath': 'assets/badges/completion_50.png',
         'color': const Color(0xFFEC4899),
       });
-    } else if (totalCompletions == 50 && shouldShow('completion_50')) {
+    }
+
+    if (totalCompletions == 50 && await shouldShow('completion_50')) {
       badges.add({
-        'title': context.tr('Legend'),
-        'desc': context.tr('legend_desc'),
+        'title': completion50Title,
+        'desc': completion50Description,
         'imagePath': 'assets/badges/completion_50.png',
         'color': const Color(0xFFF59E0B),
       });
     }
 
-    for (final b in badges) {
-      if (!context.mounted) return;
-      await showDialog(
+    for (final badge in badges) {
+      if (!context.mounted) {
+        return;
+      }
+
+      await showDialog<void>(
         context: context,
         builder: (_) => BadgeUnlockedDialog(
-          badgeTitle: b['title'],
-          badgeDescription: b['desc'],
-          imagePath: b['imagePath'],
-          badgeColor: b['color'],
+          badgeTitle: badge['title'] as String,
+          badgeDescription: badge['desc'] as String,
+          imagePath: badge['imagePath'] as String,
+          badgeColor: badge['color'] as Color,
         ),
       );
     }
