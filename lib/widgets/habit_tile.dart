@@ -83,7 +83,17 @@ class HabitTile extends StatelessWidget {
 
     final List<Map<String, dynamic>> badges = [];
 
-    if (totalCompletions == 1) {
+    final settingsBox = Hive.box('settings');
+    bool shouldShow(String badgeId) {
+      final key = 'badge_shown_$badgeId';
+      if (settingsBox.get(key, defaultValue: false) == true) {
+        return false;
+      }
+      settingsBox.put(key, true);
+      return true;
+    }
+
+    if (totalCompletions == 1 && shouldShow('first_step')) {
       badges.add({
         'title': context.tr('First Step'),
         'desc': context.tr('first_step_desc'),
@@ -91,7 +101,7 @@ class HabitTile extends StatelessWidget {
         'color': const Color(0xFF10B981),
       });
     }
-    if (isPerfectDay) {
+    if (isPerfectDay && shouldShow('perfect_day')) {
       badges.add({
         'title': context.tr('Perfect Day'),
         'desc': context.tr('perfect_day_desc'),
@@ -99,28 +109,28 @@ class HabitTile extends StatelessWidget {
         'color': const Color(0xFFF59E0B),
       });
     }
-    if (streak == 3) {
+    if (streak == 3 && shouldShow('streak_3')) {
       badges.add({
         'title': context.tr('On Fire'),
         'desc': context.tr('on_fire_desc'),
         'imagePath': 'assets/badges/streak_3.png',
         'color': const Color(0xFF3B82F6),
       });
-    } else if (streak == 7) {
+    } else if (streak == 7 && shouldShow('streak_7')) {
       badges.add({
         'title': context.tr('Willpower Master'),
         'desc': context.tr('willpower_master_desc'),
         'imagePath': 'assets/badges/streak_7.png',
         'color': const Color(0xFF8B5CF6),
       });
-    } else if (streak == 30) {
+    } else if (streak == 30 && shouldShow('streak_30')) {
       badges.add({
         'title': context.tr('habit_monster_title'),
         'desc': context.tr('habit_monster_desc'),
         'imagePath': 'assets/badges/completion_50.png',
         'color': const Color(0xFFEC4899),
       });
-    } else if (totalCompletions == 50) {
+    } else if (totalCompletions == 50 && shouldShow('completion_50')) {
       badges.add({
         'title': context.tr('Legend'),
         'desc': context.tr('legend_desc'),
