@@ -85,45 +85,45 @@ class HabitTile extends StatelessWidget {
 
     if (totalCompletions == 1) {
       badges.add({
-        'title': 'First Step'.tr(),
-        'desc': 'first_step_desc'.tr(),
+        'title': context.tr('First Step'),
+        'desc': context.tr('first_step_desc'),
         'imagePath': 'assets/badges/first_step.png',
         'color': const Color(0xFF10B981),
       });
     }
     if (isPerfectDay) {
       badges.add({
-        'title': 'Perfect Day'.tr(),
-        'desc': 'perfect_day_desc'.tr(),
+        'title': context.tr('Perfect Day'),
+        'desc': context.tr('perfect_day_desc'),
         'imagePath': 'assets/badges/perfect_day.png',
         'color': const Color(0xFFF59E0B),
       });
     }
     if (streak == 3) {
       badges.add({
-        'title': 'On Fire'.tr(),
-        'desc': 'on_fire_desc'.tr(),
+        'title': context.tr('On Fire'),
+        'desc': context.tr('on_fire_desc'),
         'imagePath': 'assets/badges/streak_3.png',
         'color': const Color(0xFF3B82F6),
       });
     } else if (streak == 7) {
       badges.add({
-        'title': 'Willpower Master'.tr(),
-        'desc': 'willpower_master_desc'.tr(),
+        'title': context.tr('Willpower Master'),
+        'desc': context.tr('willpower_master_desc'),
         'imagePath': 'assets/badges/streak_7.png',
         'color': const Color(0xFF8B5CF6),
       });
     } else if (streak == 30) {
       badges.add({
-        'title': 'habit_monster_title'.tr(),
-        'desc': 'habit_monster_desc'.tr(),
+        'title': context.tr('habit_monster_title'),
+        'desc': context.tr('habit_monster_desc'),
         'imagePath': 'assets/badges/completion_50.png',
         'color': const Color(0xFFEC4899),
       });
     } else if (totalCompletions == 50) {
       badges.add({
-        'title': 'Legend'.tr(),
-        'desc': 'legend_desc'.tr(),
+        'title': context.tr('Legend'),
+        'desc': context.tr('legend_desc'),
         'imagePath': 'assets/badges/completion_50.png',
         'color': const Color(0xFFF59E0B),
       });
@@ -309,7 +309,7 @@ class _TitleAndCategory extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
-            habit.category.tr(),
+            context.tr(habit.category),
             style: TextStyle(fontSize: 9, color: subtextColor),
           ),
         ),
@@ -364,7 +364,7 @@ class _SubtitleProgress extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        'last_30_days'.tr(),
+                        context.tr('last_30_days'),
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 10, color: subtextColor),
                       ),

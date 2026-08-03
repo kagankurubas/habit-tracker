@@ -68,6 +68,7 @@ void main() async {
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       useOnlyLangCode: true,
+      useFallbackTranslations: true,
       child: const HabitTrackerApp(),
     ),
   );
@@ -86,7 +87,7 @@ class HabitTrackerApp extends StatelessWidget {
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
-          title: 'app_title'.tr(),
+          onGenerateTitle: (context) => context.tr('app_title'),
           theme: ThemeData(
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
@@ -150,12 +151,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               BottomNavigationBarItem(
                 icon: const Icon(Icons.check_box_outlined),
                 activeIcon: const Icon(Icons.check_box_rounded),
-                label: 'routines'.tr(),
+                label: context.tr('routines'),
               ),
               BottomNavigationBarItem(
                 icon: const Icon(Icons.bar_chart_outlined),
                 activeIcon: const Icon(Icons.bar_chart_rounded),
-                label: 'statistics'.tr(),
+                label: context.tr('statistics'),
               ),
             ],
           ),

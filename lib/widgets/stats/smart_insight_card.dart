@@ -71,22 +71,26 @@ class SmartInsightCard extends StatelessWidget {
     }
 
     String emoji = '💡';
-    String message = 'analyzing_data_msg'.tr();
+    String message = context.tr('analyzing_data_msg');
     Color accentColor = const Color(0xFF6366F1);
 
     if (worstDay != null && lowestRate < 60) {
-      final dayName = _dayNames[worstDay]?.tr() ?? '';
+      final worstDayKey = _dayNames[worstDay];
+      final dayName = worstDayKey == null ? '' : context.tr(worstDayKey);
       final dropPercent = (100 - lowestRate).toInt();
       emoji = '⚠️';
       accentColor = Colors.orangeAccent;
-      message = 'bad_performance_msg'.tr(
+      message = context.tr(
+        'bad_performance_msg',
         args: [dropPercent.toString(), dayName],
       );
     } else if (bestDay != null && highestRate >= 80) {
-      final dayName = _dayNames[bestDay]?.tr() ?? '';
+      final bestDayKey = _dayNames[bestDay];
+      final dayName = bestDayKey == null ? '' : context.tr(bestDayKey);
       emoji = '⚡';
       accentColor = const Color(0xFF10B981);
-      message = 'super_performance_msg'.tr(
+      message = context.tr(
+        'super_performance_msg',
         args: [highestRate.toInt().toString(), dayName],
       );
     }
@@ -117,7 +121,7 @@ class SmartInsightCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'smart_insight'.tr(),
+                  context.tr('smart_insight'),
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,

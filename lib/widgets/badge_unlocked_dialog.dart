@@ -65,7 +65,7 @@ class BadgeUnlockedDialog extends StatelessWidget {
                       const SizedBox(height: 12),
 
                       Text(
-                        'new_achievement'.tr(),
+                        context.tr('new_achievement'),
                         style: const TextStyle(
                           color: Color(0xFFA5B4FC),
                           fontSize: 12,
@@ -76,7 +76,7 @@ class BadgeUnlockedDialog extends StatelessWidget {
                       const SizedBox(height: 6),
 
                       Text(
-                        badgeTitle.tr(),
+                        context.tr(badgeTitle),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white,
@@ -87,7 +87,7 @@ class BadgeUnlockedDialog extends StatelessWidget {
                       const SizedBox(height: 8),
 
                       Text(
-                        badgeDescription.tr(),
+                        context.tr(badgeDescription),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white70,
@@ -119,7 +119,7 @@ class BadgeUnlockedDialog extends StatelessWidget {
                           elevation: 0,
                         ),
                         child: Text(
-                          'awesome'.tr(),
+                          context.tr('awesome'),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -133,7 +133,7 @@ class BadgeUnlockedDialog extends StatelessWidget {
                         },
                         icon: const Icon(Icons.share_rounded, size: 18),
                         label: Text(
-                          'share'.tr(),
+                          context.tr('share'),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         style: ElevatedButton.styleFrom(

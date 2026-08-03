@@ -33,7 +33,7 @@ class SettingsScreen extends StatelessWidget {
           backgroundColor: bgColor,
           appBar: AppBar(
             title: Text(
-              'settings'.tr(),
+              context.tr('settings'),
               style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
             ),
             backgroundColor: Colors.transparent,
@@ -47,7 +47,10 @@ class SettingsScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
               children: [
                 // 🎨 APPEARANCE & THEME SECTION
-                _SectionTitle(title: 'appearance'.tr(), textColor: textColor),
+                _SectionTitle(
+                  title: context.tr('appearance'),
+                  textColor: textColor,
+                ),
                 const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
@@ -63,14 +66,14 @@ class SettingsScreen extends StatelessWidget {
                       color: Color(0xFF6366F1),
                     ),
                     title: Text(
-                      'theme_color'.tr(),
+                      context.tr('theme_color'),
                       style: TextStyle(
                         color: textColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     subtitle: Text(
-                      'customize_color_palette'.tr(),
+                      context.tr('customize_color_palette'),
                       style: TextStyle(color: subtextColor, fontSize: 12),
                     ),
                     trailing: const Icon(
@@ -84,7 +87,10 @@ class SettingsScreen extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // 🌍 LANGUAGE SECTION
-                _SectionTitle(title: 'language'.tr(), textColor: textColor),
+                _SectionTitle(
+                  title: context.tr('language'),
+                  textColor: textColor,
+                ),
                 const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
@@ -100,7 +106,7 @@ class SettingsScreen extends StatelessWidget {
                       color: Color(0xFF6366F1),
                     ),
                     title: Text(
-                      'language'.tr(),
+                      context.tr('language'),
                       style: TextStyle(
                         color: textColor,
                         fontWeight: FontWeight.w600,
@@ -137,9 +143,9 @@ class SettingsScreen extends StatelessWidget {
                             fontSize: 14,
                             fontFamily: 'Poppins',
                           ),
-                          onChanged: (Locale? newLocale) {
+                          onChanged: (Locale? newLocale) async {
                             if (newLocale != null) {
-                              context.setLocale(newLocale);
+                              await context.setLocale(newLocale);
                             }
                           },
                           items: const [
@@ -176,7 +182,7 @@ class SettingsScreen extends StatelessWidget {
 
                 // 🔊 SOUND & FEEDBACK SECTION
                 _SectionTitle(
-                  title: 'sound_feedback'.tr(),
+                  title: context.tr('sound_feedback'),
                   textColor: textColor,
                 ),
                 const SizedBox(height: 8),
@@ -210,14 +216,14 @@ class SettingsScreen extends StatelessWidget {
                               color: Color(0xFF6366F1),
                             ),
                             title: Text(
-                              'sound_effects'.tr(),
+                              context.tr('sound_effects'),
                               style: TextStyle(
                                 color: textColor,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             subtitle: Text(
-                              'sound_effects_desc'.tr(),
+                              context.tr('sound_effects_desc'),
                               style: TextStyle(
                                 color: subtextColor,
                                 fontSize: 12,
@@ -241,14 +247,14 @@ class SettingsScreen extends StatelessWidget {
                               color: Color(0xFF10B981),
                             ),
                             title: Text(
-                              'haptic_feedback'.tr(),
+                              context.tr('haptic_feedback'),
                               style: TextStyle(
                                 color: textColor,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             subtitle: Text(
-                              'haptic_feedback_desc'.tr(),
+                              context.tr('haptic_feedback_desc'),
                               style: TextStyle(
                                 color: subtextColor,
                                 fontSize: 12,
@@ -268,7 +274,10 @@ class SettingsScreen extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // 💾 DATA & BACKUP SECTION
-                _SectionTitle(title: 'data_backup'.tr(), textColor: textColor),
+                _SectionTitle(
+                  title: context.tr('data_backup'),
+                  textColor: textColor,
+                ),
                 const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
@@ -287,14 +296,14 @@ class SettingsScreen extends StatelessWidget {
                           color: Color(0xFF6366F1),
                         ),
                         title: Text(
-                          'create_backup'.tr(),
+                          context.tr('create_backup'),
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         subtitle: Text(
-                          'create_backup_desc'.tr(),
+                          context.tr('create_backup_desc'),
                           style: TextStyle(color: subtextColor, fontSize: 12),
                         ),
                         onTap: () async {
@@ -305,7 +314,9 @@ class SettingsScreen extends StatelessWidget {
                             );
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('backup_ready'.tr())),
+                                SnackBar(
+                                  content: Text(context.tr('backup_ready')),
+                                ),
                               );
                             }
                           } catch (e) {
@@ -313,7 +324,10 @@ class SettingsScreen extends StatelessWidget {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    'backup_error'.tr(args: [e.toString()]),
+                                    context.tr(
+                                      'backup_error',
+                                      args: [e.toString()],
+                                    ),
                                   ),
                                 ),
                               );
@@ -333,14 +347,14 @@ class SettingsScreen extends StatelessWidget {
                           color: Color(0xFF10B981),
                         ),
                         title: Text(
-                          'restore_backup'.tr(),
+                          context.tr('restore_backup'),
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         subtitle: Text(
-                          'restore_backup_desc'.tr(),
+                          context.tr('restore_backup_desc'),
                           style: TextStyle(color: subtextColor, fontSize: 12),
                         ),
                         onTap: () async {
@@ -352,12 +366,16 @@ class SettingsScreen extends StatelessWidget {
                           if (context.mounted) {
                             if (success) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('data_restored'.tr())),
+                                SnackBar(
+                                  content: Text(context.tr('data_restored')),
+                                ),
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('restore_cancelled'.tr()),
+                                  content: Text(
+                                    context.tr('restore_cancelled'),
+                                  ),
                                 ),
                               );
                             }
@@ -371,7 +389,7 @@ class SettingsScreen extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // ℹ️ APP INFO & GITHUB
-                _SectionTitle(title: 'about'.tr(), textColor: textColor),
+                _SectionTitle(title: context.tr('about'), textColor: textColor),
                 const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
@@ -396,7 +414,7 @@ class SettingsScreen extends StatelessWidget {
                           ),
                         ),
                         subtitle: Text(
-                          '${'version'.tr()} 1.0.0',
+                          '${context.tr('version')} 1.0.0',
                           style: TextStyle(color: subtextColor, fontSize: 12),
                         ),
                       ),
@@ -410,7 +428,7 @@ class SettingsScreen extends StatelessWidget {
                           color: Color(0xFF6366F1),
                         ),
                         title: Text(
-                          'github_source_code'.tr(),
+                          context.tr('github_source_code'),
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.w600,
@@ -434,7 +452,9 @@ class SettingsScreen extends StatelessWidget {
                           );
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('github_copied'.tr())),
+                              SnackBar(
+                                content: Text(context.tr('github_copied')),
+                              ),
                             );
                           }
                         },

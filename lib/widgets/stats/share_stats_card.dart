@@ -67,7 +67,7 @@ class ShareStatsCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'routine_tracking'.tr(),
+                          context.tr('routine_tracking'),
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: Colors.white,
@@ -90,7 +90,7 @@ class ShareStatsCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'consistency_report'.tr(),
+                    context.tr('consistency_report'),
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 11,
@@ -106,7 +106,7 @@ class ShareStatsCard extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    '🔥 ${'longest_streak_title'.tr()}',
+                    '🔥 ${context.tr('longest_streak_title')}',
                     style: TextStyle(
                       color: Color(0xFFC7D2FE),
                       fontSize: 13,
@@ -115,7 +115,7 @@ class ShareStatsCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'x_days'.tr(args: [maxStreak.toString()]),
+                    context.tr('x_days', args: [maxStreak.toString()]),
                     style: const TextStyle(
                       color: Colors.amberAccent,
                       fontSize: 38,
@@ -155,12 +155,15 @@ class ShareStatsCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'total_completions'.tr(),
+                          context.tr('total_completions'),
                           style: TextStyle(color: Colors.white60, fontSize: 10),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'x_times'.tr(args: [totalCompletions.toString()]),
+                          context.tr(
+                            'x_times',
+                            args: [totalCompletions.toString()],
+                          ),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -186,12 +189,15 @@ class ShareStatsCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'active_routines'.tr(),
+                          context.tr('active_routines'),
                           style: TextStyle(color: Colors.white60, fontSize: 10),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'x_routines'.tr(args: [habits.length.toString()]),
+                          context.tr(
+                            'x_routines',
+                            args: [habits.length.toString()],
+                          ),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -208,7 +214,7 @@ class ShareStatsCard extends StatelessWidget {
 
             Center(
               child: Text(
-                'share_motto'.tr(),
+                context.tr('share_motto'),
                 style: TextStyle(
                   color: Colors.indigo.shade100,
                   fontSize: 11,

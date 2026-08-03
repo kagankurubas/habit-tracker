@@ -56,7 +56,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('add_new_category'.tr()),
+      title: Text(context.tr('add_new_category')),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -66,7 +66,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               controller: _nameController,
               autofocus: true,
               decoration: InputDecoration(
-                hintText: 'category_name'.tr(),
+                hintText: context.tr('category_name'),
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -74,7 +74,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
 
             // 🎨 COLOR SELECTION
             Text(
-              'category_color'.tr(),
+              context.tr('category_color'),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
@@ -117,7 +117,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
             const SizedBox(height: 16),
 
             Text(
-              'select_icon'.tr(),
+              context.tr('select_icon'),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
@@ -162,7 +162,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('cancel'.tr()),
+          child: Text(context.tr('cancel')),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -179,7 +179,10 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               Navigator.pop(context);
             }
           },
-          child: Text('add'.tr(), style: const TextStyle(color: Colors.white)),
+          child: Text(
+            context.tr('add'),
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
       ],
     );

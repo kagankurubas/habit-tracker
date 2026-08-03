@@ -66,7 +66,7 @@ class _BadgesSectionState extends State<BadgesSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'achievements_and_badges'.tr(),
+          context.tr('achievements_and_badges'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -87,7 +87,7 @@ class _BadgesSectionState extends State<BadgesSection> {
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: FilterChip(
-                  label: Text(cat.tr()),
+                  label: Text(context.tr(cat)),
                   selected: isSelected,
                   selectedColor: const Color(0xFF6366F1),
                   backgroundColor: widget.cardColor,
@@ -129,10 +129,10 @@ class _BadgesSectionState extends State<BadgesSection> {
 
             final displayTitle = (isHiddenCategory && !unlocked)
                 ? '???'
-                : badge.title.tr();
+                : context.tr(badge.title);
             final displayDesc = (isHiddenCategory && !unlocked)
-                ? 'hidden_badge_desc'.tr()
-                : badge.description.tr();
+                ? context.tr('hidden_badge_desc')
+                : context.tr(badge.description);
 
             return GestureDetector(
               onTap: () {
@@ -224,8 +224,8 @@ class _BadgesSectionState extends State<BadgesSection> {
                                 ),
                                 child: Text(
                                   unlocked
-                                      ? 'unlocked_badge'.tr()
-                                      : 'locked_badge'.tr(),
+                                      ? context.tr('unlocked_badge')
+                                      : context.tr('locked_badge'),
                                   style: TextStyle(
                                     color: unlocked
                                         ? Colors.greenAccent
@@ -247,7 +247,7 @@ class _BadgesSectionState extends State<BadgesSection> {
                                       vertical: 13,
                                     ),
                                   ),
-                                  child: Text('close'.tr()),
+                                  child: Text(context.tr('close')),
                                 ),
                               ),
                             ],

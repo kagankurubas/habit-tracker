@@ -114,7 +114,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             Column(
                               children: [
                                 Text(
-                                  'current_streak'.tr(),
+                                  context.tr('current_streak'),
                                   style: TextStyle(
                                     color: subtextColor,
                                     fontSize: 13,
@@ -122,7 +122,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '🔥 $streak ${'days'.tr()}',
+                                  '🔥 $streak ${context.tr('days')}',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -139,7 +139,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             Column(
                               children: [
                                 Text(
-                                  'frequency'.tr(),
+                                  context.tr('frequency'),
                                   style: TextStyle(
                                     color: subtextColor,
                                     fontSize: 13,
@@ -164,7 +164,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             Column(
                               children: [
                                 Text(
-                                  'total'.tr(),
+                                  context.tr('total'),
                                   style: TextStyle(
                                     color: subtextColor,
                                     fontSize: 13,
@@ -172,7 +172,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '✅ ${widget.habit.totalCompletedDays} ${'days'.tr()}',
+                                  '✅ ${widget.habit.totalCompletedDays} ${context.tr('days')}',
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -212,8 +212,8 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             ),
                             label: Text(
                               isDoneToday
-                                  ? 'completed_today'.tr()
-                                  : 'mark_completed_today'.tr(),
+                                  ? context.tr('completed_today')
+                                  : context.tr('mark_completed_today'),
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -233,7 +233,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        'consistency_report'.tr(),
+                        context.tr('consistency_report'),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -247,7 +247,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                         ButtonSegment(
                           value: 0,
                           label: Text(
-                            'heatmap'.tr(),
+                            context.tr('heatmap'),
                             style: const TextStyle(fontSize: 12),
                           ),
                           icon: const Icon(Icons.grid_on, size: 16),
@@ -255,7 +255,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                         ButtonSegment(
                           value: 1,
                           label: Text(
-                            'calendar'.tr(),
+                            context.tr('calendar'),
                             style: const TextStyle(fontSize: 12),
                           ),
                           icon: const Icon(Icons.calendar_month, size: 16),
@@ -299,6 +299,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                         : Column(
                             children: [
                               TableCalendar(
+                                locale: context.locale.languageCode,
                                 firstDay: DateTime.utc(2024, 1, 1),
                                 lastDay: DateTime.utc(2030, 12, 31),
                                 focusedDay: _focusedDay,
@@ -374,7 +375,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        'calendar_visual_only'.tr(),
+                                        context.tr('calendar_visual_only'),
                                       ),
                                       duration: const Duration(seconds: 2),
                                     ),
@@ -392,17 +393,17 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 children: [
                                   _buildLegendItem(
                                     Colors.green,
-                                    'done'.tr(),
+                                    context.tr('done'),
                                     subtextColor,
                                   ),
                                   _buildLegendItem(
                                     targetDayColor,
-                                    'target_day'.tr(),
+                                    context.tr('target_day'),
                                     subtextColor,
                                   ),
                                   _buildLegendItem(
                                     subtextColor.withValues(alpha: 0.4),
-                                    'off_routine'.tr(),
+                                    context.tr('off_routine'),
                                     subtextColor,
                                   ),
                                 ],
@@ -440,7 +441,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'monthly_success'.tr(),
+                                context.tr('monthly_success'),
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: subtextColor,
@@ -476,7 +477,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'last_7_days'.tr(),
+                                context.tr('last_7_days'),
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: subtextColor,
@@ -512,7 +513,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'total_days'.tr(),
+                                context.tr('total_days'),
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: subtextColor,

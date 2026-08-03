@@ -23,7 +23,7 @@ class WeeklyPerformanceChart extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'weekly_performance_chart'.tr(),
+          context.tr('weekly_performance_chart'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

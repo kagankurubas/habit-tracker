@@ -42,7 +42,7 @@ class StatsScreen extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         contentPadding: const EdgeInsets.all(16),
         title: Text(
-          'share_progress'.tr(),
+          context.tr('share_progress'),
           textAlign: TextAlign.center,
           style: TextStyle(
             color: textColor,
@@ -64,7 +64,7 @@ class StatsScreen extends StatelessWidget {
                 },
                 icon: const Icon(Icons.ios_share_rounded, size: 20),
                 label: Text(
-                  'share_as_image'.tr(),
+                  context.tr('share_as_image'),
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -96,7 +96,7 @@ class StatsScreen extends StatelessWidget {
           backgroundColor: bgColor,
           appBar: AppBar(
             title: Text(
-              'general_stats_title'.tr(),
+              context.tr('general_stats_title'),
               style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
             ),
             backgroundColor: Colors.transparent,
@@ -104,7 +104,7 @@ class StatsScreen extends StatelessWidget {
             actions: [
               IconButton(
                 icon: Icon(Icons.share_outlined, color: textColor),
-                tooltip: 'share_stats'.tr(),
+                tooltip: context.tr('share_stats'),
                 onPressed: () {
                   final habits = habitsBox.values.toList();
                   if (habits.isNotEmpty) {
@@ -129,7 +129,7 @@ class StatsScreen extends StatelessWidget {
               if (habits.isEmpty) {
                 return Center(
                   child: Text(
-                    'no_stats_data'.tr(),
+                    context.tr('no_stats_data'),
                     textAlign: TextAlign.center,
                     style: TextStyle(color: subtextColor, fontSize: 16),
                   ),
@@ -189,8 +189,12 @@ class StatsScreen extends StatelessWidget {
                     : 0.0;
                 last7DaysRatios.add(ratio);
 
-                final weekdayName = _dayLabels[checkDate.weekday - 1].tr();
-                current7DaysLabels.add(i == 0 ? 'today'.tr() : weekdayName);
+                final weekdayName = context.tr(
+                  _dayLabels[checkDate.weekday - 1],
+                );
+                current7DaysLabels.add(
+                  i == 0 ? context.tr('today') : weekdayName,
+                );
               }
 
               return SingleChildScrollView(
@@ -207,9 +211,10 @@ class StatsScreen extends StatelessWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         StatMetricCard(
-                          title: 'todays_success'.tr(),
+                          title: context.tr('todays_success'),
                           value: '%${(todayProgress * 100).toInt()}',
-                          subtitle: 'tasks_completed_out_of'.tr(
+                          subtitle: context.tr(
+                            'tasks_completed_out_of',
                             args: [
                               todayTargets.length.toString(),
                               todayCompleted.toString(),
@@ -222,13 +227,13 @@ class StatsScreen extends StatelessWidget {
                           subtextColor: subtextColor,
                         ),
                         StatMetricCard(
-                          title: 'longest_streak_title'.tr(),
+                          title: context.tr('longest_streak_title'),
                           value: maxStreak > 0
-                              ? '🔥 ${'x_days'.tr(args: [maxStreak.toString()])}'
-                              : 'not_yet'.tr(),
+                              ? '🔥 ${context.tr('x_days', args: [maxStreak.toString()])}'
+                              : context.tr('not_yet'),
                           subtitle: bestStreakHabit != null
                               ? bestStreakHabit.title
-                              : 'not_yet'.tr(),
+                              : context.tr('not_yet'),
                           icon: Icons.local_fire_department_rounded,
                           color: const Color(0xFFF59E0B),
                           cardColor: cardColor,
@@ -236,10 +241,11 @@ class StatsScreen extends StatelessWidget {
                           subtextColor: subtextColor,
                         ),
                         StatMetricCard(
-                          title: 'total_completions'.tr(),
-                          value: '$totalCompletions ${'x_times'.tr(args: [''])}'
-                              .trim(),
-                          subtitle: 'all_time'.tr(),
+                          title: context.tr('total_completions'),
+                          value:
+                              '$totalCompletions ${context.tr('x_times', args: [''])}'
+                                  .trim(),
+                          subtitle: context.tr('all_time'),
                           icon: Icons.task_alt_rounded,
                           color: const Color(0xFF3B82F6),
                           cardColor: cardColor,
@@ -247,11 +253,11 @@ class StatsScreen extends StatelessWidget {
                           subtextColor: subtextColor,
                         ),
                         StatMetricCard(
-                          title: 'active_routines'.tr(),
+                          title: context.tr('active_routines'),
                           value:
-                              '${habits.length} ${'x_routines'.tr(args: [''])}'
+                              '${habits.length} ${context.tr('x_routines', args: [''])}'
                                   .trim(),
-                          subtitle: 'being_tracked'.tr(),
+                          subtitle: context.tr('being_tracked'),
                           icon: Icons.auto_awesome_rounded,
                           color: const Color(0xFF8B5CF6),
                           cardColor: cardColor,

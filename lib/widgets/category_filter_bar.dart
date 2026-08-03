@@ -33,17 +33,20 @@ class CategoryFilterBar extends StatelessWidget {
             : const Color(0xFF1E293B),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          'delete_category'.tr(),
+          context.tr('delete_category'),
           style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
         ),
         content: Text(
-          'delete_category_desc'.tr(args: [category.name.tr()]),
+          context.tr('delete_category_desc', args: [context.tr(category.name)]),
           style: TextStyle(color: subtextColor),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('cancel'.tr(), style: TextStyle(color: subtextColor)),
+            child: Text(
+              context.tr('cancel'),
+              style: TextStyle(color: subtextColor),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
@@ -53,7 +56,7 @@ class CategoryFilterBar extends StatelessWidget {
               onCategorySelected('Tüm Görevler');
             },
             child: Text(
-              'delete'.tr(),
+              context.tr('delete'),
               style: const TextStyle(color: Colors.white),
             ),
           ),
@@ -94,7 +97,7 @@ class CategoryFilterBar extends StatelessWidget {
                       final isSelected = selectedCategory == 'all_tasks';
                       return _buildChip(
                         context: context,
-                        label: 'all_tasks'.tr(),
+                        label: context.tr('all_tasks'),
                         iconData: Icons.stars_rounded,
                         chipColor: const Color(0xFF6366F1),
                         isSelected: isSelected,
@@ -155,7 +158,7 @@ class CategoryFilterBar extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'add_category_btn'.tr(),
+                                  context.tr('add_category_btn'),
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -174,7 +177,7 @@ class CategoryFilterBar extends StatelessWidget {
 
                     return _buildChip(
                       context: context,
-                      label: category.name.tr(),
+                      label: context.tr(category.name),
                       iconData: category.iconData,
                       chipColor: category.color,
                       isSelected: isSelected,

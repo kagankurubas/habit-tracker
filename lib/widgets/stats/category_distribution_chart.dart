@@ -61,7 +61,7 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'category_distribution'.tr(),
+          context.tr('category_distribution'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -146,7 +146,7 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
                           ),
                         ),
                         Text(
-                          'completion'.tr(),
+                          context.tr('completion'),
                           style: TextStyle(
                             fontSize: 11,
                             color: widget.subtextColor,
@@ -182,7 +182,7 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        '${catName.tr()} (%$percentage)',
+                        '${context.tr(catName)} (%$percentage)',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,

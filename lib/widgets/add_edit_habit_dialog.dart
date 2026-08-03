@@ -102,7 +102,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
     final isEditing = widget.habit != null;
 
     return AlertDialog(
-      title: Text(isEditing ? 'edit_task'.tr() : 'add_new_task'.tr()),
+      title: Text(
+        isEditing ? context.tr('edit_task') : context.tr('add_new_task'),
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -117,15 +119,15 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                 });
               },
               decoration: InputDecoration(
-                hintText: 'example_habits_placeholder'.tr(),
-                labelText: isEditing ? 'task_name'.tr() : null,
+                hintText: context.tr('example_habits_placeholder'),
+                labelText: isEditing ? context.tr('task_name') : null,
                 border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
 
             Text(
-              'select_icon'.tr(),
+              context.tr('select_icon'),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
@@ -167,7 +169,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             const SizedBox(height: 16),
 
             Text(
-              'theme_color'.tr(),
+              context.tr('theme_color'),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
@@ -214,7 +216,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             const SizedBox(height: 16),
 
             Text(
-              'category'.tr(),
+              context.tr('category'),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
@@ -234,7 +236,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
               items: availableCategories.map((cat) {
                 return DropdownMenuItem<String>(
                   value: cat.name,
-                  child: Text('${cat.icon} ${cat.name.tr()}'),
+                  child: Text('${cat.icon} ${context.tr(cat.name)}'),
                 );
               }).toList(),
               onChanged: (val) {
@@ -248,7 +250,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             const SizedBox(height: 16),
 
             Text(
-              'repeat_frequency'.tr(),
+              context.tr('repeat_frequency'),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
@@ -263,11 +265,20 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                 ),
               ),
               items: [
-                DropdownMenuItem(value: 0, child: Text('every_day'.tr())),
-                DropdownMenuItem(value: 1, child: Text('weekday'.tr())),
-                DropdownMenuItem(value: 2, child: Text('weekend'.tr())),
-                DropdownMenuItem(value: 3, child: Text('interval_days'.tr())),
-                DropdownMenuItem(value: 4, child: Text('specific_days'.tr())),
+                DropdownMenuItem(
+                  value: 0,
+                  child: Text(context.tr('every_day')),
+                ),
+                DropdownMenuItem(value: 1, child: Text(context.tr('weekday'))),
+                DropdownMenuItem(value: 2, child: Text(context.tr('weekend'))),
+                DropdownMenuItem(
+                  value: 3,
+                  child: Text(context.tr('interval_days')),
+                ),
+                DropdownMenuItem(
+                  value: 4,
+                  child: Text(context.tr('specific_days')),
+                ),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -357,7 +368,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                   SwitchListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 14),
                     title: Text(
-                      'reminder_notification'.tr(),
+                      context.tr('reminder_notification'),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -431,7 +442,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('cancel'.tr()),
+          child: Text(context.tr('cancel')),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -471,7 +482,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                 }
               : null,
           child: Text(
-            isEditing ? 'save'.tr() : 'add'.tr(),
+            isEditing ? context.tr('save') : context.tr('add'),
             style: const TextStyle(color: Colors.white),
           ),
         ),

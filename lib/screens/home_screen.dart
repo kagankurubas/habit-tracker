@@ -164,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: AppBar(
               title: Text(
-                'app_title'.tr(),
+                context.tr('app_title'),
                 style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
               ),
               centerTitle: true,
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
               actions: [
                 IconButton(
                   icon: Icon(Icons.settings_outlined, color: textColor),
-                  tooltip: 'settings'.tr(),
+                  tooltip: context.tr('settings'),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: habits.isEmpty
                         ? Center(
                             child: Text(
-                              'no_tasks_in_category'.tr(),
+                              context.tr('no_tasks_in_category'),
                               textAlign: TextAlign.center,
                               style: TextStyle(color: subtextColor),
                             ),
@@ -254,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
             elevation: 4,
             icon: const Icon(Icons.add),
             label: Text(
-              'new_task'.tr(),
+              context.tr('new_task'),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
