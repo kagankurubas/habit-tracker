@@ -9,7 +9,13 @@
 <h1 align="center">HABITTO</h1>
 
 <p align="center">
-  <a href="#english">English</a> | <a href="#türkçe">Türkçe</a>
+  <a href="#english">
+    <img src="https://img.shields.io/badge/English-02569B?style=for-the-badge" alt="English">
+  </a>
+  &nbsp;
+  <a href="#türkçe">
+    <img src="https://img.shields.io/badge/Türkçe-E30A17?style=for-the-badge" alt="Türkçe">
+  </a>
 </p>
 
 ---
