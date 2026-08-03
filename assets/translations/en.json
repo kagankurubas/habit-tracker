@@ -237,5 +237,10 @@
   "github_copied": "GitHub link copied! 📋",
   "add_new_category": "Add New Category",
   "category_name": "Category Name",
-  "category_color": "Category Color:"
+  "category_color": "Category Color:",
+  "current_streak": "Current Streak",
+  "days": "Days",
+  "frequency": "Frequency",
+  "total": "Total",
+  "restore_cancelled": "Import was cancelled or the selected file is invalid."
 }

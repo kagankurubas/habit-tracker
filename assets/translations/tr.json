@@ -237,5 +237,10 @@
   "github_copied": "GitHub bağlantısı kopyalandı! 📋",
   "add_new_category": "Yeni Kategori Ekle",
   "category_name": "Kategori Adı",
-  "category_color": "Kategori Rengi:"
+  "category_color": "Kategori Rengi:",
+  "current_streak": "Mevcut Zincir",
+  "days": "Gün",
+  "frequency": "Sıklık",
+  "total": "Toplam",
+  "restore_cancelled": "İçe aktarma iptal edildi veya seçilen dosya geçersiz."
 }
