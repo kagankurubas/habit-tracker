@@ -298,10 +298,216 @@ Habitto supports multiple routine frequencies:
 - [x] Publish downloadable Android releases
 - [x] Add additional language support (Turkish added in v1.1.0)
 - [ ] Improve accessibility support
-- [ ] Explore optional encrypted backup support
+- [ ] Explore optional encrypted backup support\n\n### Project Structure
 
----
-<h2 id="türkçe">Türkçe</h2>
+```text
+lib/
+├── models/
+│   ├── habit.dart
+│   ├── category_model.dart
+│   └── badge_model.dart
+│
+├── screens/
+│   ├── home_screen.dart
+│   ├── habit_detail_screen.dart
+│   ├── stats_screen.dart
+│   └── settings_screen.dart
+│
+├── services/
+│   ├── backup_service.dart
+│   ├── motivation_service.dart
+│   ├── notification_service.dart
+│   ├── share_service.dart
+│   ├── stats_service.dart
+│   └── theme_service.dart
+│
+├── widgets/
+│   ├── stats/
+│   ├── add_edit_habit_dialog.dart
+│   ├── category_filter_bar.dart
+│   ├── habit_tile.dart
+│   └── badge_unlocked_dialog.dart
+│
+├── app_themes.dart
+└── main.dart
+```
+
+### Getting Started
+
+#### Requirements
+
+Before running the project, make sure the following tools are installed:
+
+- Flutter SDK
+- Dart SDK included with Flutter
+- Android Studio, Visual Studio Code, or another Flutter-compatible IDE
+- An Android emulator or physical Android device
+
+#### Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/kagankurubas/habitto.git
+cd habitto
+```
+
+Install the dependencies:
+
+```bash
+flutter pub get
+```
+
+Run the application:
+
+```bash
+flutter run
+```
+
+#### Select a Target Device
+
+List available devices:
+
+```bash
+flutter devices
+```
+
+Run the application on a specific device:
+
+```bash
+flutter run -d <device-id>
+```
+
+Example:
+
+```bash
+flutter run -d android
+```
+
+### Code Generation
+
+Habitto uses generated Hive adapters.
+
+When a Hive model is changed, regenerate the adapter files with:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+Generated adapter files are already included in the repository, so this command is not required for a normal installation.
+
+### Building
+
+#### Android APK
+
+```bash
+flutter build apk --release
+```
+
+The generated APK can be found under:
+
+```text
+build/app/outputs/flutter-apk/app-release.apk
+```
+
+#### Android App Bundle
+
+```bash
+flutter build appbundle --release
+```
+
+Platform-specific features such as notifications, sharing, file selection, and local storage may behave differently depending on the target platform.
+
+### Continuous Integration
+
+Habitto uses GitHub Actions to validate every push and pull request targeting the `main` branch.
+
+The workflow automatically performs the following checks:
+
+```bash
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze
+flutter test
+flutter build apk --debug
+```
+
+A green CI status indicates that:
+
+- Source code formatting is valid
+- Flutter analysis completes without issues
+- Automated tests pass
+- The Android debug application builds successfully
+
+The workflow can also be started manually through the GitHub Actions page.
+
+### Testing
+
+Run all automated tests:
+
+```bash
+flutter test
+```
+
+Run a specific test file:
+
+```bash
+flutter test test/habit_test.dart
+```
+
+Current automated tests cover the initial habit model behavior. Additional unit and widget test coverage is planned.
+
+### Data and Privacy
+
+Habitto is designed as a local-first application.
+
+- Habit data is stored locally using Hive
+- No user account is required
+- No analytics or tracking service is included
+- No personal habit data is uploaded automatically
+- Users can manually export their data as a JSON backup
+- The application can be used without a permanent internet connection
+
+Deleting the application or clearing its local storage may remove existing data unless a backup has been created.
+
+### Contributing
+
+Contributions, bug reports, and feature suggestions are welcome.
+
+1. Fork the repository.
+
+2. Create a new branch:
+
+```bash
+git checkout -b feature/my-feature
+```
+
+3. Make your changes.
+
+4. Format and validate the project:
+
+```bash
+dart format lib test
+flutter analyze
+flutter test
+```
+
+5. Commit your changes:
+
+```bash
+git commit -m "Add my feature"
+```
+
+6. Push the branch:
+
+```bash
+git push origin feature/my-feature
+```
+
+7. Open a pull request.
+
+Please keep pull requests focused and make sure the GitHub Actions workflow passes before requesting a review.
+
+\n\n---\n\n<h2 id="türkçe">Türkçe</h2>
 
 <p align="center">
   <strong>Alışkanlıklar inşa et. İvmeyi koru. Gelişimini gör.</strong>
@@ -572,11 +778,216 @@ Habitto farklı rutin sıklıklarını destekler:
 - [x] İndirilebilir Android sürümleri yayınla
 - [x] Ek dil desteği ekle (v1.1.0 ile Türkçe eklendi)
 - [ ] Erişilebilirlik (accessibility) desteğini geliştir
-- [ ] İsteğe bağlı şifrelenmiş yedekleme desteğini araştır
+- [ ] İsteğe bağlı şifrelenmiş yedekleme desteğini araştır\n\n### Proje Yapısı
 
----
+```text
+lib/
+├── models/
+│   ├── habit.dart
+│   ├── category_model.dart
+│   └── badge_model.dart
+│
+├── screens/
+│   ├── home_screen.dart
+│   ├── habit_detail_screen.dart
+│   ├── stats_screen.dart
+│   └── settings_screen.dart
+│
+├── services/
+│   ├── backup_service.dart
+│   ├── motivation_service.dart
+│   ├── notification_service.dart
+│   ├── share_service.dart
+│   ├── stats_service.dart
+│   └── theme_service.dart
+│
+├── widgets/
+│   ├── stats/
+│   ├── add_edit_habit_dialog.dart
+│   ├── category_filter_bar.dart
+│   ├── habit_tile.dart
+│   └── badge_unlocked_dialog.dart
+│
+├── app_themes.dart
+└── main.dart
+```
 
-## License / Lisans
+### Başlangıç
+
+#### Gereksinimler
+
+Projeyi çalıştırmadan önce aşağıdaki araçların kurulu olduğundan emin olun:
+
+- Flutter SDK
+- Flutter ile birlikte gelen Dart SDK
+- Android Studio, Visual Studio Code veya Flutter uyumlu başka bir IDE
+- Bir Android emülatör veya fiziksel Android cihaz
+
+#### Kurulum
+
+Depoyu klonlayın:
+
+```bash
+git clone https://github.com/kagankurubas/habitto.git
+cd habitto
+```
+
+Bağımlılıkları yükleyin:
+
+```bash
+flutter pub get
+```
+
+Uygulamayı çalıştırın:
+
+```bash
+flutter run
+```
+
+#### Hedef Cihaz Seçimi
+
+Mevcut cihazları listeleyin:
+
+```bash
+flutter devices
+```
+
+Uygulamayı belirli bir cihazda çalıştırın:
+
+```bash
+flutter run -d <device-id>
+```
+
+Örnek:
+
+```bash
+flutter run -d android
+```
+
+### Kod Üretimi (Code Generation)
+
+Habitto, oluşturulmuş Hive adaptörleri kullanır.
+
+Bir Hive modeli değiştirildiğinde, adaptör dosyalarını şu komutla yeniden oluşturun:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+Oluşturulan adaptör dosyaları zaten depoya dahil edilmiştir, bu nedenle normal bir kurulum için bu komut gerekli değildir.
+
+### Derleme (Building)
+
+#### Android APK
+
+```bash
+flutter build apk --release
+```
+
+Oluşturulan APK şu yolda bulunabilir:
+
+```text
+build/app/outputs/flutter-apk/app-release.apk
+```
+
+#### Android App Bundle
+
+```bash
+flutter build appbundle --release
+```
+
+Bildirimler, dosya paylaşımı, dosya seçimi ve yerel depolama gibi platforma özel özellikler, hedef platforma bağlı olarak farklı davranabilir.
+
+### Sürekli Entegrasyon (CI)
+
+Habitto, `main` dalına yönelik her gönderimi (push) ve çekme isteğini (pull request) doğrulamak için GitHub Actions kullanır.
+
+İş akışı aşağıdaki kontrolleri otomatik olarak gerçekleştirir:
+
+```bash
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze
+flutter test
+flutter build apk --debug
+```
+
+Yeşil bir CI durumu şunları gösterir:
+
+- Kaynak kodu biçimlendirmesi geçerlidir
+- Flutter analizi sorunsuz tamamlanır
+- Otomatik testler başarıyla geçer
+- Android hata ayıklama (debug) uygulaması başarıyla derlenir
+
+İş akışı GitHub Actions sayfası üzerinden manuel olarak da başlatılabilir.
+
+### Test
+
+Tüm otomatik testleri çalıştırın:
+
+```bash
+flutter test
+```
+
+Belirli bir test dosyasını çalıştırın:
+
+```bash
+flutter test test/habit_test.dart
+```
+
+Mevcut otomatik testler başlangıçtaki alışkanlık modeli davranışını kapsar. Ek birim ve widget test kapsamı planlanmaktadır.
+
+### Veri ve Gizlilik
+
+Habitto, yerel öncelikli (local-first) bir uygulama olarak tasarlanmıştır.
+
+- Alışkanlık verileri yerel olarak Hive kullanılarak saklanır
+- Herhangi bir kullanıcı hesabı gerekmez
+- Herhangi bir analiz veya izleme servisi içermez
+- Kişisel alışkanlık verileri otomatik olarak yüklenmez (upload edilmez)
+- Kullanıcılar verilerini manuel olarak JSON yedeği olarak dışa aktarabilir
+- Uygulama sürekli bir internet bağlantısı olmadan kullanılabilir
+
+Uygulamayı silmek veya yerel depolamasını temizlemek, bir yedek oluşturulmamışsa mevcut verileri kaldırabilir.
+
+### Katkıda Bulunma (Contributing)
+
+Katkılar, hata raporları ve özellik önerileri memnuniyetle karşılanır.
+
+1. Depoyu forklayın (Fork).
+
+2. Yeni bir dal oluşturun:
+
+```bash
+git checkout -b feature/yeni-ozellik
+```
+
+3. Değişikliklerinizi yapın.
+
+4. Projeyi formatlayın ve doğrulayın:
+
+```bash
+dart format lib test
+flutter analyze
+flutter test
+```
+
+5. Değişikliklerinizi commit edin:
+
+```bash
+git commit -m "Yeni özellik eklendi"
+```
+
+6. Dalı push edin:
+
+```bash
+git push origin feature/yeni-ozellik
+```
+
+7. Bir pull request (PR) açın.
+
+Lütfen çekme isteklerini (pull request) odaklı tutun ve inceleme istemeden önce GitHub Actions iş akışının başarılı olduğundan emin olun.
+
+\n\n---\n\n## License / Lisans
 
 This project is licensed under the [MIT License](LICENSE).
 
