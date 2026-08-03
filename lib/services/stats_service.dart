@@ -1,7 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import '../models/habit.dart';
 
 class DayPerformance {
-  final int weekday; // 1: Pzt, 2: Sal, ..., 7: Paz
+  final int weekday;
   final String dayName;
   final int completedCount;
   final int targetCount;
@@ -32,7 +33,6 @@ class InsightResult {
 }
 
 class StatsService {
-  // 🛠️ Nesne türetilmesini engeller
   StatsService._();
 
   static const Map<int, String> dayNames = {
@@ -45,17 +45,12 @@ class StatsService {
     7: 'Pazar',
   };
 
-  /// Son [daysBack] gün içindeki haftalık performans analizi
   static InsightResult analyzeWeeklyPerformance(
     List<Habit> habits, {
     int daysBack = 30,
   }) {
     if (habits.isEmpty) {
-      return const InsightResult(
-        message:
-            'Henüz yeterli alışkanlık verisi yok. Görevlerini tamamladıkça sana özel analizler burada görünecek!',
-        emoji: '📊',
-      );
+      return InsightResult(message: 'insight_no_data'.tr(), emoji: '📊');
     }
 
     final now = DateTime.now();
@@ -64,7 +59,6 @@ class StatsService {
     final Map<int, int> completedPerDay = {for (var i = 1; i <= 7; i++) i: 0};
     final Map<int, int> targetPerDay = {for (var i = 1; i <= 7; i++) i: 0};
 
-    // Son X günün her bir gününü kontrol et
     for (int i = 0; i < daysBack; i++) {
       final date = todayNormalized.subtract(Duration(days: i));
       final weekday = date.weekday;
@@ -95,44 +89,37 @@ class StatsService {
     }
 
     if (performances.isEmpty) {
-      return const InsightResult(
-        message:
-            'Alışkanlık takibine devam et, ilk haftalık analizini hazırlıyoruz!',
-        emoji: '🌱',
-      );
+      return InsightResult(message: 'insight_preparing'.tr(), emoji: '🌱');
     }
 
-    // Sırala: En düşükten en yükseğe
     performances.sort((a, b) => a.completionRate.compareTo(b.completionRate));
 
     final worst = performances.first;
     final best = performances.last;
 
-    // Aksama tespiti (Eğer en kötü günün tamamlama oranı %70'in altındaysa uyarı ver)
     if (worst.completionRate < 70 && worst.targetCount >= 2) {
       final dropPercent = (100 - worst.completionRate).toStringAsFixed(0);
       return InsightResult(
         worstDay: worst,
         bestDay: best,
         emoji: '⚠️',
-        message:
-            '${worst.dayName} günleri alışkanlıklarını %$dropPercent oranında aksatıyorsun! Bugünlere biraz daha odaklanmaya ne dersin?',
+        message: 'insight_worst_day'.tr(args: [worst.dayName, dropPercent]),
       );
     } else if (best.completionRate >= 80) {
       return InsightResult(
         worstDay: worst,
         bestDay: best,
         emoji: '🔥',
-        message:
-            'Harika gidiyorsun! En verimli günün %${best.completionRate.toStringAsFixed(0)} başarı oranıyla ${best.dayName}.',
+        message: 'insight_best_day'.tr(
+          args: [best.completionRate.toStringAsFixed(0), best.dayName],
+        ),
       );
     } else {
       return InsightResult(
         worstDay: worst,
         bestDay: best,
         emoji: '💪',
-        message:
-            'Dengeli bir ivme yakaladın. Rutinlerini aksatmadan devam ettir!',
+        message: 'insight_balanced'.tr(),
       );
     }
   }

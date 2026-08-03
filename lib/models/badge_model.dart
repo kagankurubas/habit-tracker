@@ -18,20 +18,27 @@ class HabitBadge {
   });
 }
 
-// 🛠️ YARDIMCI METOTLAR (Kod tekrarını engeller ve performansı artırır)
+String _normalizeCategory(String category) {
+  return category.replaceAll('.', '').trim().toLowerCase();
+}
+
+bool _isInCategory(Habit habit, String category) {
+  return _normalizeCategory(habit.category) == _normalizeCategory(category);
+}
+
 int _getTotalCompletions(List<Habit> habits) {
   return habits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
 }
 
 int _getCategoryCompletions(List<Habit> habits, String category) {
   return habits
-      .where((h) => h.category == category)
+      .where((h) => _isInCategory(h, category))
       .fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
 }
 
-// 🏆 TÜM ROZETLER VE AÇILMA ŞARTLARI
+// 🏆 ALL BADGES AND UNLOCK CONDITIONS
 final List<HabitBadge> allBadges = [
-  // 📌 1. GENEL ROZETLER
+  // 📌 1. GENERAL BADGES
   HabitBadge(
     id: 'first_step',
     title: 'İlk Adım',
@@ -98,7 +105,6 @@ final List<HabitBadge> allBadges = [
     },
   ),
 
-  // 💻 2. KODLAMA ROZETLERİ
   HabitBadge(
     id: 'code_first',
     title: 'Hello World',
@@ -106,7 +112,7 @@ final List<HabitBadge> allBadges = [
     imagePath: 'assets/badges/code_first.png',
     category: 'Kodlama',
     isUnlocked: (habits) => habits.any(
-      (h) => h.category == 'Kodlama' && h.completedDatesList.isNotEmpty,
+      (h) => _isInCategory(h, 'Kodlama') && h.completedDatesList.isNotEmpty,
     ),
   ),
   HabitBadge(
@@ -126,7 +132,6 @@ final List<HabitBadge> allBadges = [
     isUnlocked: (habits) => _getCategoryCompletions(habits, 'Kodlama') >= 15,
   ),
 
-  // 🎸 3. MÜZİK ROZETLERİ
   HabitBadge(
     id: 'music_first',
     title: 'İlk Akor',
@@ -134,7 +139,7 @@ final List<HabitBadge> allBadges = [
     imagePath: 'assets/badges/music_first.png',
     category: 'Müzik',
     isUnlocked: (habits) => habits.any(
-      (h) => h.category == 'Müzik' && h.completedDatesList.isNotEmpty,
+      (h) => _isInCategory(h, 'Müzik') && h.completedDatesList.isNotEmpty,
     ),
   ),
   HabitBadge(
@@ -154,7 +159,6 @@ final List<HabitBadge> allBadges = [
     isUnlocked: (habits) => _getCategoryCompletions(habits, 'Müzik') >= 20,
   ),
 
-  // 🎮 4. OYUN DEV. ROZETLERİ
   HabitBadge(
     id: 'gamedev_builder',
     title: 'Dünya Mimarı',
@@ -162,7 +166,7 @@ final List<HabitBadge> allBadges = [
     imagePath: 'assets/badges/gamedev_builder.png',
     category: 'Oyun Dev.',
     isUnlocked: (habits) => habits.any(
-      (h) => h.category == 'Oyun Dev.' && h.completedDatesList.isNotEmpty,
+      (h) => _isInCategory(h, 'Oyun Dev.') && h.completedDatesList.isNotEmpty,
     ),
   ),
   HabitBadge(
@@ -174,7 +178,6 @@ final List<HabitBadge> allBadges = [
     isUnlocked: (habits) => _getCategoryCompletions(habits, 'Oyun Dev.') >= 10,
   ),
 
-  // 🏃 5. SPOR ROZETLERİ
   HabitBadge(
     id: 'sport_runner',
     title: 'Maratoncu',
@@ -192,7 +195,6 @@ final List<HabitBadge> allBadges = [
     isUnlocked: (habits) => _getCategoryCompletions(habits, 'Spor') >= 15,
   ),
 
-  // 📚 6. OKUMA ROZETLERİ
   HabitBadge(
     id: 'read_bookworm',
     title: 'Kitap Kurdu',
@@ -210,7 +212,6 @@ final List<HabitBadge> allBadges = [
     isUnlocked: (habits) => _getCategoryCompletions(habits, 'Okuma') >= 15,
   ),
 
-  // 🦉 7. GİZLİ BAŞARIMLAR
   HabitBadge(
     id: 'secret_early_bird',
     title: 'Erkenci Kuş',

@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../models/habit.dart';
 import '../services/theme_service.dart';
 import '../app_themes.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class HabitDetailScreen extends StatefulWidget {
   final Habit habit;
@@ -18,7 +19,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   final DateTime _focusedDay = DateTime.now();
   int _selectedViewIndex = 0;
 
-  // 🎯 HEDEF GÜN İÇİN SABİT SARI RENK
   static const Color targetDayColor = Color(0xFFF59E0B);
 
   Map<DateTime, int> _getHeatmapDatasets() {
@@ -91,7 +91,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // DİNAMİK TEMALI ÖZET KARTI
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
@@ -115,7 +114,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             Column(
                               children: [
                                 Text(
-                                  'Mevcut Zincir',
+                                  context.tr('current_streak'),
                                   style: TextStyle(
                                     color: subtextColor,
                                     fontSize: 13,
@@ -123,7 +122,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '🔥 $streak Gün',
+                                  '🔥 $streak ${context.tr('days')}',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -140,7 +139,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             Column(
                               children: [
                                 Text(
-                                  'Sıklık',
+                                  context.tr('frequency'),
                                   style: TextStyle(
                                     color: subtextColor,
                                     fontSize: 13,
@@ -165,7 +164,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             Column(
                               children: [
                                 Text(
-                                  'Toplam',
+                                  context.tr('total'),
                                   style: TextStyle(
                                     color: subtextColor,
                                     fontSize: 13,
@@ -173,7 +172,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '✅ ${widget.habit.totalCompletedDays} Gün',
+                                  '✅ ${widget.habit.totalCompletedDays} ${context.tr('days')}',
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -213,8 +212,8 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             ),
                             label: Text(
                               isDoneToday
-                                  ? 'Bugün Tamamlandı 🎉'
-                                  : 'Bugün Tamamlandı Olarak İşaretle',
+                                  ? context.tr('completed_today')
+                                  : context.tr('mark_completed_today'),
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -229,32 +228,37 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // GÖRÜNÜM SEÇİMİ (HEATMAP & TAKVİM SEÇİCİ)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'İstikrar Raporu',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: textColor,
+                    Expanded(
+                      child: Text(
+                        context.tr('consistency_report'),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: textColor,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     SegmentedButton<int>(
-                      segments: const [
+                      segments: [
                         ButtonSegment(
                           value: 0,
                           label: Text(
-                            'Heatmap',
-                            style: TextStyle(fontSize: 12),
+                            context.tr('heatmap'),
+                            style: const TextStyle(fontSize: 12),
                           ),
-                          icon: Icon(Icons.grid_on, size: 16),
+                          icon: const Icon(Icons.grid_on, size: 16),
                         ),
                         ButtonSegment(
                           value: 1,
-                          label: Text('Takvim', style: TextStyle(fontSize: 12)),
-                          icon: Icon(Icons.calendar_month, size: 16),
+                          label: Text(
+                            context.tr('calendar'),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          icon: const Icon(Icons.calendar_month, size: 16),
                         ),
                       ],
                       selected: {_selectedViewIndex},
@@ -268,7 +272,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 ),
                 const SizedBox(height: 12),
 
-                // DİNAMİK KART / HEATMAP & TAKVİM
                 Card(
                   color: cardColor,
                   elevation: 0,
@@ -296,6 +299,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                         : Column(
                             children: [
                               TableCalendar(
+                                locale: context.locale.languageCode,
                                 firstDay: DateTime.utc(2024, 1, 1),
                                 lastDay: DateTime.utc(2030, 12, 31),
                                 focusedDay: _focusedDay,
@@ -369,11 +373,11 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 ),
                                 onDaySelected: (selectedDay, focusedDay) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       content: Text(
-                                        'Takvim görsel takiptir. Tamamlamaları üstteki butondan yapabilirsiniz!',
+                                        context.tr('calendar_visual_only'),
                                       ),
-                                      duration: Duration(seconds: 2),
+                                      duration: const Duration(seconds: 2),
                                     ),
                                   );
                                 },
@@ -389,17 +393,17 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                 children: [
                                   _buildLegendItem(
                                     Colors.green,
-                                    'Yapıldı',
+                                    context.tr('done'),
                                     subtextColor,
                                   ),
                                   _buildLegendItem(
                                     targetDayColor,
-                                    'Hedef Gün',
+                                    context.tr('target_day'),
                                     subtextColor,
                                   ),
                                   _buildLegendItem(
                                     subtextColor.withValues(alpha: 0.4),
-                                    'Rutin Dışı',
+                                    context.tr('off_routine'),
                                     subtextColor,
                                   ),
                                 ],
@@ -411,7 +415,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // İSTATİSTİK ÖZET KARTLARI
                 Row(
                   children: [
                     Expanded(
@@ -438,7 +441,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Aylık Başarı',
+                                context.tr('monthly_success'),
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: subtextColor,
@@ -474,7 +477,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Son 7 Gün',
+                                context.tr('last_7_days'),
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: subtextColor,
@@ -510,7 +513,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Toplam Gün',
+                                context.tr('total_days'),
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: subtextColor,

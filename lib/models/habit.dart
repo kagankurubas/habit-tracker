@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 part 'habit.g.dart';
 
@@ -76,7 +77,6 @@ class Habit extends HiveObject {
 
   Color get color => Color(colorValue);
 
-  // ⚡ Static Icon Map: RAM'de sadece 1 kez oluşturulur
   static final Map<int, IconData> _iconMap = {
     Icons.book_rounded.codePoint: Icons.book_rounded,
     Icons.fitness_center_rounded.codePoint: Icons.fitness_center_rounded,
@@ -88,7 +88,6 @@ class Habit extends HiveObject {
     Icons.self_improvement_rounded.codePoint: Icons.self_improvement_rounded,
   };
 
-  // ⚡ Static Day Names: Bellekte her seferinde yeniden türetilmez
   static const Map<int, String> _dayNames = {
     1: 'Pzt',
     2: 'Sal',
@@ -104,31 +103,28 @@ class Habit extends HiveObject {
   String get frequencyText {
     switch (frequencyType) {
       case 1:
-        return 'Hafta İçi';
+        return 'weekday'.tr();
       case 2:
-        return 'Hafta Sonu';
+        return 'weekend'.tr();
       case 3:
-        return '$intervalDays Günde Bir';
+        return '$intervalDays ${'interval_days_suffix'.tr()}';
       case 4:
         final names = selectedWeekdays
             .map((d) => _dayNames[d])
             .whereType<String>()
             .join(', ');
-        return names.isEmpty ? 'Haftalık' : names;
+        return names.isEmpty ? 'weekly'.tr() : names;
       case 0:
       default:
-        return 'Her Gün';
+        return 'every_day'.tr();
     }
   }
 
-  // Tarih saatini 00:00:00 yapacak yardımcı metot
   DateTime _stripTime(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 
-  /// ⚡ Hızlı Set dönüştürücü
   Set<DateTime> get _completedDatesSet =>
       completedDatesList.map((d) => _stripTime(d)).toSet();
 
-  /// ⚡ OPTİMİZE EDİLDİ: Sort yapmadan tek geçişte en eski tarihi bulur
   DateTime get startDate {
     if (completedDatesList.isNotEmpty) {
       final earliest = completedDatesList.reduce(
@@ -173,13 +169,13 @@ class Habit extends HiveObject {
     final newList = List<DateTime>.from(completedDatesList);
 
     final index = newList.indexWhere(
-      (d) => _stripTime(d).isAtSameMomentAs(target),
+      (completedDate) => _stripTime(completedDate).isAtSameMomentAs(target),
     );
 
     if (index != -1) {
       newList.removeAt(index);
     } else {
-      newList.add(target);
+      newList.add(date);
     }
 
     completedDatesList = newList;

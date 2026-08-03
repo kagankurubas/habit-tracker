@@ -7,20 +7,25 @@ import 'screens/home_screen.dart';
 import 'screens/stats_screen.dart';
 import 'services/notification_service.dart';
 import 'services/theme_service.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'app_themes.dart';
 import 'models/category_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
 
-  // 1. Zaman dilimlerini yükle ve varsayılan lokasyonu ayarla
   tz.initializeTimeZones();
-  tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
+  try {
+    final currentTimeZone = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(currentTimeZone.toString()));
+  } catch (e) {
+    tz.setLocalLocation(tz.getLocation('UTC'));
+  }
 
-  // 2. Hive veritabanını başlat
   await Hive.initFlutter();
 
-  // Adapter Kayıtları (Çift kayıt engelleyici ile)
   if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(HabitAdapter());
   }
@@ -29,11 +34,9 @@ void main() async {
     Hive.registerAdapter(CategoryModelAdapter());
   }
 
-  // Kutuları Açalım
   final habitsBox = await Hive.openBox<Habit>('habits');
   final categoriesBox = await Hive.openBox<CategoryModel>('categories');
 
-  // Varsayılan Kategoriler
   if (categoriesBox.isEmpty) {
     final defaultCategories = [
       CategoryModel(id: '1', name: 'Genel', icon: '📌'),
@@ -50,10 +53,8 @@ void main() async {
     }
   }
 
-  // 3. Tema servisini başlat
   await ThemeService.init();
 
-  // 4. Bildirim servisini başlat
   final notificationService = NotificationService();
 
   await notificationService.init();
@@ -61,7 +62,16 @@ void main() async {
   for (final habit in habitsBox.values) {
     await notificationService.scheduleHabitNotification(habit);
   }
-  runApp(const HabitTrackerApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('en'), Locale('tr')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      useOnlyLangCode: true,
+      useFallbackTranslations: true,
+      child: const HabitTrackerApp(),
+    ),
+  );
 }
 
 class HabitTrackerApp extends StatelessWidget {
@@ -74,7 +84,10 @@ class HabitTrackerApp extends StatelessWidget {
       builder: (context, bgColor, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Habit Tracker',
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          onGenerateTitle: (context) => context.tr('app_title'),
           theme: ThemeData(
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
@@ -134,16 +147,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 _currentIndex = index;
               });
             },
-            items: const [
+            items: [
               BottomNavigationBarItem(
-                icon: Icon(Icons.check_box_outlined),
-                activeIcon: Icon(Icons.check_box_rounded),
-                label: 'Rutinlerim',
+                icon: const Icon(Icons.check_box_outlined),
+                activeIcon: const Icon(Icons.check_box_rounded),
+                label: context.tr('routines'),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.bar_chart_outlined),
-                activeIcon: Icon(Icons.bar_chart_rounded),
-                label: 'İstatistikler',
+                icon: const Icon(Icons.bar_chart_outlined),
+                activeIcon: const Icon(Icons.bar_chart_rounded),
+                label: context.tr('statistics'),
               ),
             ],
           ),

@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../../models/habit.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CategoryDistributionChart extends StatefulWidget {
   final List<Habit> habits;
@@ -24,7 +25,6 @@ class CategoryDistributionChart extends StatefulWidget {
 class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
   int _touchedIndex = -1;
 
-  // ⚡ KATEGORİ TEMİZLEME YARDIMCISI
   static String _cleanCategoryName(String rawCategory) {
     String name = rawCategory.trim();
     if (name.endsWith('.')) {
@@ -35,7 +35,6 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Kategori bazında toplam tamamlama sayılarını hesaplayalım
     final Map<String, int> categoryCompletions = {};
     final Map<String, Color> categoryColors = {};
     int totalCount = 0;
@@ -53,7 +52,7 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
     }
 
     if (totalCount == 0) {
-      return const SizedBox.shrink(); // Henüz tamamlama yoksa gizle
+      return const SizedBox.shrink();
     }
 
     final categories = categoryCompletions.keys.toList();
@@ -62,7 +61,7 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Kategori Dağılımı',
+          context.tr('category_distribution'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -86,7 +85,6 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // DONUT PASTA GRAFİK
                     PieChart(
                       PieChartData(
                         pieTouchData: PieTouchData(
@@ -136,7 +134,6 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
                         }),
                       ),
                     ),
-                    // HALKA ORTASI MERKEZ BİLGİSİ
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -149,7 +146,7 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
                           ),
                         ),
                         Text(
-                          'Tamamlama',
+                          context.tr('completion'),
                           style: TextStyle(
                             fontSize: 11,
                             color: widget.subtextColor,
@@ -161,7 +158,6 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
                 ),
               ),
               const SizedBox(height: 16),
-              // LEJAND / KATEGORİ RENK LİSTESİ
               Wrap(
                 spacing: 12,
                 runSpacing: 8,
@@ -186,7 +182,7 @@ class _CategoryDistributionChartState extends State<CategoryDistributionChart> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        '$catName (%$percentage)',
+                        '${context.tr(catName)} (%$percentage)',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,

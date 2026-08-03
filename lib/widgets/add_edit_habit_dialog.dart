@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/habit.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class AddEditHabitDialog extends StatefulWidget {
-  final Habit?
-  habit; // Null ise "Yeni Ekle", dolu ise "Düzenle" modunda çalışır.
+  final Habit? habit;
   final Function({
     required String title,
     required int frequencyType,
@@ -102,7 +102,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
     final isEditing = widget.habit != null;
 
     return AlertDialog(
-      title: Text(isEditing ? 'Görevi Düzenle' : 'Yeni Görev / Rutin Ekle'),
+      title: Text(
+        isEditing ? context.tr('edit_task') : context.tr('add_new_task'),
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -117,16 +119,16 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                 });
               },
               decoration: InputDecoration(
-                hintText: isEditing ? null : 'Örn: Kitap Oku, Gitar Çalış...',
-                labelText: isEditing ? 'Görevin Adı' : null,
+                hintText: context.tr('example_habits_placeholder'),
+                labelText: isEditing ? context.tr('task_name') : null,
                 border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
 
-            const Text(
-              'İkon Seç:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            Text(
+              context.tr('select_icon'),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -166,9 +168,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ),
             const SizedBox(height: 16),
 
-            const Text(
-              'Tema Rengi:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            Text(
+              context.tr('theme_color'),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
             Row(
@@ -213,9 +215,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ),
             const SizedBox(height: 16),
 
-            const Text(
-              'Kategori:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            Text(
+              context.tr('category'),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
@@ -234,7 +236,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
               items: availableCategories.map((cat) {
                 return DropdownMenuItem<String>(
                   value: cat.name,
-                  child: Text('${cat.icon} ${cat.name}'),
+                  child: Text('${cat.icon} ${context.tr(cat.name)}'),
                 );
               }).toList(),
               onChanged: (val) {
@@ -247,9 +249,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ),
             const SizedBox(height: 16),
 
-            const Text(
-              'Tekrar Sıklığı:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            Text(
+              context.tr('repeat_frequency'),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<int>(
@@ -262,14 +264,20 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                   vertical: 12,
                 ),
               ),
-              items: const [
-                DropdownMenuItem(value: 0, child: Text('Her Gün')),
-                DropdownMenuItem(value: 1, child: Text('Hafta İçi (Pzt-Cum)')),
-                DropdownMenuItem(value: 2, child: Text('Hafta Sonu (Cmt-Paz)')),
-                DropdownMenuItem(value: 3, child: Text('X Günde Bir')),
+              items: [
+                DropdownMenuItem(
+                  value: 0,
+                  child: Text(context.tr('every_day')),
+                ),
+                DropdownMenuItem(value: 1, child: Text(context.tr('weekday'))),
+                DropdownMenuItem(value: 2, child: Text(context.tr('weekend'))),
+                DropdownMenuItem(
+                  value: 3,
+                  child: Text(context.tr('interval_days')),
+                ),
                 DropdownMenuItem(
                   value: 4,
-                  child: Text('Haftanın Belirli Günleri'),
+                  child: Text(context.tr('specific_days')),
                 ),
               ],
               onChanged: (val) {
@@ -346,7 +354,6 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ],
             const SizedBox(height: 20),
 
-            // 🔔 BİLDİRİM KARTI
             Container(
               decoration: BoxDecoration(
                 color: Color(_selectedColorValue).withValues(alpha: 0.08),
@@ -360,9 +367,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                 children: [
                   SwitchListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 14),
-                    title: const Text(
-                      'Hatırlatıcı Bildirim',
-                      style: TextStyle(
+                    title: Text(
+                      context.tr('reminder_notification'),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
@@ -388,20 +395,27 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                       ),
                       title: Text(
                         _selectedTime == null
-                            ? 'Hatırlatma Saati Ayarla'
-                            : 'Saat: ${_selectedTime!.format(context)}',
+                            ? context.tr('set_reminder_time')
+                            : context.tr(
+                                'reminder_time_value',
+                                args: [_selectedTime!.format(context)],
+                              ),
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      subtitle: const Text(
-                        'Her gün bu saatte bildirim gönderilir',
-                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                      subtitle: Text(
+                        context.tr('reminder_daily_desc'),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey,
+                        ),
                       ),
                       trailing: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(_selectedColorValue),
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                         ),
                         onPressed: () async {
@@ -417,7 +431,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                           }
                         },
                         child: Text(
-                          _selectedTime == null ? 'Seç' : 'Değiştir',
+                          _selectedTime == null
+                              ? context.tr('select_button')
+                              : context.tr('change'),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
@@ -435,7 +451,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('İptal'),
+          child: Text(context.tr('cancel')),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -459,7 +475,6 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                     frequencyType: _selectedFrequency,
                     intervalDays: _intervalDays,
 
-                    // Yalnızca "Haftanın Belirli Günleri" seçildiyse kullan.
                     selectedWeekdays: _selectedFrequency == 4
                         ? List<int>.from(_selectedWeekdays)
                         : <int>[],
@@ -476,7 +491,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                 }
               : null,
           child: Text(
-            isEditing ? 'Kaydet' : 'Ekle',
+            isEditing ? context.tr('save') : context.tr('add'),
             style: const TextStyle(color: Colors.white),
           ),
         ),

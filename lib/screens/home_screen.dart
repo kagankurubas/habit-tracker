@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/habit.dart';
 import '../models/category_model.dart';
@@ -21,7 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late Box<Habit> _habitsBox;
   late Box<CategoryModel> _categoriesBox;
-  String _selectedFilterCategory = 'Tüm Görevler';
+  String _selectedFilterCategory = 'all_tasks';
 
   @override
   void initState() {
@@ -140,7 +141,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ⚡ NOKTA VE BOŞLUK FARKLARINI YOK SAYAN TEMİZLİK METODU
   static String _normalizeCategory(String text) {
     return text.replaceAll('.', '').trim().toLowerCase();
   }
@@ -164,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: AppBar(
               title: Text(
-                'Rutin & Alışkanlık Takibi',
+                context.tr('app_title'),
                 style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
               ),
               centerTitle: true,
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
               actions: [
                 IconButton(
                   icon: Icon(Icons.settings_outlined, color: textColor),
-                  tooltip: 'Ayarlar',
+                  tooltip: context.tr('settings'),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -194,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
             valueListenable: _habitsBox.listenable(),
             builder: (context, box, _) {
               final habits = box.values.where((h) {
-                if (_selectedFilterCategory == 'Tüm Görevler') return true;
+                if (_selectedFilterCategory == 'all_tasks') return true;
                 return _normalizeCategory(h.category) ==
                     _normalizeCategory(_selectedFilterCategory);
               }).toList();
@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: habits.isEmpty
                         ? Center(
                             child: Text(
-                              'Bu kategoride henüz görev yok!\nAşağıdaki butonla yeni görev ekleyebilirsin.',
+                              context.tr('no_tasks_in_category'),
                               textAlign: TextAlign.center,
                               style: TextStyle(color: subtextColor),
                             ),
@@ -253,9 +253,9 @@ class _HomeScreenState extends State<HomeScreen> {
             foregroundColor: Colors.white,
             elevation: 4,
             icon: const Icon(Icons.add),
-            label: const Text(
-              'Yeni Görev',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            label: Text(
+              context.tr('new_task'),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         );

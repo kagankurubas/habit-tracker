@@ -39,7 +39,7 @@ class ThemeService {
           valueListenable: currentColor,
           builder: (context, activeColor, _) {
             return SafeArea(
-              // 📌 Alttaki sistem tuşlarıyla çakışmayı önlemek için eklendi
+              // 📌 Added to prevent collision with system navigation buttons
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../models/habit.dart';
 import '../services/notification_service.dart';
 import '../services/theme_service.dart';
 import '../app_themes.dart';
 import 'badge_unlocked_dialog.dart';
+import '../services/badge_service.dart';
 
 class HabitTile extends StatelessWidget {
   final Habit habit;
@@ -25,21 +27,28 @@ class HabitTile extends StatelessWidget {
     required this.onTap,
   });
 
-  // ⚡ TIKLAMA HAPTIK, SES VE VERİ GÜNCELLEME İŞLEMİ
   Future<void> _handleToggle(BuildContext context, Habit currentHabit) async {
     final now = DateTime.now();
     final todayNormalized = DateTime(now.year, now.month, now.day);
+
     final willComplete = !currentHabit.isCompletedOn(todayNormalized);
 
-    final bool isSettingsOpen = Hive.isBoxOpen('settings');
-    final Box? settingsBox = isSettingsOpen ? Hive.box('settings') : null;
-    final bool isSoundEnabled =
+    final isSettingsOpen = Hive.isBoxOpen('settings');
+    final Box<dynamic>? settingsBox = isSettingsOpen
+        ? Hive.box<dynamic>('settings')
+        : null;
+
+    final isSoundEnabled =
         settingsBox?.get('isSoundEnabled', defaultValue: true) ?? true;
-    final bool isHapticEnabled =
+
+    final isHapticEnabled =
         settingsBox?.get('isHapticEnabled', defaultValue: true) ?? true;
 
     if (willComplete) {
-      if (isHapticEnabled) HapticFeedback.mediumImpact();
+      if (isHapticEnabled) {
+        HapticFeedback.mediumImpact();
+      }
+
       if (isSoundEnabled) {
         try {
           await _audioPlayer.stop();
@@ -50,7 +59,8 @@ class HabitTile extends StatelessWidget {
       HapticFeedback.lightImpact();
     }
 
-    currentHabit.toggleDate(todayNormalized);
+    // Gerçek saat korunarak tamamlanır.
+    currentHabit.toggleDate(now);
 
     if (currentHabit.key != null) {
       await habitsBox.put(currentHabit.key, currentHabit);
@@ -58,86 +68,126 @@ class HabitTile extends StatelessWidget {
       await habitsBox.putAt(index, currentHabit);
     }
 
-    if (willComplete && context.mounted) {
-      _checkBadgeUnlocked(context);
+    if (!willComplete || !context.mounted) {
+      return;
     }
+
+    await _checkBadgeUnlocked(context, currentHabit);
   }
 
-  // 🏆 ROZET KONTROLÜ VE SIRALI POP-UP GÖSTERİMİ
-  void _checkBadgeUnlocked(BuildContext context) async {
-    final int streak = habit.currentStreak;
-    final int totalCompletions = habitsBox.values.fold(
+  Future<void> _checkBadgeUnlocked(
+    BuildContext context,
+    Habit completedHabit,
+  ) async {
+    final streak = completedHabit.currentStreak;
+
+    final totalCompletions = habitsBox.values.fold<int>(
       0,
-      (sum, h) => sum + h.completedDatesList.length,
+      (sum, habit) => sum + habit.completedDatesList.length,
     );
 
     final now = DateTime.now();
     final todayNormalized = DateTime(now.year, now.month, now.day);
+
     final allHabits = habitsBox.values.toList();
+
     final todayTargets = allHabits
-        .where((h) => h.isTargetDate(todayNormalized))
+        .where((habit) => habit.isTargetDate(todayNormalized))
         .toList();
+
     final isPerfectDay =
         todayTargets.length >= 3 &&
-        todayTargets.every((h) => h.isCompletedOn(todayNormalized));
+        todayTargets.every((habit) => habit.isCompletedOn(todayNormalized));
 
-    final List<Map<String, dynamic>> badges = [];
+    // Çevirileri herhangi bir async boşluktan önce alıyoruz.
+    final firstStepTitle = context.tr('First Step');
+    final firstStepDescription = context.tr('first_step_desc');
 
-    if (totalCompletions == 1) {
+    final perfectDayTitle = context.tr('Perfect Day');
+    final perfectDayDescription = context.tr('perfect_day_desc');
+
+    final streak3Title = context.tr('On Fire');
+    final streak3Description = context.tr('on_fire_desc');
+
+    final streak7Title = context.tr('Willpower Master');
+    final streak7Description = context.tr('willpower_master_desc');
+
+    final streak30Title = context.tr('habit_monster_title');
+    final streak30Description = context.tr('habit_monster_desc');
+
+    final completion50Title = context.tr('Legend');
+    final completion50Description = context.tr('legend_desc');
+
+    final badges = <Map<String, dynamic>>[];
+
+    final settingsBox = Hive.box<dynamic>('settings');
+
+    Future<bool> shouldShow(String badgeId) {
+      return BadgeService.claimIfNew(settingsBox, badgeId);
+    }
+
+    if (totalCompletions == 1 && await shouldShow('first_step')) {
       badges.add({
-        'title': 'İlk Adım',
-        'desc': 'İlk rutinini başarıyla tamamladın!',
+        'title': firstStepTitle,
+        'desc': firstStepDescription,
         'imagePath': 'assets/badges/first_step.png',
         'color': const Color(0xFF10B981),
       });
     }
-    if (isPerfectDay) {
+
+    if (isPerfectDay && await shouldShow('perfect_day')) {
       badges.add({
-        'title': 'Mükemmel Gün',
-        'desc': 'Bugünkü tüm hedefleri eksiksiz tamamladın!',
+        'title': perfectDayTitle,
+        'desc': perfectDayDescription,
         'imagePath': 'assets/badges/perfect_day.png',
         'color': const Color(0xFFF59E0B),
       });
     }
-    if (streak == 3) {
+
+    if (streak == 3 && await shouldShow('streak_3')) {
       badges.add({
-        'title': 'Alev Alev',
-        'desc': '3 gün üst üste harika seri!',
+        'title': streak3Title,
+        'desc': streak3Description,
         'imagePath': 'assets/badges/streak_3.png',
         'color': const Color(0xFF3B82F6),
       });
-    } else if (streak == 7) {
+    } else if (streak == 7 && await shouldShow('streak_7')) {
       badges.add({
-        'title': 'İrade Ustası',
-        'desc': 'Aralıksız 1 hafta disiplin!',
+        'title': streak7Title,
+        'desc': streak7Description,
         'imagePath': 'assets/badges/streak_7.png',
         'color': const Color(0xFF8B5CF6),
       });
-    } else if (streak == 30) {
+    } else if (streak == 30 && await shouldShow('streak_30')) {
       badges.add({
-        'title': 'Alışkanlık Canavarı',
-        'desc': 'Tam 30 günlük efsane seri!',
+        'title': streak30Title,
+        'desc': streak30Description,
         'imagePath': 'assets/badges/completion_50.png',
         'color': const Color(0xFFEC4899),
       });
-    } else if (totalCompletions == 50) {
+    }
+
+    if (totalCompletions == 50 && await shouldShow('completion_50')) {
       badges.add({
-        'title': 'Efsane',
-        'desc': 'Toplamda 50 kez tamamladın!',
+        'title': completion50Title,
+        'desc': completion50Description,
         'imagePath': 'assets/badges/completion_50.png',
         'color': const Color(0xFFF59E0B),
       });
     }
 
-    for (final b in badges) {
-      if (!context.mounted) return;
-      await showDialog(
+    for (final badge in badges) {
+      if (!context.mounted) {
+        return;
+      }
+
+      await showDialog<void>(
         context: context,
         builder: (_) => BadgeUnlockedDialog(
-          badgeTitle: b['title'],
-          badgeDescription: b['desc'],
-          imagePath: b['imagePath'],
-          badgeColor: b['color'],
+          badgeTitle: badge['title'] as String,
+          badgeDescription: badge['desc'] as String,
+          imagePath: badge['imagePath'] as String,
+          badgeColor: badge['color'] as Color,
         ),
       );
     }
@@ -309,7 +359,7 @@ class _TitleAndCategory extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
-            habit.category,
+            context.tr(habit.category),
             style: TextStyle(fontSize: 9, color: subtextColor),
           ),
         ),
@@ -364,7 +414,7 @@ class _SubtitleProgress extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        'Son 30 Gün',
+                        context.tr('last_30_days'),
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 10, color: subtextColor),
                       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../services/share_service.dart';
 
 class BadgeUnlockedDialog extends StatelessWidget {
@@ -7,7 +8,6 @@ class BadgeUnlockedDialog extends StatelessWidget {
   final String imagePath;
   final Color badgeColor;
 
-  // ⚡ GlobalKey build metodu dışına alınarak re-render esnasında kaybolması önlendi
   final GlobalKey _shareKey = GlobalKey();
 
   BadgeUnlockedDialog({
@@ -30,7 +30,6 @@ class BadgeUnlockedDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // 📸 KAREMSİ PAYLAŞILABİLİR KART ALANI
               RepaintBoundary(
                 key: _shareKey,
                 child: Container(
@@ -50,7 +49,6 @@ class BadgeUnlockedDialog extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // ✨ DOLGUN BÜYÜKLÜKTE ROZET GÖRSELİ
                       SizedBox(
                         height: 280,
                         width: 280,
@@ -66,10 +64,9 @@ class BadgeUnlockedDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
 
-                      // ÜST KÜÇÜK BAŞLIK
-                      const Text(
-                        '🎉 YENİ BAŞARIM!',
-                        style: TextStyle(
+                      Text(
+                        context.tr('new_achievement'),
+                        style: const TextStyle(
                           color: Color(0xFFA5B4FC),
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -78,9 +75,8 @@ class BadgeUnlockedDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
 
-                      // ROZET ADI
                       Text(
-                        badgeTitle,
+                        context.tr(badgeTitle),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white,
@@ -90,9 +86,8 @@ class BadgeUnlockedDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
 
-                      // AÇIKLAMA
                       Text(
-                        badgeDescription,
+                        context.tr(badgeDescription),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white70,
@@ -106,12 +101,11 @@ class BadgeUnlockedDialog extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // 🚀 BUTONLAR (HARİKA & PAYLAŞ)
+              // 🚀 BUTTONS (AWESOME & SHARE)
               SizedBox(
                 width: 320,
                 child: Row(
                   children: [
-                    // KAPAT / HARİKA BUTONU
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () => Navigator.pop(context),
@@ -124,24 +118,23 @@ class BadgeUnlockedDialog extends StatelessWidget {
                           ),
                           elevation: 0,
                         ),
-                        child: const Text(
-                          'Harika!',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        child: Text(
+                          context.tr('awesome'),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
 
-                    // ROZETİ PAYLAŞ BUTONU
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () async {
                           await ShareService.shareWidgetAsImage(_shareKey);
                         },
                         icon: const Icon(Icons.share_rounded, size: 18),
-                        label: const Text(
-                          'Paylaş',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        label: Text(
+                          context.tr('share'),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: badgeColor,

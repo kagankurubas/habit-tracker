@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class WeeklyPerformanceChart extends StatelessWidget {
   final List<double> last7DaysRatios;
@@ -22,7 +23,7 @@ class WeeklyPerformanceChart extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Haftalık Performans Grafiği',
+          context.tr('weekly_performance_chart'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -43,7 +44,6 @@ class WeeklyPerformanceChart extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: List.generate(7, (index) {
-                // ⚡ Liste uzunluğu güvenliği (RangeError önleme)
                 final ratio =
                     (index < last7DaysRatios.length
                             ? last7DaysRatios[index]

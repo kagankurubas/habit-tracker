@@ -28,7 +28,7 @@ class CategoryModel extends HiveObject {
     this.iconCodePoint = 0xe3af,
   });
 
-  // 🎨 İsme göre akıllı renk eşlemesi
+  // 🎨 Smart color matching by name
   Color get color {
     if (colorValue != 0xFF6366F1) return Color(colorValue);
 
@@ -51,7 +51,6 @@ class CategoryModel extends HiveObject {
     }
   }
 
-  // 🎭 İsme göre akıllı ikon eşlemesi
   IconData get iconData {
     switch (name.trim().toLowerCase()) {
       case 'genel':

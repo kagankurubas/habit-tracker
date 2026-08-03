@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/category_model.dart';
 import '../services/theme_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../app_themes.dart';
 import 'add_category_dialog.dart';
 
@@ -32,17 +33,20 @@ class CategoryFilterBar extends StatelessWidget {
             : const Color(0xFF1E293B),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          'Kategoriyi Sil',
+          context.tr('delete_category'),
           style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
         ),
         content: Text(
-          '"${category.name}" kategorisini silmek istediğinize emin misiniz?',
+          context.tr('delete_category_desc', args: [context.tr(category.name)]),
           style: TextStyle(color: subtextColor),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('İptal', style: TextStyle(color: subtextColor)),
+            child: Text(
+              context.tr('cancel'),
+              style: TextStyle(color: subtextColor),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
@@ -51,7 +55,10 @@ class CategoryFilterBar extends StatelessWidget {
               if (ctx.mounted) Navigator.pop(ctx);
               onCategorySelected('Tüm Görevler');
             },
-            child: const Text('Sil', style: TextStyle(color: Colors.white)),
+            child: Text(
+              context.tr('delete'),
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -86,21 +93,19 @@ class CategoryFilterBar extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: userCategories.length + 2,
                   itemBuilder: (context, index) {
-                    // 1. TÜM GÖREVLER ÇİPİ
                     if (index == 0) {
-                      final isSelected = selectedCategory == 'Tüm Görevler';
+                      final isSelected = selectedCategory == 'all_tasks';
                       return _buildChip(
                         context: context,
-                        label: 'Tüm Görevler',
+                        label: context.tr('all_tasks'),
                         iconData: Icons.stars_rounded,
                         chipColor: const Color(0xFF6366F1),
                         isSelected: isSelected,
                         isLight: isLight,
-                        onTap: () => onCategorySelected('Tüm Görevler'),
+                        onTap: () => onCategorySelected('all_tasks'),
                       );
                     }
 
-                    // 2. KATEGORİ EKLE BUTONU
                     if (index == 1) {
                       return Padding(
                         padding: const EdgeInsets.only(right: 8.0),
@@ -144,16 +149,16 @@ class CategoryFilterBar extends StatelessWidget {
                                 width: 1.5,
                               ),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.add,
                                   size: 16,
                                   color: Color(0xFF6366F1),
                                 ),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 4),
                                 Text(
-                                  'Ekle',
+                                  context.tr('add_category_btn'),
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -167,13 +172,12 @@ class CategoryFilterBar extends StatelessWidget {
                       );
                     }
 
-                    // 3. DİNAMİK KATEGORİ ÇİPLERİ
                     final category = userCategories[index - 2];
                     final isSelected = selectedCategory == category.name;
 
                     return _buildChip(
                       context: context,
-                      label: category.name,
+                      label: context.tr(category.name),
                       iconData: category.iconData,
                       chipColor: category.color,
                       isSelected: isSelected,
