@@ -5,6 +5,7 @@ import '../models/habit.dart';
 import '../models/category_model.dart';
 import '../services/backup_service.dart';
 import '../services/theme_service.dart';
+import '../services/notification_service.dart';
 import '../app_themes.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -52,13 +53,11 @@ class SettingsScreen extends StatelessWidget {
                   textColor: textColor,
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  decoration: BoxDecoration(
-                    color: cardColor,
+                Material(
+                  color: cardColor,
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: subtextColor.withValues(alpha: 0.15),
-                    ),
+                    side: BorderSide(color: subtextColor.withValues(alpha: 0.15)),
                   ),
                   child: ListTile(
                     leading: const Icon(
@@ -92,13 +91,11 @@ class SettingsScreen extends StatelessWidget {
                   textColor: textColor,
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  decoration: BoxDecoration(
-                    color: cardColor,
+                Material(
+                  color: cardColor,
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: subtextColor.withValues(alpha: 0.15),
-                    ),
+                    side: BorderSide(color: subtextColor.withValues(alpha: 0.15)),
                   ),
                   child: ListTile(
                     leading: const Icon(
@@ -383,6 +380,55 @@ class SettingsScreen extends StatelessWidget {
                         },
                       ),
                     ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 🔔 NOTIFICATION TEST
+                _SectionTitle(
+                  title: context.tr('notifications'),
+                  textColor: textColor,
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: subtextColor.withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.notifications_active_rounded,
+                      color: Color(0xFF6366F1),
+                    ),
+                    title: Text(
+                      context.tr('test_notification'),
+                      style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Text(
+                      context.tr('test_notification_desc'),
+                      style: TextStyle(color: subtextColor, fontSize: 12),
+                    ),
+                    trailing: const Icon(
+                      Icons.send_rounded,
+                      color: Colors.grey,
+                    ),
+                    onTap: () async {
+                      await NotificationService().showInstantTestNotification();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Test bildirimi tetiklendi!'),
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ),
 

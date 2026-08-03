@@ -43,8 +43,27 @@ class NotificationService {
     try {
       final currentTimeZone = await FlutterTimezone.getLocalTimezone();
       tz.setLocalLocation(tz.getLocation(currentTimeZone.toString()));
+      debugPrint('🔔 Bildirimler için Saat Dilimi ayarlandı: $currentTimeZone');
     } catch (e) {
-      tz.setLocalLocation(tz.getLocation('UTC'));
+      debugPrint('⚠️ Saat dilimi bulunamadı, ofset ile bulunmaya çalışılıyor. Hata: $e');
+      try {
+        final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds;
+        tz.Location? bestLocation;
+        for (final loc in tz.timeZoneDatabase.locations.values) {
+          if (loc.currentTimeZone.offset.inMilliseconds == offsetMs) {
+            bestLocation = loc;
+            break;
+          }
+        }
+        if (bestLocation != null) {
+          tz.setLocalLocation(bestLocation);
+          debugPrint('🔔 Ofset ile saat dilimi ayarlandı: ${bestLocation.name}');
+        } else {
+          tz.setLocalLocation(tz.getLocation('UTC'));
+        }
+      } catch (e2) {
+        tz.setLocalLocation(tz.getLocation('UTC'));
+      }
     }
 
     const androidSettings = AndroidInitializationSettings(
@@ -75,6 +94,8 @@ class NotificationService {
     if (androidImplementation != null) {
       final permissionGranted = await androidImplementation
           .requestNotificationsPermission();
+
+      await androidImplementation.requestExactAlarmsPermission();
 
       debugPrint(
         'Bildirim izni: ${permissionGranted == true ? "verildi" : "verilmedi"}',
@@ -169,18 +190,31 @@ class NotificationService {
     required tz.TZDateTime date,
     DateTimeComponents? repeatComponents,
   }) async {
-    await _notificationsPlugin.zonedSchedule(
-      id: id,
-      title: '🔥 ${habit.title}',
-      body: MotivationService.getRandomQuote(),
-      scheduledDate: date,
-      notificationDetails: _notificationDetails,
-
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-
-      matchDateTimeComponents: repeatComponents,
-      payload: habit.id,
-    );
+    try {
+      await _notificationsPlugin.zonedSchedule(
+        id: id,
+        title: '🔥 ${habit.title}',
+        body: MotivationService.getRandomQuote(),
+        scheduledDate: date,
+        notificationDetails: _notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: repeatComponents,
+        payload: habit.id,
+      );
+      debugPrint('✅ Bildirim başarıyla planlandı: ${habit.title} -> $date');
+    } catch (e) {
+      debugPrint('⚠️ Tam saatli bildirim kurulamadı, esnek saate geçiliyor. Hata: $e');
+      await _notificationsPlugin.zonedSchedule(
+        id: id,
+        title: '🔥 ${habit.title}',
+        body: MotivationService.getRandomQuote(),
+        scheduledDate: date,
+        notificationDetails: _notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        matchDateTimeComponents: repeatComponents,
+        payload: habit.id,
+      );
+    }
   }
 
   Future<void> scheduleHabitNotification(Habit habit) async {

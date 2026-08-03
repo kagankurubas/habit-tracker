@@ -76,7 +76,7 @@ class BadgeUnlockedDialog extends StatelessWidget {
                       const SizedBox(height: 6),
 
                       Text(
-                        context.tr(badgeTitle),
+                        badgeTitle,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white,
@@ -87,7 +87,7 @@ class BadgeUnlockedDialog extends StatelessWidget {
                       const SizedBox(height: 8),
 
                       Text(
-                        context.tr(badgeDescription),
+                        badgeDescription,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white70,
