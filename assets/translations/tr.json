@@ -197,6 +197,7 @@
   "stats": "İstatistik",
   "delete_category": "Kategoriyi Sil",
   "delete_category_desc": "\"{}\" kategorisini silmek istediğinize emin misiniz?",
+  "all_categories_deleted_desc": "Genel hariç tüm aktif kategoriler silindi.",
   "add_category_btn": "Ekle",
   "share_progress": "Gelişimini Paylaş 🚀",
   "share_as_image": "Görsel Olarak Paylaş",
