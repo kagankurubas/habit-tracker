@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ShareService {
-  // 🛠️ Nesne türetilmesini engeller
   ShareService._();
 
   static Future<void> shareWidgetAsImage(GlobalKey globalKey) async {
@@ -23,7 +23,6 @@ class ShareService {
 
       final pngBytes = byteData.buffer.asUint8List();
 
-      // 🌐 WEB ORTAMI KONTROLÜ
       if (kIsWeb) {
         final xFile = XFile.fromData(
           pngBytes,
@@ -32,13 +31,9 @@ class ShareService {
         );
 
         await SharePlus.instance.share(
-          ShareParams(
-            files: [xFile],
-            text: 'İşte benim rutin ve alışkanlık gelişimim! 🔥🚀',
-          ),
+          ShareParams(files: [xFile], text: 'share_routine_text'.tr()),
         );
       } else {
-        // 📱 MOBİL / MASAÜSTÜ ORTAMI
         final tempDir = await getTemporaryDirectory();
         final file = await File(
           '${tempDir.path}/my_routine_stats.png',
@@ -48,10 +43,7 @@ class ShareService {
         final xFile = XFile(file.path);
 
         await SharePlus.instance.share(
-          ShareParams(
-            files: [xFile],
-            text: 'İşte benim rutin ve alışkanlık gelişimim! 🔥🚀',
-          ),
+          ShareParams(files: [xFile], text: 'share_routine_text'.tr()),
         );
       }
     } catch (e) {

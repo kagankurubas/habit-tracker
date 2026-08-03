@@ -49,6 +49,8 @@ dependencies:
   audioplayers: ^6.0.0
   fl_chart: ^1.2.0
   path_provider: ^2.1.6
+  easy_localization: ^3.0.8
+  flutter_timezone: ^5.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -76,6 +78,7 @@ flutter:
   assets:
     - assets/badges/
     - assets/sounds/complete.mp3
+    - assets/translations/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

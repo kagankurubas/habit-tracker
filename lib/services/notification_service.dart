@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -20,26 +22,30 @@ class NotificationService {
       ValueNotifier<String?>(null);
 
   static const String _channelId = 'habit_reminders';
-  static const String _channelName = 'Rutin Hatırlatıcıları';
 
-  static const NotificationDetails _notificationDetails = NotificationDetails(
+  static NotificationDetails get _notificationDetails => NotificationDetails(
     android: AndroidNotificationDetails(
       _channelId,
-      _channelName,
-      channelDescription: 'Alışkanlıklarınızı hatırlatan bildirimler',
+      'notification_channel_name'.tr(),
+      channelDescription: 'notification_channel_desc'.tr(),
       importance: Importance.max,
       priority: Priority.high,
       playSound: true,
       enableVibration: true,
     ),
-    iOS: DarwinNotificationDetails(),
+    iOS: const DarwinNotificationDetails(),
   );
 
   Future<void> init() async {
     if (kIsWeb) return;
 
     tz.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
+    try {
+      final currentTimeZone = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(currentTimeZone.toString()));
+    } catch (e) {
+      tz.setLocalLocation(tz.getLocation('UTC'));
+    }
 
     const androidSettings = AndroidInitializationSettings(
       '@mipmap/ic_launcher',
@@ -106,7 +112,7 @@ class NotificationService {
 
     await _notificationsPlugin.show(
       id: 999,
-      title: '🧪 HABITTO Test Bildirimi',
+      title: 'test_notification_title'.tr(),
       body: MotivationService.getRandomQuote(),
       notificationDetails: _notificationDetails,
     );
@@ -124,7 +130,6 @@ class NotificationService {
       }
     }
 
-    // Eski sürümde oluşturulmuş bildirimleri de temizle.
     await _notificationsPlugin.cancel(id: habit.id.hashCode.abs());
 
     for (int weekday = 1; weekday <= 7; weekday++) {
@@ -171,8 +176,6 @@ class NotificationService {
       scheduledDate: date,
       notificationDetails: _notificationDetails,
 
-      // Habit tracker için tam saniye hassasiyeti gerekmiyor.
-      // Böylece özel exact-alarm iznine bağımlı kalmıyoruz.
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
 
       matchDateTimeComponents: repeatComponents,
@@ -197,7 +200,6 @@ class NotificationService {
     );
 
     switch (habit.frequencyType) {
-      // Her gün
       case 0:
         await _scheduleNotification(
           habit: habit,
@@ -207,7 +209,6 @@ class NotificationService {
         );
         break;
 
-      // Hafta içi
       case 1:
         await _scheduleWeeklyNotifications(habit, initialDate, const [
           1,
@@ -218,17 +219,14 @@ class NotificationService {
         ]);
         break;
 
-      // Hafta sonu
       case 2:
         await _scheduleWeeklyNotifications(habit, initialDate, const [6, 7]);
         break;
 
-      // X günde bir
       case 3:
         await _scheduleIntervalNotifications(habit, initialDate);
         break;
 
-      // Haftanın belirli günleri
       case 4:
         await _scheduleWeeklyNotifications(
           habit,
@@ -280,7 +278,6 @@ class NotificationService {
     int scheduledCount = 0;
     int scannedDays = 0;
 
-    // Önümüzdeki 30 uygun tarihi zamanla.
     while (scheduledCount < 30 && scannedDays < 365) {
       final normalDate = DateTime(
         candidateDate.year,

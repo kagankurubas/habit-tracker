@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // 📌 Panoya kopyalama için eklendi
+import 'package:flutter/services.dart'; // 📌 Added for clipboard copy
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/habit.dart';
 import '../models/category_model.dart';
 import '../services/backup_service.dart';
 import '../services/theme_service.dart';
 import '../app_themes.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SettingsScreen extends StatelessWidget {
   final Box<Habit> habitsBox;
@@ -32,7 +33,7 @@ class SettingsScreen extends StatelessWidget {
           backgroundColor: bgColor,
           appBar: AppBar(
             title: Text(
-              'Ayarlar',
+              'settings'.tr(),
               style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
             ),
             backgroundColor: Colors.transparent,
@@ -45,8 +46,8 @@ class SettingsScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
               children: [
-                // 🎨 GÖRÜNÜM & TEMA SEKSİYONU
-                _SectionTitle(title: 'Görünüm', textColor: textColor),
+                // 🎨 APPEARANCE & THEME SECTION
+                _SectionTitle(title: 'appearance'.tr(), textColor: textColor),
                 const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
@@ -62,14 +63,14 @@ class SettingsScreen extends StatelessWidget {
                       color: Color(0xFF6366F1),
                     ),
                     title: Text(
-                      'Tema Rengi',
+                      'theme_color'.tr(),
                       style: TextStyle(
                         color: textColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     subtitle: Text(
-                      'Uygulama renk paletini kişiselleştir',
+                      'customize_color_palette'.tr(),
                       style: TextStyle(color: subtextColor, fontSize: 12),
                     ),
                     trailing: const Icon(
@@ -82,9 +83,100 @@ class SettingsScreen extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                // 🔊 SES & GERİ BİLDİRİM SEKSİYONU
+                // 🌍 LANGUAGE SECTION
+                _SectionTitle(title: 'language'.tr(), textColor: textColor),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: subtextColor.withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.language_rounded,
+                      color: Color(0xFF6366F1),
+                    ),
+                    title: Text(
+                      'language'.tr(),
+                      style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: textColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<Locale>(
+                          value: context.locale,
+                          focusColor: Colors.transparent,
+                          icon: Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Icon(
+                              Icons.expand_more_rounded,
+                              color: subtextColor,
+                            ),
+                          ),
+                          dropdownColor: AppThemes.isLightBackground(bgColor)
+                              ? Colors.white
+                              : const Color(0xFF1E293B),
+                          borderRadius: BorderRadius.circular(12),
+                          elevation: 6,
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            fontFamily: 'Poppins',
+                          ),
+                          onChanged: (Locale? newLocale) {
+                            if (newLocale != null) {
+                              context.setLocale(newLocale);
+                            }
+                          },
+                          items: const [
+                            DropdownMenuItem(
+                              value: Locale('en'),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('🇬🇧', style: TextStyle(fontSize: 16)),
+                                  SizedBox(width: 8),
+                                  Text('English'),
+                                ],
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: Locale('tr'),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('🇹🇷', style: TextStyle(fontSize: 16)),
+                                  SizedBox(width: 8),
+                                  Text('Türkçe'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 🔊 SOUND & FEEDBACK SECTION
                 _SectionTitle(
-                  title: 'Ses & Geri Bildirim',
+                  title: 'sound_feedback'.tr(),
                   textColor: textColor,
                 ),
                 const SizedBox(height: 8),
@@ -110,7 +202,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       child: Column(
                         children: [
-                          // 🔊 Ses Efekti Switch
+                          // 🔊 Sound Effect Switch
                           SwitchListTile(
                             activeThumbColor: const Color(0xFF6366F1),
                             secondary: const Icon(
@@ -118,14 +210,14 @@ class SettingsScreen extends StatelessWidget {
                               color: Color(0xFF6366F1),
                             ),
                             title: Text(
-                              'Ses Efektleri',
+                              'sound_effects'.tr(),
                               style: TextStyle(
                                 color: textColor,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             subtitle: Text(
-                              'Görev tamamlandığında tamamlama sesi çalar',
+                              'sound_effects_desc'.tr(),
                               style: TextStyle(
                                 color: subtextColor,
                                 fontSize: 12,
@@ -141,7 +233,7 @@ class SettingsScreen extends StatelessWidget {
                             color: subtextColor.withValues(alpha: 0.1),
                           ),
 
-                          // 📳 Haptik Titreşim Switch
+                          // 📳 Haptic Vibration Switch
                           SwitchListTile(
                             activeThumbColor: const Color(0xFF6366F1),
                             secondary: const Icon(
@@ -149,14 +241,14 @@ class SettingsScreen extends StatelessWidget {
                               color: Color(0xFF10B981),
                             ),
                             title: Text(
-                              'Haptik Titreşim',
+                              'haptic_feedback'.tr(),
                               style: TextStyle(
                                 color: textColor,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             subtitle: Text(
-                              'Dokunma anında fiziksel titreşim hissi verir',
+                              'haptic_feedback_desc'.tr(),
                               style: TextStyle(
                                 color: subtextColor,
                                 fontSize: 12,
@@ -175,8 +267,8 @@ class SettingsScreen extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                // 💾 VERİ & YEDEKLEME SEKSİYONU
-                _SectionTitle(title: 'Veri & Yedekleme', textColor: textColor),
+                // 💾 DATA & BACKUP SECTION
+                _SectionTitle(title: 'data_backup'.tr(), textColor: textColor),
                 const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
@@ -188,21 +280,21 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      // 📤 Dışa Aktar (Export)
+                      // 📤 Export Backup
                       ListTile(
                         leading: const Icon(
                           Icons.upload_file_rounded,
                           color: Color(0xFF6366F1),
                         ),
                         title: Text(
-                          'Yedek Oluştur (JSON Dışa Aktar)',
+                          'create_backup'.tr(),
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         subtitle: Text(
-                          'Tüm alışkanlık ve kategori verilerini dosya olarak kaydet',
+                          'create_backup_desc'.tr(),
                           style: TextStyle(color: subtextColor, fontSize: 12),
                         ),
                         onTap: () async {
@@ -213,15 +305,17 @@ class SettingsScreen extends StatelessWidget {
                             );
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Yedek dosyası hazırlandı! 🎉'),
-                                ),
+                                SnackBar(content: Text('backup_ready'.tr())),
                               );
                             }
                           } catch (e) {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Yedekleme hatası: $e')),
+                                SnackBar(
+                                  content: Text(
+                                    'backup_error'.tr(args: [e.toString()]),
+                                  ),
+                                ),
                               );
                             }
                           }
@@ -232,21 +326,21 @@ class SettingsScreen extends StatelessWidget {
                         color: subtextColor.withValues(alpha: 0.1),
                       ),
 
-                      // 📥 İçe Aktar (Import)
+                      // 📥 Import Backup
                       ListTile(
                         leading: const Icon(
                           Icons.download_for_offline_rounded,
                           color: Color(0xFF10B981),
                         ),
                         title: Text(
-                          'Yedekten Geri Yükle (JSON İçe Aktar)',
+                          'restore_backup'.tr(),
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         subtitle: Text(
-                          'Önceden aldığın .json yedek dosyasını yükle',
+                          'restore_backup_desc'.tr(),
                           style: TextStyle(color: subtextColor, fontSize: 12),
                         ),
                         onTap: () async {
@@ -258,18 +352,12 @@ class SettingsScreen extends StatelessWidget {
                           if (context.mounted) {
                             if (success) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Veriler başarıyla yüklendi! 🚀',
-                                  ),
-                                ),
+                                SnackBar(content: Text('data_restored'.tr())),
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'İçe aktarma iptal edildi veya dosya geçersiz.',
-                                  ),
+                                SnackBar(
+                                  content: Text('restore_cancelled'.tr()),
                                 ),
                               );
                             }
@@ -282,8 +370,8 @@ class SettingsScreen extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                // ℹ️ UYGULAMA BİLGİSİ & GİTHUB
-                _SectionTitle(title: 'Hakkında', textColor: textColor),
+                // ℹ️ APP INFO & GITHUB
+                _SectionTitle(title: 'about'.tr(), textColor: textColor),
                 const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
@@ -308,7 +396,7 @@ class SettingsScreen extends StatelessWidget {
                           ),
                         ),
                         subtitle: Text(
-                          'Sürüm 1.0.0',
+                          '${'version'.tr()} 1.0.0',
                           style: TextStyle(color: subtextColor, fontSize: 12),
                         ),
                       ),
@@ -322,7 +410,7 @@ class SettingsScreen extends StatelessWidget {
                           color: Color(0xFF6366F1),
                         ),
                         title: Text(
-                          'GitHub Kaynak Kodu',
+                          'github_source_code'.tr(),
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.w600,
@@ -346,11 +434,7 @@ class SettingsScreen extends StatelessWidget {
                           );
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'GitHub bağlantısı kopyalandı! 📋',
-                                ),
-                              ),
+                              SnackBar(content: Text('github_copied'.tr())),
                             );
                           }
                         },
@@ -367,7 +451,6 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-// 🛠️ BAŞLIK WIDGET'I
 class _SectionTitle extends StatelessWidget {
   final String title;
   final Color textColor;

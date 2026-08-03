@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/habit.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SmartInsightCard extends StatelessWidget {
   final List<Habit> habits;
@@ -8,13 +9,13 @@ class SmartInsightCard extends StatelessWidget {
   final Color subtextColor;
 
   static const Map<int, String> _dayNames = {
-    1: 'Pazartesi',
-    2: 'Salı',
-    3: 'Çarşamba',
-    4: 'Perşembe',
-    5: 'Cuma',
-    6: 'Cumartesi',
-    7: 'Pazar',
+    1: 'mon',
+    2: 'tue',
+    3: 'wed',
+    4: 'thu',
+    5: 'fri',
+    6: 'sat',
+    7: 'sun',
   };
 
   const SmartInsightCard({
@@ -33,7 +34,6 @@ class SmartInsightCard extends StatelessWidget {
     final Map<int, int> completedPerDay = {for (var i = 1; i <= 7; i++) i: 0};
     final Map<int, int> targetPerDay = {for (var i = 1; i <= 7; i++) i: 0};
 
-    // Son 28 günün analizi
     for (int i = 0; i < 28; i++) {
       final date = todayNormalized.subtract(Duration(days: i));
       final weekday = date.weekday;
@@ -71,23 +71,24 @@ class SmartInsightCard extends StatelessWidget {
     }
 
     String emoji = '💡';
-    String message =
-        'Verilerinizi analiz ediyoruz. Rutinlerinizi aksatmadan tamamlamaya devam edin!';
+    String message = 'analyzing_data_msg'.tr();
     Color accentColor = const Color(0xFF6366F1);
 
     if (worstDay != null && lowestRate < 60) {
-      final dayName = _dayNames[worstDay] ?? '';
+      final dayName = _dayNames[worstDay]?.tr() ?? '';
       final dropPercent = (100 - lowestRate).toInt();
       emoji = '⚠️';
       accentColor = Colors.orangeAccent;
-      message =
-          '$dayName günleri alışkanlıklarını %$dropPercent oranında aksatıyorsun! Bugünlere biraz daha odaklanmaya ne dersin?';
+      message = 'bad_performance_msg'.tr(
+        args: [dropPercent.toString(), dayName],
+      );
     } else if (bestDay != null && highestRate >= 80) {
-      final dayName = _dayNames[bestDay] ?? '';
+      final dayName = _dayNames[bestDay]?.tr() ?? '';
       emoji = '⚡';
       accentColor = const Color(0xFF10B981);
-      message =
-          'Süper performans! En verimli günün %${highestRate.toInt()} başarı oranıyla $dayName.';
+      message = 'super_performance_msg'.tr(
+        args: [highestRate.toInt().toString(), dayName],
+      );
     }
 
     return Container(
@@ -116,7 +117,7 @@ class SmartInsightCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Akıllı Rutin Analizi',
+                  'smart_insight'.tr(),
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,

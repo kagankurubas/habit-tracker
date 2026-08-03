@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../models/habit.dart';
 
 class ShareStatsCard extends StatelessWidget {
@@ -13,7 +14,6 @@ class ShareStatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ⚡ Toplam tamamlama ve en iyi seriyi tek geçişte hesaplama
     final totalCompletions = habits.fold<int>(
       0,
       (sum, h) => sum + h.completedDatesList.length,
@@ -53,28 +53,33 @@ class ShareStatsCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ÜST BAŞLIK & LOGO
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
-                  children: [
-                    Icon(
-                      Icons.auto_awesome_rounded,
-                      color: Color(0xFFA5B4FC),
-                      size: 24,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Rutin Takibi',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                Expanded(
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.auto_awesome_rounded,
+                        color: Color(0xFFA5B4FC),
+                        size: 24,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'routine_tracking'.tr(),
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -84,8 +89,8 @@ class ShareStatsCard extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    'İstikrar Raporu',
+                  child: Text(
+                    'consistency_report'.tr(),
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 11,
@@ -97,12 +102,11 @@ class ShareStatsCard extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // ANA SERİ VURGUSU
             Center(
               child: Column(
                 children: [
-                  const Text(
-                    '🔥 En Uzun Seri',
+                  Text(
+                    '🔥 ${'longest_streak_title'.tr()}',
                     style: TextStyle(
                       color: Color(0xFFC7D2FE),
                       fontSize: 13,
@@ -111,7 +115,7 @@ class ShareStatsCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '$maxStreak Gün',
+                    'x_days'.tr(args: [maxStreak.toString()]),
                     style: const TextStyle(
                       color: Colors.amberAccent,
                       fontSize: 38,
@@ -135,7 +139,6 @@ class ShareStatsCard extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // İKİLİ METRİK KUTULARI
             Row(
               children: [
                 Expanded(
@@ -151,13 +154,13 @@ class ShareStatsCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Toplam Tamamlama',
+                        Text(
+                          'total_completions'.tr(),
                           style: TextStyle(color: Colors.white60, fontSize: 10),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '$totalCompletions Kez',
+                          'x_times'.tr(args: [totalCompletions.toString()]),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -182,13 +185,13 @@ class ShareStatsCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Aktif Rutinler',
+                        Text(
+                          'active_routines'.tr(),
                           style: TextStyle(color: Colors.white60, fontSize: 10),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${habits.length} Rutin',
+                          'x_routines'.tr(args: [habits.length.toString()]),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -203,10 +206,9 @@ class ShareStatsCard extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // ALT MOTİVASYON NOTU
             Center(
               child: Text(
-                'Küçük adımlar, büyük zaferler doğurur!',
+                'share_motto'.tr(),
                 style: TextStyle(
                   color: Colors.indigo.shade100,
                   fontSize: 11,

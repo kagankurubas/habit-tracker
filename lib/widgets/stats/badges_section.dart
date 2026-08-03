@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/habit.dart';
 import '../../models/badge_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class BadgesSection extends StatefulWidget {
   final List<Habit> habits;
@@ -21,10 +22,10 @@ class BadgesSection extends StatefulWidget {
 }
 
 class _BadgesSectionState extends State<BadgesSection> {
-  String _selectedBadgeCategory = 'Tüm Rozetler';
+  String _selectedBadgeCategory = 'all_badges';
 
-  static const List<String> _badgeCategories = [
-    'Tüm Rozetler',
+  static List<String> get _badgeCategories => [
+    'all_badges',
     'Genel',
     'Kodlama',
     'Müzik',
@@ -34,21 +35,19 @@ class _BadgesSectionState extends State<BadgesSection> {
     'Gizli',
   ];
 
-  // ⚡ KATEGORİ TEMİZLEME (Boşluk / Nokta Toleransı)
   static String _normalizeCategory(String text) {
     return text.replaceAll('.', '').trim().toLowerCase();
   }
 
   @override
   Widget build(BuildContext context) {
-    final filteredBadges = _selectedBadgeCategory == 'Tüm Rozetler'
+    final filteredBadges = _selectedBadgeCategory == 'all_badges'
         ? allBadges
         : allBadges.where((b) {
             return _normalizeCategory(b.category) ==
                 _normalizeCategory(_selectedBadgeCategory);
           }).toList();
 
-    // ⚡ OPTİMİZE EDİLDİ: isUnlocked kontrolü her karşılaştırma için tekrar çalışmasın diye Map ile önceden hesaplanır
     final unlockedStatus = {
       for (final badge in filteredBadges)
         badge.id: badge.isUnlocked(widget.habits),
@@ -67,7 +66,7 @@ class _BadgesSectionState extends State<BadgesSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Başarımlar & Rozetler 🏆',
+          'achievements_and_badges'.tr(),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -76,7 +75,6 @@ class _BadgesSectionState extends State<BadgesSection> {
         ),
         const SizedBox(height: 12),
 
-        // ROZET KATEGORİ FİLTRE ÇUBUĞU
         SizedBox(
           height: 38,
           child: ListView.builder(
@@ -89,7 +87,7 @@ class _BadgesSectionState extends State<BadgesSection> {
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: FilterChip(
-                  label: Text(cat),
+                  label: Text(cat.tr()),
                   selected: isSelected,
                   selectedColor: const Color(0xFF6366F1),
                   backgroundColor: widget.cardColor,
@@ -113,7 +111,6 @@ class _BadgesSectionState extends State<BadgesSection> {
         ),
         const SizedBox(height: 16),
 
-        // ROZET GRID LISTESİ
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -130,13 +127,12 @@ class _BadgesSectionState extends State<BadgesSection> {
             final isHiddenCategory =
                 _normalizeCategory(badge.category) == 'gizli';
 
-            // 🕵️ GİZLİ ROZET ADI MANTIGI
             final displayTitle = (isHiddenCategory && !unlocked)
                 ? '???'
-                : badge.title;
+                : badge.title.tr();
             final displayDesc = (isHiddenCategory && !unlocked)
-                ? 'Bu sürpriz ve gizli bir rozettir! Doğru zamanda kendiliğinden açılacak.'
-                : badge.description;
+                ? 'hidden_badge_desc'.tr()
+                : badge.description.tr();
 
             return GestureDetector(
               onTap: () {
@@ -227,7 +223,9 @@ class _BadgesSectionState extends State<BadgesSection> {
                                   ),
                                 ),
                                 child: Text(
-                                  unlocked ? 'Kazanıldı 🎉' : 'Kilitli 🔒',
+                                  unlocked
+                                      ? 'unlocked_badge'.tr()
+                                      : 'locked_badge'.tr(),
                                   style: TextStyle(
                                     color: unlocked
                                         ? Colors.greenAccent
@@ -249,7 +247,7 @@ class _BadgesSectionState extends State<BadgesSection> {
                                       vertical: 13,
                                     ),
                                   ),
-                                  child: const Text('Kapat'),
+                                  child: Text('close'.tr()),
                                 ),
                               ),
                             ],

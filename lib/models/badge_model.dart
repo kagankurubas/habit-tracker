@@ -18,7 +18,6 @@ class HabitBadge {
   });
 }
 
-// 🛠️ YARDIMCI METOTLAR (Kod tekrarını engeller ve performansı artırır)
 int _getTotalCompletions(List<Habit> habits) {
   return habits.fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
 }
@@ -29,9 +28,9 @@ int _getCategoryCompletions(List<Habit> habits, String category) {
       .fold<int>(0, (sum, h) => sum + h.completedDatesList.length);
 }
 
-// 🏆 TÜM ROZETLER VE AÇILMA ŞARTLARI
+// 🏆 ALL BADGES AND UNLOCK CONDITIONS
 final List<HabitBadge> allBadges = [
-  // 📌 1. GENEL ROZETLER
+  // 📌 1. GENERAL BADGES
   HabitBadge(
     id: 'first_step',
     title: 'İlk Adım',
@@ -98,7 +97,6 @@ final List<HabitBadge> allBadges = [
     },
   ),
 
-  // 💻 2. KODLAMA ROZETLERİ
   HabitBadge(
     id: 'code_first',
     title: 'Hello World',
@@ -126,7 +124,6 @@ final List<HabitBadge> allBadges = [
     isUnlocked: (habits) => _getCategoryCompletions(habits, 'Kodlama') >= 15,
   ),
 
-  // 🎸 3. MÜZİK ROZETLERİ
   HabitBadge(
     id: 'music_first',
     title: 'İlk Akor',
@@ -154,7 +151,6 @@ final List<HabitBadge> allBadges = [
     isUnlocked: (habits) => _getCategoryCompletions(habits, 'Müzik') >= 20,
   ),
 
-  // 🎮 4. OYUN DEV. ROZETLERİ
   HabitBadge(
     id: 'gamedev_builder',
     title: 'Dünya Mimarı',
@@ -174,7 +170,6 @@ final List<HabitBadge> allBadges = [
     isUnlocked: (habits) => _getCategoryCompletions(habits, 'Oyun Dev.') >= 10,
   ),
 
-  // 🏃 5. SPOR ROZETLERİ
   HabitBadge(
     id: 'sport_runner',
     title: 'Maratoncu',
@@ -192,7 +187,6 @@ final List<HabitBadge> allBadges = [
     isUnlocked: (habits) => _getCategoryCompletions(habits, 'Spor') >= 15,
   ),
 
-  // 📚 6. OKUMA ROZETLERİ
   HabitBadge(
     id: 'read_bookworm',
     title: 'Kitap Kurdu',
@@ -210,7 +204,6 @@ final List<HabitBadge> allBadges = [
     isUnlocked: (habits) => _getCategoryCompletions(habits, 'Okuma') >= 15,
   ),
 
-  // 🦉 7. GİZLİ BAŞARIMLAR
   HabitBadge(
     id: 'secret_early_bird',
     title: 'Erkenci Kuş',

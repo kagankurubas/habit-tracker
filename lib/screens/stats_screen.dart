@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/habit.dart';
 import '../services/theme_service.dart';
@@ -15,15 +16,14 @@ class StatsScreen extends StatelessWidget {
   final Box<Habit> habitsBox;
   final GlobalKey _shareCardKey = GlobalKey();
 
-  // ⚡ Static gün isimleri listesi (Bellek tasarrufu)
   static const List<String> _dayLabels = [
-    'Pzt',
-    'Sal',
-    'Çar',
-    'Per',
-    'Cum',
-    'Cmt',
-    'Paz',
+    'mon_short',
+    'tue_short',
+    'wed_short',
+    'thu_short',
+    'fri_short',
+    'sat_short',
+    'sun_short',
   ];
 
   StatsScreen({super.key, required this.habitsBox});
@@ -42,7 +42,7 @@ class StatsScreen extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         contentPadding: const EdgeInsets.all(16),
         title: Text(
-          'Gelişimini Paylaş 🚀',
+          'share_progress'.tr(),
           textAlign: TextAlign.center,
           style: TextStyle(
             color: textColor,
@@ -63,8 +63,8 @@ class StatsScreen extends StatelessWidget {
                   await ShareService.shareWidgetAsImage(_shareCardKey);
                 },
                 icon: const Icon(Icons.ios_share_rounded, size: 20),
-                label: const Text(
-                  'Görsel Olarak Paylaş',
+                label: Text(
+                  'share_as_image'.tr(),
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -96,7 +96,7 @@ class StatsScreen extends StatelessWidget {
           backgroundColor: bgColor,
           appBar: AppBar(
             title: Text(
-              'Genel İstatistikler & Başarı',
+              'general_stats_title'.tr(),
               style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
             ),
             backgroundColor: Colors.transparent,
@@ -104,7 +104,7 @@ class StatsScreen extends StatelessWidget {
             actions: [
               IconButton(
                 icon: Icon(Icons.share_outlined, color: textColor),
-                tooltip: 'İstatistikleri Paylaş',
+                tooltip: 'share_stats'.tr(),
                 onPressed: () {
                   final habits = habitsBox.values.toList();
                   if (habits.isNotEmpty) {
@@ -129,7 +129,7 @@ class StatsScreen extends StatelessWidget {
               if (habits.isEmpty) {
                 return Center(
                   child: Text(
-                    'Henüz veri yok.\nİstatistikleri görmek için birkaç görev ekleyin!',
+                    'no_stats_data'.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(color: subtextColor, fontSize: 16),
                   ),
@@ -153,7 +153,6 @@ class StatsScreen extends StatelessWidget {
                   ? (todayCompleted / todayTargets.length)
                   : 0.0;
 
-              // ⚡ Fold ile optimize edilmiş toplam tamamlama sayısı
               final int totalCompletions = habits.fold<int>(
                 0,
                 (sum, h) => sum + h.completedDatesList.length,
@@ -190,8 +189,8 @@ class StatsScreen extends StatelessWidget {
                     : 0.0;
                 last7DaysRatios.add(ratio);
 
-                final weekdayName = _dayLabels[checkDate.weekday - 1];
-                current7DaysLabels.add(i == 0 ? 'Bugün' : weekdayName);
+                final weekdayName = _dayLabels[checkDate.weekday - 1].tr();
+                current7DaysLabels.add(i == 0 ? 'today'.tr() : weekdayName);
               }
 
               return SingleChildScrollView(
@@ -199,7 +198,6 @@ class StatsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1. ÖZET METRİK KARTLARI GRID
                     GridView.count(
                       crossAxisCount: 2,
                       crossAxisSpacing: 12,
@@ -209,10 +207,14 @@ class StatsScreen extends StatelessWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         StatMetricCard(
-                          title: 'Bugünkü Başarı',
+                          title: 'todays_success'.tr(),
                           value: '%${(todayProgress * 100).toInt()}',
-                          subtitle:
-                              '${todayTargets.length} Görevden $todayCompleted Yapıldı',
+                          subtitle: 'tasks_completed_out_of'.tr(
+                            args: [
+                              todayTargets.length.toString(),
+                              todayCompleted.toString(),
+                            ],
+                          ),
                           icon: Icons.donut_large_rounded,
                           color: const Color(0xFF10B981),
                           cardColor: cardColor,
@@ -220,11 +222,13 @@ class StatsScreen extends StatelessWidget {
                           subtextColor: subtextColor,
                         ),
                         StatMetricCard(
-                          title: 'En Uzun Zincir',
-                          value: '🔥 $maxStreak Gün',
+                          title: 'longest_streak_title'.tr(),
+                          value: maxStreak > 0
+                              ? '🔥 ${'x_days'.tr(args: [maxStreak.toString()])}'
+                              : 'not_yet'.tr(),
                           subtitle: bestStreakHabit != null
                               ? bestStreakHabit.title
-                              : 'Henüz Yok',
+                              : 'not_yet'.tr(),
                           icon: Icons.local_fire_department_rounded,
                           color: const Color(0xFFF59E0B),
                           cardColor: cardColor,
@@ -232,9 +236,10 @@ class StatsScreen extends StatelessWidget {
                           subtextColor: subtextColor,
                         ),
                         StatMetricCard(
-                          title: 'Toplam Tamamlama',
-                          value: '$totalCompletions Kez',
-                          subtitle: 'Tüm Zamanlar',
+                          title: 'total_completions'.tr(),
+                          value: '$totalCompletions ${'x_times'.tr(args: [''])}'
+                              .trim(),
+                          subtitle: 'all_time'.tr(),
                           icon: Icons.task_alt_rounded,
                           color: const Color(0xFF3B82F6),
                           cardColor: cardColor,
@@ -242,9 +247,11 @@ class StatsScreen extends StatelessWidget {
                           subtextColor: subtextColor,
                         ),
                         StatMetricCard(
-                          title: 'Aktif Rutinler',
-                          value: '${habits.length} Rutin',
-                          subtitle: 'Takip Ediliyor',
+                          title: 'active_routines'.tr(),
+                          value:
+                              '${habits.length} ${'x_routines'.tr(args: [''])}'
+                                  .trim(),
+                          subtitle: 'being_tracked'.tr(),
                           icon: Icons.auto_awesome_rounded,
                           color: const Color(0xFF8B5CF6),
                           cardColor: cardColor,
@@ -255,7 +262,6 @@ class StatsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    // 2. AKILLI RUTİN ANALİZİ KARTI
                     SmartInsightCard(
                       habits: habits,
                       cardColor: cardColor,
@@ -265,7 +271,6 @@ class StatsScreen extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    // 3. HAFTALIK PERFORMANS GRAFİĞİ
                     WeeklyPerformanceChart(
                       last7DaysRatios: last7DaysRatios,
                       current7DaysLabels: current7DaysLabels,
@@ -276,7 +281,6 @@ class StatsScreen extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    // 4. KATEGORİ DAĞILIM GRAFİĞİ
                     CategoryDistributionChart(
                       habits: habits,
                       cardColor: cardColor,
@@ -286,7 +290,6 @@ class StatsScreen extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    // 5. BAŞARIMLAR VE ROZETLER SEKSİYONU
                     BadgesSection(
                       habits: habits,
                       cardColor: cardColor,

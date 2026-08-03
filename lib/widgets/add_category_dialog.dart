@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class AddCategoryDialog extends StatefulWidget {
@@ -46,7 +47,6 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
     _selectedIconCodePoint = _availableIcons[0].codePoint;
   }
 
-  // ⚡ MEMORY LEAK ÖNLEYİCİ DISPOSE METODU
   @override
   void dispose() {
     _nameController.dispose();
@@ -56,7 +56,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Yeni Kategori Ekle'),
+      title: Text('add_new_category'.tr()),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -65,17 +65,17 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
             TextField(
               controller: _nameController,
               autofocus: true,
-              decoration: const InputDecoration(
-                hintText: 'Kategori Adı',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: 'category_name'.tr(),
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
 
-            // 🎨 RENK SEÇİMİ
-            const Text(
-              'Kategori Rengi:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            // 🎨 COLOR SELECTION
+            Text(
+              'category_color'.tr(),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
             SingleChildScrollView(
@@ -116,10 +116,9 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
             ),
             const SizedBox(height: 16),
 
-            // 🎭 İKON SEÇİMİ
-            const Text(
-              'İkon Seç:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            Text(
+              'select_icon'.tr(),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -163,7 +162,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('İptal'),
+          child: Text('cancel'.tr()),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -180,7 +179,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               Navigator.pop(context);
             }
           },
-          child: const Text('Ekle', style: TextStyle(color: Colors.white)),
+          child: Text('add'.tr(), style: const TextStyle(color: Colors.white)),
         ),
       ],
     );

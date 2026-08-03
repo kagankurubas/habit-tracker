@@ -1,22 +1,21 @@
 import 'dart:math';
+import 'package:easy_localization/easy_localization.dart';
 
 class MotivationService {
-  // 🛠️ Yanlışlıkla nesne üretilmesini engeller
   MotivationService._();
 
   static final Random _random = Random();
 
   static const List<String> _quotes = [
-    "Zinciri kırma, bugün de hedefine bir adım daha yaklaş!",
-    "Küçük adımlar, büyük zaferler getirir. Başlayalım mı?",
-    "Bugünün disiplini, yarının başarısıdır!",
-    "Harika gidiyorsun! Bugünkü rutinini tamamlamaya ne dersin?",
-    "Zaman akıp gidiyor ama sen hedefine odaklanmaya devam et!",
-    "Rutinlerine sahip çık, geleceğini inşa et!",
+    "quote_1",
+    "quote_2",
+    "quote_3",
+    "quote_4",
+    "quote_5",
+    "quote_6",
   ];
 
-  /// 🎲 Rastgele bir motivasyon sözü döndürür
   static String getRandomQuote() {
-    return _quotes[_random.nextInt(_quotes.length)];
+    return _quotes[_random.nextInt(_quotes.length)].tr();
   }
 }

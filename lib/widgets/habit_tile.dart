@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../models/habit.dart';
 import '../services/notification_service.dart';
 import '../services/theme_service.dart';
@@ -25,7 +26,6 @@ class HabitTile extends StatelessWidget {
     required this.onTap,
   });
 
-  // ⚡ TIKLAMA HAPTIK, SES VE VERİ GÜNCELLEME İŞLEMİ
   Future<void> _handleToggle(BuildContext context, Habit currentHabit) async {
     final now = DateTime.now();
     final todayNormalized = DateTime(now.year, now.month, now.day);
@@ -63,7 +63,7 @@ class HabitTile extends StatelessWidget {
     }
   }
 
-  // 🏆 ROZET KONTROLÜ VE SIRALI POP-UP GÖSTERİMİ
+  // 🏆 BADGE CONTROL AND SEQUENTIAL POP-UP DISPLAY
   void _checkBadgeUnlocked(BuildContext context) async {
     final int streak = habit.currentStreak;
     final int totalCompletions = habitsBox.values.fold(
@@ -85,45 +85,45 @@ class HabitTile extends StatelessWidget {
 
     if (totalCompletions == 1) {
       badges.add({
-        'title': 'İlk Adım',
-        'desc': 'İlk rutinini başarıyla tamamladın!',
+        'title': 'First Step'.tr(),
+        'desc': 'first_step_desc'.tr(),
         'imagePath': 'assets/badges/first_step.png',
         'color': const Color(0xFF10B981),
       });
     }
     if (isPerfectDay) {
       badges.add({
-        'title': 'Mükemmel Gün',
-        'desc': 'Bugünkü tüm hedefleri eksiksiz tamamladın!',
+        'title': 'Perfect Day'.tr(),
+        'desc': 'perfect_day_desc'.tr(),
         'imagePath': 'assets/badges/perfect_day.png',
         'color': const Color(0xFFF59E0B),
       });
     }
     if (streak == 3) {
       badges.add({
-        'title': 'Alev Alev',
-        'desc': '3 gün üst üste harika seri!',
+        'title': 'On Fire'.tr(),
+        'desc': 'on_fire_desc'.tr(),
         'imagePath': 'assets/badges/streak_3.png',
         'color': const Color(0xFF3B82F6),
       });
     } else if (streak == 7) {
       badges.add({
-        'title': 'İrade Ustası',
-        'desc': 'Aralıksız 1 hafta disiplin!',
+        'title': 'Willpower Master'.tr(),
+        'desc': 'willpower_master_desc'.tr(),
         'imagePath': 'assets/badges/streak_7.png',
         'color': const Color(0xFF8B5CF6),
       });
     } else if (streak == 30) {
       badges.add({
-        'title': 'Alışkanlık Canavarı',
-        'desc': 'Tam 30 günlük efsane seri!',
+        'title': 'habit_monster_title'.tr(),
+        'desc': 'habit_monster_desc'.tr(),
         'imagePath': 'assets/badges/completion_50.png',
         'color': const Color(0xFFEC4899),
       });
     } else if (totalCompletions == 50) {
       badges.add({
-        'title': 'Efsane',
-        'desc': 'Toplamda 50 kez tamamladın!',
+        'title': 'Legend'.tr(),
+        'desc': 'legend_desc'.tr(),
         'imagePath': 'assets/badges/completion_50.png',
         'color': const Color(0xFFF59E0B),
       });
@@ -309,7 +309,7 @@ class _TitleAndCategory extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
-            habit.category,
+            habit.category.tr(),
             style: TextStyle(fontSize: 9, color: subtextColor),
           ),
         ),
@@ -364,7 +364,7 @@ class _SubtitleProgress extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        'Son 30 Gün',
+                        'last_30_days'.tr(),
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 10, color: subtextColor),
                       ),

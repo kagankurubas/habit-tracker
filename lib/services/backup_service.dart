@@ -5,12 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:universal_html/html.dart' as html;
 import '../models/habit.dart';
 import '../models/category_model.dart';
 
 class BackupService {
-  // 📤 1. JSON OLARAK DIŞA AKTAR (WEB + MOBİL UYUMLU)
+  // 📤 1. EXPORT AS JSON (WEB + MOBILE COMPATIBLE)
   static Future<void> exportDataToJson(
     Box<Habit> habitsBox,
     Box<CategoryModel> categoriesBox,
@@ -50,7 +51,6 @@ class BackupService {
       final fileName =
           'habit_tracker_backup_${DateTime.now().millisecondsSinceEpoch}.json';
 
-      // 🌐 A) CHROME (WEB) İÇİN BROWSER DOWNLOAD
       if (kIsWeb) {
         final bytes = utf8.encode(jsonString);
         final blob = html.Blob([bytes], 'application/json');
@@ -64,7 +64,6 @@ class BackupService {
         return;
       }
 
-      // 📱 B) MOBİL / DESKTOP İÇİN SHARE EKRANI
       final tempDir = await getTemporaryDirectory();
       final filePath = '${tempDir.path}/$fileName';
       final file = File(filePath);
@@ -73,7 +72,7 @@ class BackupService {
       await SharePlus.instance.share(
         ShareParams(
           files: [XFile(filePath)],
-          text: 'Habitto Veri Yedeği (JSON)',
+          text: 'backup_file_share_text'.tr(),
         ),
       );
     } catch (e) {
@@ -84,7 +83,7 @@ class BackupService {
     }
   }
 
-  // 📥 2. JSON YEDEĞİNİ İÇE AKTAR (RESTORE)
+  // 📥 2. IMPORT JSON BACKUP (RESTORE)
   static Future<bool> importDataFromJson(
     Box<Habit> habitsBox,
     Box<CategoryModel> categoriesBox,
@@ -112,7 +111,6 @@ class BackupService {
         final Map<String, dynamic> data = jsonDecode(jsonString);
 
         if (data.containsKey('habits')) {
-          // 🏷️ KATEGORİLERİ İÇE AKTAR
           if (data.containsKey('categories')) {
             final List categoriesJson = data['categories'];
             for (final c in categoriesJson) {
@@ -125,7 +123,6 @@ class BackupService {
             }
           }
 
-          // 📝 HABIT'LERİ İÇE AKTAR
           final List habitsJson = data['habits'];
           for (final h in habitsJson) {
             final habit = Habit(
