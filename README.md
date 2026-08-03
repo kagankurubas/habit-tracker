@@ -507,7 +507,10 @@ git push origin feature/my-feature
 
 Please keep pull requests focused and make sure the GitHub Actions workflow passes before requesting a review.
 
-\n\n---\n\n<h2 id="türkçe">Türkçe</h2>
+
+---
+
+<h2 id="türkçe">Türkçe</h2>
 
 <p align="center">
   <strong>Alışkanlıklar inşa et. İvmeyi koru. Gelişimini gör.</strong>
@@ -987,7 +990,10 @@ git push origin feature/yeni-ozellik
 
 Lütfen çekme isteklerini (pull request) odaklı tutun ve inceleme istemeden önce GitHub Actions iş akışının başarılı olduğundan emin olun.
 
-\n\n---\n\n## License / Lisans
+
+---
+
+## License / Lisans
 
 This project is licensed under the [MIT License](LICENSE).
 
