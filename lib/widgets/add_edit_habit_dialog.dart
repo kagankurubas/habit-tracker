@@ -307,10 +307,22 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                   ),
                 ),
                 items: [
-                  DropdownMenuItem(value: 2, child: Text(context.tr('every_x_days', args: ['2']))),
-                  DropdownMenuItem(value: 3, child: Text(context.tr('every_x_days', args: ['3']))),
-                  DropdownMenuItem(value: 4, child: Text(context.tr('every_x_days', args: ['4']))),
-                  DropdownMenuItem(value: 5, child: Text(context.tr('every_x_days', args: ['5']))),
+                  DropdownMenuItem(
+                    value: 2,
+                    child: Text(context.tr('every_x_days', args: ['2'])),
+                  ),
+                  DropdownMenuItem(
+                    value: 3,
+                    child: Text(context.tr('every_x_days', args: ['3'])),
+                  ),
+                  DropdownMenuItem(
+                    value: 4,
+                    child: Text(context.tr('every_x_days', args: ['4'])),
+                  ),
+                  DropdownMenuItem(
+                    value: 5,
+                    child: Text(context.tr('every_x_days', args: ['5'])),
+                  ),
                 ],
                 onChanged: (val) {
                   if (val != null) {
@@ -462,9 +474,7 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                   if (_isNotificationEnabled && _selectedTime == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                          context.tr('reminder_time_required'),
-                        ),
+                        content: Text(context.tr('reminder_time_required')),
                       ),
                     );
                     return;
