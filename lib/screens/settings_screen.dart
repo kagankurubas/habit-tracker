@@ -427,8 +427,8 @@ class SettingsScreen extends StatelessWidget {
                       await NotificationService().showInstantTestNotification();
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Test bildirimi tetiklendi!'),
+                          SnackBar(
+                            content: Text(context.tr('test_notification_sent')),
                           ),
                         );
                       }

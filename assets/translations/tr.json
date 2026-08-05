@@ -251,5 +251,11 @@
   "reminder_time_value": "Saat: {}",
   "reminder_daily_desc": "Her gün bu saatte bildirim gönderilir",
   "select_button": "Seç",
-  "change": "Değiştir"
+  "change": "Değiştir",
+  "how_often": "Kaç günde bir yapılmalı?",
+  "which_days": "Hangi günlerde yapılacak?",
+  "every_x_days": "{} Günde Bir",
+  "reminder_time_required": "Bildirim için bir hatırlatma saati seçmelisin.",
+  "choose_bg_color": "Arka Plan Rengi Seç",
+  "test_notification_sent": "Test bildirimi tetiklendi!"
 }

@@ -57,14 +57,14 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
     Icons.self_improvement_rounded,
   ];
 
-  final Map<int, String> _daysMap = const {
-    1: 'Pzt',
-    2: 'Sal',
-    3: 'Çar',
-    4: 'Per',
-    5: 'Cum',
-    6: 'Cmt',
-    7: 'Paz',
+  Map<int, String> get _daysMap => {
+    1: context.tr('mon_short'),
+    2: context.tr('tue_short'),
+    3: context.tr('wed_short'),
+    4: context.tr('thu_short'),
+    5: context.tr('fri_short'),
+    6: context.tr('sat_short'),
+    7: context.tr('sun_short'),
   };
 
   @override
@@ -291,9 +291,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             const SizedBox(height: 12),
 
             if (_selectedFrequency == 3) ...[
-              const Text(
-                'Kaç günde bir yapılmalı?',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+              Text(
+                context.tr('how_often'),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(height: 6),
               DropdownButtonFormField<int>(
@@ -306,11 +306,11 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
                     vertical: 12,
                   ),
                 ),
-                items: const [
-                  DropdownMenuItem(value: 2, child: Text('2 Günde Bir')),
-                  DropdownMenuItem(value: 3, child: Text('3 Günde Bir')),
-                  DropdownMenuItem(value: 4, child: Text('4 Günde Bir')),
-                  DropdownMenuItem(value: 5, child: Text('5 Günde Bir')),
+                items: [
+                  DropdownMenuItem(value: 2, child: Text(context.tr('every_x_days', args: ['2']))),
+                  DropdownMenuItem(value: 3, child: Text(context.tr('every_x_days', args: ['3']))),
+                  DropdownMenuItem(value: 4, child: Text(context.tr('every_x_days', args: ['4']))),
+                  DropdownMenuItem(value: 5, child: Text(context.tr('every_x_days', args: ['5']))),
                 ],
                 onChanged: (val) {
                   if (val != null) {
@@ -323,9 +323,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
             ],
 
             if (_selectedFrequency == 4) ...[
-              const Text(
-                'Hangi günlerde yapılacak?',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+              Text(
+                context.tr('which_days'),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -461,9 +461,9 @@ class _AddEditHabitDialogState extends State<AddEditHabitDialog> {
               ? () {
                   if (_isNotificationEnabled && _selectedTime == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
-                          'Bildirim için bir hatırlatma saati seçmelisin.',
+                          context.tr('reminder_time_required'),
                         ),
                       ),
                     );

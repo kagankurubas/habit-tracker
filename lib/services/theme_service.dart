@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../app_themes.dart';
 
 class ThemeService {
@@ -46,9 +47,9 @@ class ThemeService {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Arka Plan Rengi Seç',
-                      style: TextStyle(
+                    Text(
+                      context.tr('choose_bg_color'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

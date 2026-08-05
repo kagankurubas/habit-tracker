@@ -251,5 +251,11 @@
   "reminder_time_value": "Time: {}",
   "reminder_daily_desc": "A notification will be sent every day at this time",
   "select_button": "Select",
-  "change": "Change"
+  "change": "Change",
+  "how_often": "How often should it be done?",
+  "which_days": "On which days?",
+  "every_x_days": "Every {} Days",
+  "reminder_time_required": "You must select a reminder time for notifications.",
+  "choose_bg_color": "Choose Background Color",
+  "test_notification_sent": "Test notification triggered!"
 }
